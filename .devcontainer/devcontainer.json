@@ -1,0 +1,14 @@
+{
+	"name": "TFG",
+	"image": "mcr.microsoft.com/devcontainers/base:debian",
+
+	"features": {
+		"ghcr.io/prulloac/devcontainer-features/latex:1": {}
+	},
+
+	"forwardPorts": [],
+
+	"postCreateCommand": "sudo bash .devcontainer/install-dependencies.sh",
+
+	"customizations": {}
+}
