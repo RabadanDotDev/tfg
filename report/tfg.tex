@@ -11,6 +11,7 @@
 \usepackage{xcolor}
 \usepackage{fancyhdr}
 \usepackage{fontspec}
+\usepackage[spanish,catalan,english]{babel}
 
 % Document style
 \usepackage[
@@ -38,9 +39,13 @@
 
 \include{front_pages/front_pages}
 
-\include{abstract/abstract_ca}
 \include{abstract/abstract_es}
+\begin{otherlanguage}{catalan}
+\include{abstract/abstract_ca}
+\end{otherlanguage}
+\begin{otherlanguage}{english}
 \include{abstract/abstract_en}
+\end{otherlanguage}
 
 \include{introduction/introduction}
 

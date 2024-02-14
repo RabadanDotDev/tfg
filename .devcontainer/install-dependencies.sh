@@ -4,3 +4,5 @@ apt install -y /tmp/ttf-mscorefonts-installer_3.7_all.deb
 fc-cache -f -v
 tlmgr install fontspec
 tlmgr install xcolor
+tlmgr install babel-spanish
+tlmgr install babel-catalan
