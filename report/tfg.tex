@@ -20,6 +20,7 @@
     bookmarksnumbered=true,
     hidelinks=true
 ]{hyperref}
+\usepackage[all]{hypcap}
 
 % Index generation
 \makeindex
@@ -57,6 +58,7 @@
 \setlength{\cftaftertoctitleskip}{0ex}%
 \renewcommand{\cfttoctitlefont}{\hfill\textbf}%
 \renewcommand{\cftaftertoctitle}{\hfill}%
+\addto\captionsspanish{\renewcommand{\contentsname}{ÍNDICE}}
 
 % Table of contents chapter
 \setlength{\cftbeforechapskip}{1em}%
@@ -88,7 +90,18 @@
 \renewcommand{\cftsubsubsecaftersnum}{. \space}%
 \renewcommand{\cftsubsubsecleader}{\hfill}%
 
-\addto\captionsspanish{\renewcommand{\contentsname}{ÍNDICE}}
+% List of figures title
+\setlength{\cftbeforeloftitleskip}{0ex}%
+\setlength{\cftafterloftitleskip}{0ex}%
+\renewcommand{\cftloftitlefont}{\hfill\textbf}%
+\renewcommand{\cftafterloftitle}{\hfill}%
+\addto\captionsspanish{\renewcommand{\listfigurename}{ÍNDICE DE FIGURAS}}
+
+% List of figures point
+\renewcommand{\cftfigleader}{\hfill}%
+\setlength{\cftfignumwidth}{5em}
+\renewcommand{\cftfigpresnum}{Figura~}
+\renewcommand{\cftfigaftersnum}{.}
 
 \begin{document}
 
@@ -105,6 +118,8 @@
 \selectlanguage{spanish}
 
 \tableofcontents
+\newpage
+\listoffigures
 
 \include{introduction/introduction}
 \include{test/test}
