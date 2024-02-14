@@ -6,3 +6,7 @@ tlmgr install fontspec
 tlmgr install xcolor
 tlmgr install babel-spanish
 tlmgr install babel-catalan
+tlmgr install xkeyval
+tlmgr install imakeidx
+tlmgr install tocloft
+tlmgr install etoolbox

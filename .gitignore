@@ -13,6 +13,11 @@
 **.cb2
 **.*.lb
 
+## imakeindex auxiliary files:
+**.idx
+**.ilg
+**.ind
+
 ## Intermediate documents
 **.dvi
 **.xdv

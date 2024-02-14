@@ -12,6 +12,17 @@
 \usepackage{fancyhdr}
 \usepackage{fontspec}
 \usepackage[spanish,catalan,english]{babel}
+\usepackage{tocloft}
+\usepackage{imakeidx}
+\usepackage[
+    hyperindex=true,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    hidelinks=true
+]{hyperref}
+
+% Index generation
+\makeindex
 
 % Document style
 \usepackage[
@@ -35,18 +46,71 @@
     \renewcommand{\headrulewidth}{0pt}
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Table of contents config                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tocloftpagestyle{empty}
+
+% Table of contents title
+\setlength{\cftbeforetoctitleskip}{0ex}%
+\setlength{\cftaftertoctitleskip}{0ex}%
+\renewcommand{\cfttoctitlefont}{\hfill\textbf}%
+\renewcommand{\cftaftertoctitle}{\hfill}%
+
+% Table of contents chapter
+\setlength{\cftbeforechapskip}{1em}%
+\setlength{\cftchapindent}{0em}%
+\renewcommand{\cftchapaftersnum}{. \space}%
+\renewcommand{\cftchapleader}{\hfill}%
+
+% Table of contents section
+\setlength{\cftbeforesecskip}{0.5em}%
+\setlength{\cftsecindent}{0em}%
+\renewcommand{\cftsecfont}{\bfseries\footnotesize}%
+\renewcommand{\cftsecpagefont}{\bfseries\footnotesize}%
+\renewcommand{\cftsecaftersnum}{. \space}%
+\renewcommand{\cftsecleader}{\hfill}%
+
+% Table of contents subsection
+\setlength{\cftbeforesubsecskip}{0.5em}%
+\setlength{\cftsubsecindent}{0em}%
+\renewcommand{\cftsubsecfont}{\bfseries\footnotesize}%
+\renewcommand{\cftsubsecpagefont}{\bfseries\footnotesize}%
+\renewcommand{\cftsubsecaftersnum}{. \space}%
+\renewcommand{\cftsubsecleader}{\hfill}%
+
+% Table of contents subsubsection
+\setlength{\cftbeforesubsubsecskip}{0.5em}%
+\setlength{\cftsubsubsecindent}{0em}%
+\renewcommand{\cftsubsubsecfont}{\bfseries\footnotesize}%
+\renewcommand{\cftsubsubsecpagefont}{\bfseries\footnotesize}%
+\renewcommand{\cftsubsubsecaftersnum}{. \space}%
+\renewcommand{\cftsubsubsecleader}{\hfill}%
+
+\addto\captionsspanish{\renewcommand{\contentsname}{ÍNDICE}}
+
 \begin{document}
 
+\selectlanguage{spanish}
 \include{front_pages/front_pages}
 
+\selectlanguage{spanish}
 \include{abstract/abstract_es}
-\begin{otherlanguage}{catalan}
+\selectlanguage{catalan}
 \include{abstract/abstract_ca}
-\end{otherlanguage}
-\begin{otherlanguage}{english}
+\selectlanguage{english}
 \include{abstract/abstract_en}
-\end{otherlanguage}
+
+\selectlanguage{spanish}
+
+\tableofcontents
 
 \include{introduction/introduction}
+\include{test/test}
+\include{conclusions/conclusions}
+\include{acknowledgements/acknowledgements}
+\include{bibliography/bibliography}
+\include{appendix/appendix}
 
 \end{document}
