@@ -12,3 +12,6 @@ tlmgr install tocloft
 tlmgr install etoolbox
 tlmgr install glossaries
 tlmgr install glossaries-spanish
+tlmgr install hyphen-spanish
+tlmgr install titlesec
+tlmgr install blindtext
