@@ -11,7 +11,7 @@
 \usepackage{xcolor}
 \usepackage{fancyhdr}
 \usepackage{fontspec}
-\usepackage[spanish,catalan,english]{babel}
+\usepackage[spanish,es-tabla,catalan,english]{babel}
 \usepackage{tocloft}
 \usepackage[
     hyperindex=true,
@@ -101,6 +101,19 @@
 \setlength{\cftfignumwidth}{5em}
 \renewcommand{\cftfigpresnum}{Figura~}
 \renewcommand{\cftfigaftersnum}{.}
+
+% List of tables title
+\setlength{\cftbeforelottitleskip}{0ex}%
+\setlength{\cftafterlottitleskip}{0ex}%
+\renewcommand{\cftlottitlefont}{\hfill\textbf}%
+\renewcommand{\cftafterlottitle}{\hfill}%
+\addto\captionsspanish{\renewcommand{\listtablename}{ÍNDICE DE TABLAS}}
+
+% List of tables point
+\renewcommand{\cfttableader}{\hfill}%
+\setlength{\cfttabnumwidth}{5em}
+\renewcommand{\cfttabpresnum}{Tabla~}
+\renewcommand{\cfttabaftersnum}{.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Glossary                                                                    %
