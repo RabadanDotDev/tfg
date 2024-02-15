@@ -13,19 +13,18 @@
 \usepackage{fontspec}
 \usepackage[spanish,catalan,english]{babel}
 \usepackage{tocloft}
-\usepackage{imakeidx}
 \usepackage[
     hyperindex=true,
     bookmarks=true,
     bookmarksnumbered=true,
-    hidelinks=true
+    hidelinks=true,
 ]{hyperref}
 \usepackage[all]{hypcap}
 
-% Index generation
-\makeindex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document style                                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Document style
 \usepackage[
     lmargin=3cm,
     rmargin=3cm,
@@ -48,7 +47,7 @@
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Table of contents config                                                    %
+% Table of contents style                                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \tocloftpagestyle{empty}
@@ -103,11 +102,41 @@
 \renewcommand{\cftfigpresnum}{Figura~}
 \renewcommand{\cftfigaftersnum}{.}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Glossary                                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Import
+\usepackage[acronym,automake,section=subsubsection]{glossaries}
+
+% Generation
+\makeglossaries
+
+% Contents
+\newglossaryentry{matrix}% the label
+{name={matrix},% the term
+ description={a rectangular table of elements},% brief description
+ plural={matrices}% the plural
+}
+
+\newacronym{svm}{SVM}{support vector machine}
+
+% Style
+
+\addto\captionsspanish{\renewcommand{\glossaryname}{TÉRMINOS}}
+\addto\captionsspanish{\renewcommand{\acronymname}{ACRÓNIMOS}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document                                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{document}
 
+% Front pages
 \selectlanguage{spanish}
 \include{front_pages/front_pages}
 
+% Abatracts
 \selectlanguage{spanish}
 \include{abstract/abstract_es}
 \selectlanguage{catalan}
@@ -115,12 +144,11 @@
 \selectlanguage{english}
 \include{abstract/abstract_en}
 
+% Indices
 \selectlanguage{spanish}
+\include{index_pages/index_pages}
 
-\tableofcontents
-\newpage
-\listoffigures
-
+% Contents
 \include{introduction/introduction}
 \include{test/test}
 \include{conclusions/conclusions}

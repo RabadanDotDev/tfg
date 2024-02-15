@@ -10,3 +10,5 @@ tlmgr install xkeyval
 tlmgr install imakeidx
 tlmgr install tocloft
 tlmgr install etoolbox
+tlmgr install glossaries
+tlmgr install glossaries-spanish
