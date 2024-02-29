@@ -4,14 +4,14 @@
 \phantomsection\addcontentsline{toc}{chapter}{INTRODUCCIÓN}
 \chapter*{INTRODUCCIÓN}
 
-La ciberseguridad es una de las fronteras del conocimiento que ha tomado más relevancia estos últimos años. Para salvaguardar la disponibilidad, integridad y confidencialidad de la información tanto almacenada como en tránsito, se aplican numerosas y diversas técnicas en conjunto. Desde medidas criptográficas para proteger la información hasta el análisis del tráfico de red para detectar comportamientos maliciosos y poder bloquearlos. El presente trabajo se focalizará en el último punto.
+La ciberseguridad es una de las fronteras del conocimiento que ha tomado más relevancia estos últimos años. Para salvaguardar la disponibilidad, integridad y confidencialidad de la información tanto almacenada como en tránsito, se aplican numerosas y diversas técnicas en conjunto. Desde medidas criptográficas para proteger la información hasta el análisis del tráfico de red para detectar comportamientos maliciosos y poder bloquearlos. El presente trabajo se focalizará principalmente en el último punto.
 
 \phantomsection\addcontentsline{toc}{section}{MOTIVACIÓN}
 \section*{MOTIVACIÓN}
 
-La motivación de este trabajo radica en mi interés por la aplicabilidad de los sistemas de \gls{ml} en entornos limitados o con requerimientos de actuación en tiempo real, especialmente en el ámbito de ciberseguridad en las redes. En muchos casos, los tráficos de red maliciosos son identificados cuando estos ya han ocurrido o están generando problemas activamente para el resto de usuarios de la red La hazaña intelectual que supondría la detección de ataques en su inicio o incluso antes de que ocurriesen es una meta en la que me gustaría colaborar. Llegar a este ideal es seguramente improbable. Sin embargo, tenerlo como horizonte para dirigir el camino y acercarse lo máximo posible a este, ofrece la capacidad de mejorar la mitigación contra posibles adversarios.
+La motivación del ámbito de este trabajo surge de una beca de colaboración con el grupo de investigación CRAAX y mi interés por la aplicabilidad de los sistemas de \gls{ml} en entornos limitados o con requerimientos de actuación en tiempo real, especialmente en el ámbito de ciberseguridad en las redes. En muchos casos, los tráficos de red maliciosos son identificados cuando estos ya han ocurrido o están generando problemas activamente para el resto de usuarios de la red. La gran utilidad que supondría la detección de ataques en su inicio o incluso antes de que ocurriesen es una meta en la que me gustaría colaborar. Llegar a este ideal es altamente difícil. Sin embargo, tenerlo como horizonte para dirigir el camino y acercarse lo máximo posible a este, ofrece la capacidad de mejorar la mitigación contra posibles adversarios.
 
-Existen diversas herramientas similares a la ideada para el trabajo, pero debido a su dificultad de uso, su naturaleza propietaria o su desalineación al uso específico que se le quiere dar, he querido desarrollar una alternativa.
+Durante la colaboración, he utilizado herramientas de extracción de características para la caracterización de flujos de red. Sin embargo, estas presentaban ciertas limitaciones e inconvenientes, los cuales me han impulsado a querer desarrollar una alternativa.
 
 \phantomsection\addcontentsline{toc}{section}{OBJETIVOS}
 \section*{OBJETIVOS}
@@ -20,7 +20,45 @@ El objetivo principal del trabajo consiste en diseñar, programar y demostrar la
 
 La utilidad de la herramienta se evaluará según su capacidad de adaptación a diferentes entornos de ejecución y diferentes tipos de tráfico de red. Esto es necesario, ya que, dependiendo de su rendimiento, podrá ser integrada en sistemas más generales y complejos.
 
+\phantomsection\addcontentsline{toc}{section}{PASOS PARA EL DESAROLLO}
+\section*{PASOS PARA EL DESAROLLO}
+
+\begin{itemize}
+  \item Anàlisis de las herramientas de extracción de características
+  \begin{itemize}
+    \item CICFlowmeter-V4.0 (java)
+    \item CICFlowmeter-V4.0 (python)
+    \item nProbe
+    \item Identificación de las posibles mejoras
+  \end{itemize}
+  \item Anàlisis de datasets a utilizar
+  \begin{itemize}
+    \item CICFlowmeter-V4.0 (java)
+    \item CICFlowmeter-V4.0 (python)
+    \item nProbe
+    \item Identificación de las posibles mejoras
+  \end{itemize}
+  \item Desarrollo de la herramienta
+  \begin{itemize}
+    \item Lectura del formato pcap
+    \item Lectura de paquetes en vivo
+    \item Extracción de campos de paquetes
+    \item Separación de paquetes en flujos
+    \item Computo de características de flujos
+    \item Exportación de las características de los flujos
+    \item Etiquetado de los flujos
+    \item Uso de la herramienta como libreria de python ?
+  \end{itemize}
+  \item Demostración del funcionamiento de la herramienta
+  \begin{itemize}
+    \item Generación de datos de entrenamiento con flujos terminados
+    \item Entrenamiento de algoritmos de ML con flujos terminados
+    \item Generación de datos de entrenamiento con flujos parciales ?
+    \item Entrenamiento de algoritmos de ML con flujos parciales ?
+  \end{itemize}
+\end{itemize}
+
 \phantomsection\addcontentsline{toc}{section}{METODOLOGÍA}
 \section*{METODOLOGÍA}
 
-(extreme programming, definir tests y metas etc)
+(por explicar)
