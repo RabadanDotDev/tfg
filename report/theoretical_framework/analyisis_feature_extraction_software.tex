@@ -2,9 +2,9 @@
 
 \subsection{CICFlowmeter}
 
-CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost}. Permite obtener información sobre flujos bidireccionales sobre IP, utilizen estos TCP o UDP. Por cada flujo, genera seis columnas identificativas y añade cierta información del flujo. En el Readme del codigo fuente ofrecido, podemos encontrar las características generades.
+CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost}. Permite obtener información sobre flujos bidireccionales sobre IP, utilizen estos TCP o UDP. Por cada flujo, genera seis columnas identificativas y añade cierta información del flujo. En el Readme del codigo fuente ofrecido, podemos encontrar las siguientes características generadas:
 
-\begin{itemize}
+\begin{enumerate}
     \item \textbf{Flow ID}: Combinación de las otras columnas separadas por giones
     \item \textbf{Src IP}: La dirección IP del remitente des de la cual se ha iniciado el flujo
     \item \textbf{Src Port}: La dirección IP del destinatario hacia la cual se ha dirigido el flujo
@@ -19,7 +19,7 @@ CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicf
     \item \textbf{Total Length of Bwd Packet}: Número completo de bytes recibidos des del destinatario
     \item \textbf{Fwd Packet Length Max}: Tamaño en bytes del paquete mas grande enviado hacia el destinatario
     \item \textbf{Fwd Packet Length Min}: Tamaño en bytes del paquete mas pequeño enviado hacia el destinatario
-    \item \textbf{Fwd Packet Length Mean}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el destinatario
+    \item \textbf{Fwd Packet Length Mean}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el destinatario. Es extraido de un objeto "SummaryStatistics" en el código
     \item \textbf{Fwd Packet Length Std}: Desviación estándard del tamaño en bytes de los paquetes enviados hacia el destinatario
     \item \textbf{Bwd Packet Length Max}: Tamaño en bytes del paquete mas grande enviado hacia el emisor
     \item \textbf{Bwd Packet Length Min}: Tamaño en bytes del paquete mas pequeño enviado hacia el emisor
@@ -49,23 +49,23 @@ CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicf
     \item \textbf{Bwd Header Length}: Número de paquetes con el flag PSH activado en la cabecera TCP hacia el receptor
     \item \textbf{Fwd Packets s}: Paquetes por segundo hacia el receptor
     \item \textbf{Bwd Packets s}: Paquetes por segundo hacia el emisor
-    \item \textbf{Packet Length Min}: todo
-    \item \textbf{Packet Length Max}: todo
-    \item \textbf{Packet Length Mean}: todo
-    \item \textbf{Packet Length Std}: todo
-    \item \textbf{Packet Length Variance}: todo
-    \item \textbf{FIN Flag Count}: todo
-    \item \textbf{SYN Flag Count}: todo
-    \item \textbf{RST Flag Count}: todo
-    \item \textbf{PSH Flag Count}: todo
-    \item \textbf{ACK Flag Count}: todo
-    \item \textbf{URG Flag Count}: todo
-    \item \textbf{CWR Flag Count}: todo
-    \item \textbf{ECE Flag Count}: todo
-    \item \textbf{Down Up Ratio}: todo
-    \item \textbf{Average Packet Size}: todo
-    \item \textbf{Fwd Segment Size.Avg}: todo
-    \item \textbf{Bwd Segment Size Avg}: todo
+    \item \textbf{Packet Length Min}: Longitud en bytes del paquete mas pequeño del flujo
+    \item \textbf{Packet Length Max}: Longitud en bytes del paquete mas grande del flujo
+    \item \textbf{Packet Length Mean}: Media aritmética del tamaño de los paquetes en bytes
+    \item \textbf{Packet Length Std}: Desviación estándard del tamaño de los paquetes en bytes
+    \item \textbf{Packet Length Variance}: Varianza del tamaño de los paquetes en bytes
+    \item \textbf{FIN Flag Count}: Número total de paquetes con el flag FIN activado en la cabecera TCP
+    \item \textbf{SYN Flag Count}: Número total de paquetes con el flag SYN activado en la cabecera TCP
+    \item \textbf{RST Flag Count}: Número total de paquetes con el flag RST activado en la cabecera TCP
+    \item \textbf{PSH Flag Count}: Número total de paquetes con el flag PSH activado en la cabecera TCP
+    \item \textbf{ACK Flag Count}: Número total de paquetes con el flag ACK activado en la cabecera TCP
+    \item \textbf{URG Flag Count}: Número total de paquetes con el flag URG activado en la cabecera TCP
+    \item \textbf{CWR Flag Count}: Número total de paquetes con el flag CWR activado en la cabecera TCP
+    \item \textbf{ECE Flag Count}: Número total de paquetes con el flag ECE activado en la cabecera TCP
+    \item \textbf{Down Up Ratio}: Ratio entre la descarga y la carga
+    \item \textbf{Average Packet Size}: Media aritmética del tamaño de los paquetes
+    \item \textbf{Fwd Segment Size Avg}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el destinatario. Es calculado haciendo la division de la suma de los tamaños total en SummaryStatistics con el numero de veces que se han acomulado valores en SummaryStatistics.
+    \item \textbf{Bwd Segment Size Avg}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el emisor. Es calculado haciendo la division de la suma de los tamaños total en SummaryStatistics con el numero de veces que se han acomulado valores en SummaryStatistics.
     \item \textbf{Fwd Bytes Bulk Avg}: todo
     \item \textbf{Fwd Packet Bulk Avg}: todo
     \item \textbf{Fwd Bulk Rate Avg}: todo
@@ -88,7 +88,7 @@ CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicf
     \item \textbf{Idle Std}: todo
     \item \textbf{Idle Max}: todo
     \item \textbf{Idle Min}: todo
-\end{itemize}
+\end{enumerate}
 
 \subsection{Wireshark}
 
