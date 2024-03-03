@@ -2,43 +2,48 @@
 
 \subsection{CICFlowmeter}
 
-CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost}. Permite obtener información sobre flujos bidireccionales sobre IP, utilizen estos TCP o UDP. Por cada flujo, genera seis columnas identificativas y añade cierta información del flujo. En el Readme del codigo fuente ofrecido, podemos encontrar las siguientes características generadas:
+CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost}. Permite obtener información sobre flujos bidireccionales sobre IP, utilizan estos TCP o UDP a partir de trazas de red en archivos con el formato pcap. Por cada flujo, genera seis columnas identificativas y añade cierta información del flujo. 
+
+\subsubsection{Features generadas}
+
+En el Readme del código fuente ofrecido, podemos encontrar las siguientes características generadas. Hay algunas que representan lo mismo, pero se obtienen de manera distinta como "Fwd Packet Length Mean" y "Fwd Segment Size Avg".
+
 
 \begin{enumerate}
     \item \textbf{Flow ID}: Combinación de las otras columnas separadas por giones
-    \item \textbf{Src IP}: La dirección IP del remitente des de la cual se ha iniciado el flujo
+    \item \textbf{Src IP}: La dirección IP del remitente desde la cual se ha iniciado el flujo
     \item \textbf{Src Port}: La dirección IP del destinatario hacia la cual se ha dirigido el flujo
     \item \textbf{Dst IP}: El puerto origen o de retorno del remitente
     \item \textbf{Dst Port}: El puerto destino del destinatario
-    \item \textbf{Protocol}: Identificador del protocolo sobre IP segun definido por IANA \cite{ipprotocolnumbers}
-    \item \textbf{Timestamp}: Momento del incio del flujo, expresado en dd/MM/yyyy hh:mm:ss de la zona horaria local. En la descripción se indica que 
+    \item \textbf{Protocol}: Identificador del protocolo sobre IP según definido por IANA \cite{ipprotocolnumbers}
+    \item \textbf{Timestamp}: Momento del inicio del flujo, expresado en dd/MM/yyyy hh:mm:ss de la zona horaria local. En la descripción se indica que 
     \item \textbf{Flow Duration}: Duracion del flujo, expresado en microsegundos
     \item \textbf{Total Fwd Packet}: Número total de paquetes hacia el destinatario
-    \item \textbf{Total Bwd packets}: Número total del paquetes hacia el receptor
+    \item \textbf{Total Bwd packets}: Número total de paquetes hacia el receptor
     \item \textbf{Total Length of Fwd Packet}: Número completo de bytes transmitidos hacia el destinatario
-    \item \textbf{Total Length of Bwd Packet}: Número completo de bytes recibidos des del destinatario
-    \item \textbf{Fwd Packet Length Max}: Tamaño en bytes del paquete mas grande enviado hacia el destinatario
-    \item \textbf{Fwd Packet Length Min}: Tamaño en bytes del paquete mas pequeño enviado hacia el destinatario
-    \item \textbf{Fwd Packet Length Mean}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el destinatario. Es extraido de un objeto "SummaryStatistics" en el código
-    \item \textbf{Fwd Packet Length Std}: Desviación estándard del tamaño en bytes de los paquetes enviados hacia el destinatario
-    \item \textbf{Bwd Packet Length Max}: Tamaño en bytes del paquete mas grande enviado hacia el emisor
-    \item \textbf{Bwd Packet Length Min}: Tamaño en bytes del paquete mas pequeño enviado hacia el emisor
+    \item \textbf{Total Length of Bwd Packet}: Número completo de bytes recibidos desde el destinatario
+    \item \textbf{Fwd Packet Length Max}: Tamaño en bytes del paquete más grande enviado hacia el destinatario
+    \item \textbf{Fwd Packet Length Min}: Tamaño en bytes del paquete más pequeño enviado hacia el destinatario
+    \item \textbf{Fwd Packet Length Mean}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el destinatario. Es extraído de un objeto "SummaryStatistics" en el código
+    \item \textbf{Fwd Packet Length Std}: Desviación estándar del tamaño en bytes de los paquetes enviados hacia el destinatario
+    \item \textbf{Bwd Packet Length Max}: Tamaño en bytes del paquete más grande enviado hacia el emisor
+    \item \textbf{Bwd Packet Length Min}: Tamaño en bytes del paquete más pequeño enviado hacia el emisor
     \item \textbf{Bwd Packet Length Mean}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el emisor
-    \item \textbf{Bwd Packet Length Std}: Desviación estándard del tamaño en bytes de los paquetes enviados hacia el emisor
+    \item \textbf{Bwd Packet Length Std}: Desviación estándar del tamaño en bytes de los paquetes enviados hacia el emisor
     \item \textbf{Flow Bytes s}: Bytes por segundo del flujo
     \item \textbf{Flow Packets s}: Paquetes por segundo del flujo
     \item \textbf{Flow IAT Mean}: Media aritmética del tiempo de llegada entre paquetes
-    \item \textbf{Flow IAT Std}: Desviación estándard del tiempo de llegada entre paquetes
+    \item \textbf{Flow IAT Std}: Desviación estándar del tiempo de llegada entre paquetes
     \item \textbf{Flow IAT Max}: Tiempo máximo de llegada entre paquetes
     \item \textbf{Flow IAT Min}: Tiempo mínimo de llegada entre paquetes
     \item \textbf{Fwd IAT Total}: Tiempo total entre la llegada de dos paquetes hacia el receptor
     \item \textbf{Fwd IAT Mean}: Media aritmética del tiempo de llegada entre paquetes hacia el receptor
-    \item \textbf{Fwd IAT Std}: Desviación estándard del tiempo de llegada entre paquetes hacia el receptor
+    \item \textbf{Fwd IAT Std}: Desviación estándar del tiempo de llegada entre paquetes hacia el receptor
     \item \textbf{Fwd IAT Max}: Tiempo máximo de llegada entre paquetes hacia el receptor
     \item \textbf{Fwd IAT Min}: Tiempo mínimo de llegada entre paquetes hacia el receptor
     \item \textbf{Bwd IAT Total}: Tiempo total entre la llegada de dos paquetes hacia el emisor
     \item \textbf{Bwd IAT Mean}: Media aritmética del tiempo de llegada entre paquetes hacia el emisor
-    \item \textbf{Bwd IAT Std}: Desviación estándard del tiempo de llegada entre paquetes hacia el emisor
+    \item \textbf{Bwd IAT Std}: Desviación estándar del tiempo de llegada entre paquetes hacia el emisor
     \item \textbf{Bwd IAT Max}: Tiempo máximo de llegada entre paquetes hacia el emisor
     \item \textbf{Bwd IAT Min}: Tiempo mínimo de llegada entre paquetes hacia el emisor
     \item \textbf{Fwd PSH Flags}: Número de paquetes con el flag PSH activado en la cabecera TCP hacia el emisor
@@ -49,10 +54,10 @@ CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicf
     \item \textbf{Bwd Header Length}: Número de paquetes con el flag PSH activado en la cabecera TCP hacia el receptor
     \item \textbf{Fwd Packets s}: Paquetes por segundo hacia el receptor
     \item \textbf{Bwd Packets s}: Paquetes por segundo hacia el emisor
-    \item \textbf{Packet Length Min}: Longitud en bytes del paquete mas pequeño del flujo
-    \item \textbf{Packet Length Max}: Longitud en bytes del paquete mas grande del flujo
+    \item \textbf{Packet Length Min}: Longitud en bytes del paquete más pequeño del flujo
+    \item \textbf{Packet Length Max}: Longitud en bytes del paquete más grande del flujo
     \item \textbf{Packet Length Mean}: Media aritmética del tamaño de los paquetes en bytes
-    \item \textbf{Packet Length Std}: Desviación estándard del tamaño de los paquetes en bytes
+    \item \textbf{Packet Length Std}: Desviación estándar del tamaño de los paquetes en bytes
     \item \textbf{Packet Length Variance}: Varianza del tamaño de los paquetes en bytes
     \item \textbf{FIN Flag Count}: Número total de paquetes con el flag FIN activado en la cabecera TCP
     \item \textbf{SYN Flag Count}: Número total de paquetes con el flag SYN activado en la cabecera TCP
@@ -64,31 +69,41 @@ CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicf
     \item \textbf{ECE Flag Count}: Número total de paquetes con el flag ECE activado en la cabecera TCP
     \item \textbf{Down Up Ratio}: Ratio entre la descarga y la carga
     \item \textbf{Average Packet Size}: Media aritmética del tamaño de los paquetes
-    \item \textbf{Fwd Segment Size Avg}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el destinatario. Es calculado haciendo la division de la suma de los tamaños total en SummaryStatistics con el numero de veces que se han acomulado valores en SummaryStatistics.
-    \item \textbf{Bwd Segment Size Avg}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el emisor. Es calculado haciendo la division de la suma de los tamaños total en SummaryStatistics con el numero de veces que se han acomulado valores en SummaryStatistics.
-    \item \textbf{Fwd Bytes Bulk Avg}: todo
-    \item \textbf{Fwd Packet Bulk Avg}: todo
-    \item \textbf{Fwd Bulk Rate Avg}: todo
-    \item \textbf{Bwd Bytes Bulk Avg}: todo
-    \item \textbf{Bwd Packet Bulk Avg}: todo
-    \item \textbf{Bwd Bulk Rate Avg}: todo
-    \item \textbf{Subflow Fwd Packets}: todo
-    \item \textbf{Subflow Fwd Bytes}: todo
-    \item \textbf{Subflow Bwd Packets}: todo
-    \item \textbf{Subflow Bwd Bytes}: todo
-    \item \textbf{FWD Init Win Bytes}: todo
-    \item \textbf{Bwd Init Win Bytes}: todo
-    \item \textbf{Fwd Act Data Pkts}: todo
-    \item \textbf{Fwd Seg Size Min}: todo
-    \item \textbf{Active Mean}: todo
-    \item \textbf{Active Std}: todo
-    \item \textbf{Active Max}: todo
-    \item \textbf{Active Min}: todo
-    \item \textbf{Idle Mean}: todo
-    \item \textbf{Idle Std}: todo
-    \item \textbf{Idle Max}: todo
-    \item \textbf{Idle Min}: todo
+    \item \textbf{Fwd Segment Size Avg}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el destinatario. Es calculado haciendo la división de la suma de los tamaños total en SummaryStatistics con el número de veces que se han acumulado valores en SummaryStatistics.
+    \item \textbf{Bwd Segment Size Avg}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el emisor. Es calculado haciendo la división de la suma de los tamaños total en SummaryStatistics con el número de veces que se han acumulado valores en SummaryStatistics.
+    \item \textbf{Fwd Bytes Bulk Avg}: Media aritmética del número de bytes en un grupo de paquetes sin tiempo de inactividad hacia el receptor
+    \item \textbf{Fwd Packet Bulk Avg}: Media aritmética del número de paquetes en un grupo de paquetes sin tiempo de inactividad hacia el receptor
+    \item \textbf{Fwd Bulk Rate Avg}: Ratio de número de bytes por segundo en un grupo de paquetes sin tiempo de inactividad hacia el receptor
+    \item \textbf{Bwd Bytes Bulk Avg}: Media aritmética del número de bytes en un grupo de paquetes sin tiempo de inactividad hacia el emisor
+    \item \textbf{Bwd Packet Bulk Avg}: Media aritmética del número de paquetes en un grupo de paquetes sin tiempo de inactividad hacia el emisor
+    \item \textbf{Bwd Bulk Rate Avg}: Ratio de número de bytes por segundo en un grupo de paquetes sin tiempo de inactividad hacia el emisor
+    \item \textbf{Subflow Fwd Packets}: Número de paquetes dividido por el número de "subflujos" (espacios de más de un segundo sin paquetes) hacia el receptor
+    \item \textbf{Subflow Fwd Bytes}: Número de bytes divididos por el número de "subflujos" (espacios de más de un segundo sin paquetes) hacia el receptor
+    \item \textbf{Subflow Bwd Packets}: Número de bytes dividido por el número de "subflujos" (espacios de más de un segundo sin paquetes) hacia el emisor
+    \item \textbf{Subflow Bwd Bytes}: Número de bytes dividido por el número de "subflujos" (espacios de más de un segundo sin paquetes) hacia el emisor
+    \item \textbf{FWD Init Win Bytes}: El número total de bytes enviados en la ventana TCP inicial hacia el receptor
+    \item \textbf{Bwd Init Win Bytes}: El número total de bytes enviados en la ventana TCP inicial hacia el emisor
+    \item \textbf{Fwd Act Data Pkts}: El número de paquetes con al menos un byte en el campo de datos de TCP hacia el receptor
+    \item \textbf{Fwd Seg Size Min}: El tamaño de segmento en bytes en la cabecera más pequeño observado hacia el receptor
+    \item \textbf{Active Mean}: La media aritmética del tiempo que el flujo se ha mantenido activo antes de pasar a estar inactivo
+    \item \textbf{Active Std}: La desviación estándar de tiempo que el flujo se ha mantenido activo antes de pasar a estar inactivo
+    \item \textbf{Active Max}: El tiempo máximo que el flujo se ha mantenido activo antes de pasar a estar inactivo
+    \item \textbf{Active Min}: El tiempo mínimo que el flujo se ha mantenido activo antes de pasar a estar inactivo
+    \item \textbf{Idle Mean}: La media aritmética del tiempo que el flujo se ha mantenido inactivo antes de pasar a estar activo
+    \item \textbf{Idle Std}: La desviación estándar de tiempo que el flujo se ha mantenido inactivo antes de pasar a estar activo
+    \item \textbf{Idle Max}: El tiempo máximo que el flujo se ha mantenido inactivo antes de pasar a estar activo
+    \item \textbf{Idle Min}: El tiempo mínimo que el flujo se ha mantenido inactivo antes de pasar a estar activo
 \end{enumerate}
+
+\subsubsection{Soporte de formatos}
+
+CICFlowMeter no soporta todos los posibles formatos que se pueden encontrar en un pcap. En caso de encontrar contenidos no soportados, estos son ignorados. Si accedemos al módulo que realiza la lectura de los paquetes (cic.cs.unb.ca.jnetpcap.PacketReader) podemos ver que hace uso de la librería jnetpcap. Para la capa de acceso a la red en la pila TCP/IP utiliza Ethernet, para la capa de red utiliza IP4 e IP6, para la de transporte utiliza TCP y UDP y finalmente añade un módulo de la capa de aplicación para poder entender datos de VPN. 
+
+Como veremos en INTRODUCIR REFERENCIA DATASET, necesitaríamos que tuviese soporte adicionalmente para DLT\_LINUX\_SLL. Este es un tipo especial de cabecera de nivel de acceso a la red para, entre otros, casos en los cuales se capturan trazas de diferentes orígenes.
+
+\subsubsection{Limitantes i mejoras}
+
+(por explicar)
 
 \subsection{Wireshark}
 
