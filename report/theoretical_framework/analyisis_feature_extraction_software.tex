@@ -2,7 +2,7 @@
 
 \subsection{CICFlowmeter}
 
-CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost}. Permite obtener información sobre flujos bidireccionales sobre IP, utilizan estos TCP o UDP a partir de trazas de red en archivos con el formato pcap. Por cada flujo, genera seis columnas identificativas y añade cierta información del flujo. 
+CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost} \cite{icissp17} \cite{cicflowrepo}. Permite obtener información sobre flujos bidireccionales sobre IP, utilizan estos TCP o UDP a partir de trazas de red en archivos con el formato pcap. Por cada flujo, genera seis columnas identificativas y añade cierta información del flujo. 
 
 \subsubsection{Features generadas}
 
@@ -103,7 +103,60 @@ Como veremos en INTRODUCIR REFERENCIA DATASET, necesitaríamos que tuviese sopor
 
 \subsubsection{Limitantes i mejoras}
 
-(por explicar)
+Se han observado tres puntos de mejora que la herramienta presenta, aparte de la falta de soporte para DLT\_LINUX\_SLL.
+
+El primero consiste en que, en el momento de realizar extracción de características a partir de trazas de red, se ha observado una segunda cabecera en partes impredecibles de los archivos csv. Después de revisar el código, la causa es debido a que en el módulo cic.cs.unb.ca.jnetpcap.FlowGenerator, en la función dumpLabeledFlowBasedFeatures, se escribe la cabecera dos veces, una después de generar el archivo y otra después de escribir todos los flujos completos. No hay ninguna indicación de por qué se ha realizado de esta manera, y la línea 282 del módulo, la cual escribe la cabecera por segunda vez, tiene una indentación de dos cuando el código alrededor tiene tres. La razón más probable es que sea un error no intencional.
+
+El segundo trata sobre la documentación del código y su calidad. La mayor parte de funciones, clases y módulos se encuentran sin documentación, hay bloques de código comentados (puestos en forma de comentario para que sean ignorados en el momento de ejecución), en muchas ocasiones la indentación es confusa y el estilo no parece ser uniforme. 
+
+El último se basa en el lenguaje utilizado. Como podemos ver en la Tabla \ref{table:languagebench}, en muchos entornos Java no es el lenguaje más óptimo en tareas que requieran cómputo. Los programas creados en java son entre 2 y 5 veces más lentos que los creados en nim, rust, d o zig. Además de también utilizar alrededor más de diez veces la cantidad de memoria en el pico.
+
+\begin{table}[]
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{|c c c c c c c c|} 
+            \hline
+            \textbf{lang} & \textbf{code} & \textbf{time} & \textbf{stddev} & \textbf{peak-mem} & \textbf{time(user)} & \textbf{time(sys)} & \textbf{compiler/runtime} \\
+            \hline\hline
+            zig     & 1.zig   & 247ms   & 1.0ms  & 4.2MB    & 237ms      & 0ms       & zig 0.12.0-dev.2341+92211135f \\
+            rust    & 9.rs    & 247ms   & 1.9ms  & 4.9MB    & 237ms      & 0ms       & rustc 1.77.0-nightly \\
+            rust    & 8.rs    & 296ms   & 1.9ms  & 4.9MB    & 287ms      & 0ms       & rustc 1.75.0 \\
+            d       & 1.d     & 322ms   & 1.3ms  & 7.4MB    & 310ms      & 0ms       & ldc2 1.36.0 \\
+            crystal & 1.cr    & 373ms   & 1.3ms  & 9.5MB    & 360ms      & 0ms       & crystal 1.11.2 \\
+            nim     & 1.nim   & 389ms   & 2.4ms  & 4.8MB    & 377ms      & 0ms       & nim/clang 2.0.2 \\
+            nim     & 1.nim   & 577ms   & 3.8ms  & 4.5MB    & 563ms      & 0ms       & nim 2.0.2 \\
+            csharp  & 2.cs    & 666ms   & 69ms 	 & 209.7MB  & 540ms      & 90ms      & dotnet 8.0.101 \\
+            wasm    & 8.rs    & 864ms   & 2.7ms  & 21.8MB   & 850ms      & 0ms       & wasmtime 17.0.0 \\
+            wasm    & 8.rs    & 1081ms  & 21ms 	 & 54.1MB   & 1067ms     & 13ms      & node 18.19.0 \\
+            java    & 1b.java & 1159ms  & 6.4ms  & 54.5MB   & 1263ms     & 30ms      & openjdk 21 \\
+            java    & 1b.java & 1160ms  & 10ms 	 & 54.8MB   & 1273ms     & 23ms      & openjdk 23 \\
+            java    & 1b.java & 1196ms  & 32ms 	 & 107.7MB  & 1377ms     & 40ms      & graal/jvm 17.0.8 \\
+            java    & 1.java  & 1255ms  & 1.2ms  & 131.4MB  & 1353ms     & 53ms      & graal/jvm 17.0.8 \\
+            java    & 1b.java & 1269ms  & 25ms 	 & 52.8MB   & 1257ms     & 137ms     & openjdk/zgc 21 \\
+            odin    & 1.odin  & 1571ms  & 1.6ms  & 4.6MB    & 1560ms     & 0ms       & odin 2024 \\
+            java    & 1a.java & 1650ms  & 5.1ms  & 54.9MB   & 1750ms     & 20ms      & openjdk 21 \\
+            java    & 1a.java & 1665ms  & 3.7ms  & 54.7MB   & 1760ms     & 17ms      & openjdk 23 \\
+            java    & 1a.java & 1686ms  & 18ms 	 & 103.8MB  & 1813ms     & 33ms      & graal/jvm 17.0.8 \\
+            java    & 1.java  & 1695ms  & 6.4ms  & 202.3MB  & 1747ms     & 60ms      & openjdk 23 \\
+            java    & 1.java  & 1697ms  & 4.4ms  & 258.0MB  & 1760ms     & 47ms      & openjdk 21 \\
+            java    & 1a.java & 1768ms  & 4.0ms  & 51.7MB   & 1740ms     & 143ms     & openjdk/zgc 21 \\
+            csharp  & 1.cs    & 2059ms  & 1.7ms  & 42.1MB   & 2023ms     & 10ms      & dotnet 8.0.101 \\
+            d       & 1.d     & 2117ms  & 11ms 	 & 9.0MB    & 2103ms     & 0ms       & dmd 2.106.1 \\
+            java    & 1.java  & 2356ms  & 6.1ms  & 864.1MB  & 1797ms     & 667ms     & openjdk/zgc 21 \\
+            csharp  & 3.cs    & 2491ms  & 24ms 	 & 42.5MB   & 2443ms     & 20ms      & dotnet 8.0.101 \\
+            csharp  & 3.cs    & 2491ms  & 7.0ms  & 22.6MB   & 2487ms     & 0ms       & dotnet/aot 8.0.101 \\
+            go      & 1.go    & 3215ms  & 5.5ms  & 7.3MB    & 3203ms     & 3ms       & go 1.21.6 \\
+            csharp  & 1.cs    & 3587ms  & 56ms 	 & 22.7MB   & 3583ms     & 0ms       & dotnet/aot 8.0.101 \\
+            go      & 1.go    & 4022ms  & 4.0ms  & 5.8MB    & 4013ms     & 0ms       & tinygo 0.30.0 \\
+            csharp  & 1.cs    & timeout & 0.0ms  & 25.1MB   & 4980ms     & 3ms       & mono 6.12.0 \\
+            java    & 2.java  & timeout & 0.0ms  & 662.0MB  & 5350ms     & 123ms     & openjdk 21 \\
+            java    & 2.java  & timeout & 0.0ms  & 718.8MB  & 5263ms     & 137ms     & openjdk 23 \\
+            java    & 2.java  & timeout & 0.0ms  & 3397.0MB & 3463ms     & 1890ms    & openjdk/zgc 21  \\
+            \hline
+        \end{tabular}
+    }
+    \caption{Tiempo de ejecución del computo del conjunto de Mandelbrot \cite{languagebench}}
+    \label{table:languagebench}
+\end{table}
 
 \subsection{Wireshark}
 
