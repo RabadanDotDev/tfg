@@ -160,35 +160,25 @@ El último se basa en el lenguaje utilizado. Como podemos ver en la Tabla \ref{t
 
 \subsection{TShark}
 
-TShark és un analizador de protocolos de red \cite{tsharkmanual}. Permite capturar datos de la red o leer paquetes de un archivo de captura. Así como Wireshark \cite{wsharkmanual}, es capaz de leer una gran cantidad de formatos y protocolos. Además, a partir de una captura finalizada, puede calcular estadísticas sobre el tráfico capturado a través del paràmetro "-z". Hay muchas opciones de generación de estadísticas, algunas que podrian ser relevantes son:
+TShark es un analizador de protocolos de red \cite{tsharkmanual}. Permite capturar datos de la red o leer paquetes de un archivo de captura. Así como Wireshark \cite{wsharkmanual}, es capaz de leer una gran cantidad de formatos y protocolos. Además, a partir de una captura finalizada, puede calcular estadísticas sobre el tráfico capturado a través del parámetro "-z". Hay muchas opciones de generación de estadísticas, algunas que podrían ser relevantes son:
 
 \begin{enumerate} 
-    \item \textbf{-z conv,type[,filter]}: 
-    \item \textbf{-z dests,tree[,filter]}: 
-    \item \textbf{-z endpoints,type[,filter]}: 
-    \item \textbf{-z expert[,error|,warn|,note|,chat|,comment][,filter]}:  
-    \item \textbf{-z flow,name,mode[,filter]}: 
-    \item \textbf{-z follow,prot,mode,filter[,range]}: 
-    \item \textbf{-z hosts[,ip][,ipv4][,ipv6]}: 
-    \item \textbf{-z icmp,srt[,filter]}: 
-    \item \textbf{-z icmpv6,srt[,filter]}: 
-    \item \textbf{-z io,phs[,filter]}: 
-    \item \textbf{-z io,stat,interval[,filter][,filter][,filter]…​}: 
-    \item \textbf{-z io,stat,interval,"COUNT|SUM|MIN|MAX|AVG|LOAD(field)filter"}: 
-    \item \textbf{-z ip\_hosts,tree[,filter]}: 
-    \item \textbf{-z ip\_srcdst,tree[,filter]}: 
-    \item \textbf{-z ip\_ttl,tree[,filter]}: 
-    \item \textbf{-z ip6\_dests,tree[,filter]}: 
-    \item \textbf{-z ip6\_hosts,tree[,filter]}: 
-    \item \textbf{-z ip6\_ptype,tree[,filter]}: 
-    \item \textbf{-z ip6\_srcdst,tree[,filter]}: 
-    \item \textbf{-z ip6\_hop,tree[,filter]}: 
-    \item \textbf{-z plen,tree[,filter]}: 
-    \item \textbf{-z proto,colinfo,filter,field}: 
-    \item \textbf{-z ptype,tree[,filter]}:   
+    \item \textbf{-z conv,type[,filter]}: Genera una tabla que lista todas las conversaciones que se han detectado en la captura. "type" indica el tipo de conversación, la cual puede ser tanto por direcciones de acceso a la red (Bluetooth, Ethernet, ...) como de red o transporte (ip, tcp, udp, ...). Cada conversación es mostrada en una fila de la tabla, la cual muestra, en número de tramas/bytes transmitidos en cada dirección, en número total, el tiempo relativo de inicio y la duración.
+    \item \textbf{-z dests,tree[,filter]}: Genera estadísticas por direcciones ipv4, transporte tcp/udp y/o puerto asociado. Da información del número de transmisiones por cada uno y la cadencia
+    \item \textbf{-z endpoints,type[,filter]}: Genera una tabla por cada dirección del tipo seleccionado con información sobre el número de paquetes y bytes totales, recibidos y enviados.
+    \item \textbf{-z flow,name,mode[,filter]}: Muestra un diagrama de los flujos de datos en ASCII
+    \item \textbf{-z icmp,srt[,filter]}: Muestra información sobre peticiones, respuestas, perdidas y latencias de peticiones ICMP eco
+    \item \textbf{-z io,phs[,filter]}: Muestra un árbol con los protocolos utilizados y la cantidad respectiva de tramas/bytes que los lleva.
+    \item \textbf{-z io,stat,interval[,filter][,filter][,filter]…​}: Muestra, por cada incremento del intervalo especificado, el número de tramas y bytes. 
+    \item \textbf{-z io,stat,interval,"COUNT|SUM|MIN|MAX|AVG|LOAD(field)filter"}: Permite generar el número, suma, mínimo, máximo, media o proporción de cada campo en el intervalo especificado. Adicionalmente, se puede pedir el número de tramas y bytes como en la opción anterior con "FRAMES()" o "BYTES()"
+    \item \textbf{-z ip\_hosts,tree[,filter]}: Genera información como con dests, pero solo de direcciones IPv4.
+    \item \textbf{-z ip\_srcdst,tree[,filter]}: Genera información como con ip\_hosts, pero diferenciando direcciones IP de origen y de destino.
+    \item \textbf{-z plen,tree[,filter]}: Genera estadísticas sobre los tamaños de los paquetes. Por cada grupo, se indica el número, el tamaño medio, el valor mínimo, el valor máximo y la cadencia
+    \item \textbf{-z proto,colinfo,filter,field}: Utilizado para mostrar por el canal estándard información adicional sobre los campos de cada paquete
+    \item \textbf{-z ptype,tree[,filter]}: Genera estadísticas sobre los protocolos utilizados en paquetes IPv4
 \end{enumerate}
 
-Pese a esto, el programa no esta diseñado para la generación de estadísticas en tiempo real. Su principal objectivo es el de permitir a un operador de una red o desarolladores de aplicaciones ver lo que esta ocurriendo en la red con facilidad. La documentación del programa és util para poder tener mayor información de los protocolos de red, pero el programa no esta pensado para el proposito de generar estadísticas de los flujos en tiempo real \cite{wiresharkrealtimestats}.
+Pese a esto, el programa no está diseñado para la generación de estadísticas en tiempo real. Su principal objetivo es el de permitir a un operador de una red o desarrolladores de aplicaciones ver lo que está ocurriendo en la red con facilidad. La documentación del programa es útil para poder tener mayor información de lo que está ocurriendo en un momento dado de la red, pero el programa no está pensado para el propósito de generar estadísticas de los flujos en tiempo real \cite{wiresharkrealtimestats}. Lo podemos ver en el hecho de que las estadísticas se proporcionen al final, como resumen, y no se generen en cuanto los datos se encuentran disponibles.
 
 \subsection{Zeek}
 
