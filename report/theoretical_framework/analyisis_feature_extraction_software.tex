@@ -158,9 +158,119 @@ El último se basa en el lenguaje utilizado. Como podemos ver en la Tabla \ref{t
     \label{table:languagebench}
 \end{table}
 
-\subsection{Wireshark}
+\subsection{TShark}
 
-a
+TShark és un analizador de protocolos de red \cite{tsharkmanual}. Permite capturar datos de la red o leer paquetes de un archivo de captura. Así como Wireshark \cite{wsharkmanual}, es capaz de leer una gran cantidad de formatos y protocolos. Además, a partir de una captura finalizada, puede calcular estadísticas sobre el tráfico capturado a través del paràmetro "-z". Hay muchas opciones de generación de estadísticas, algunas que podrian ser relevantes son:
+
+\begin{enumerate}
+    \item \textbf{-z afp,srt[,filter]}: 
+    \item \textbf{-z ancp,tree[,filter]}: 
+    \item \textbf{-z ansi\_a,bsmap[,filter]}: 
+    \item \textbf{-z ansi\_a,dtap[,filter]}: 
+    \item \textbf{-z ansi\_map[,filter]}: 
+    \item \textbf{-z asap,stat[,filter]}: 
+    \item \textbf{-z bacapp\_instanceid,tree[,filter]}: 
+    \item \textbf{-z bacapp\_ip,tree[,filter]}: 
+    \item \textbf{-z bacapp\_objectid,tree[,filter]}: 
+    \item \textbf{-z bacapp\_service,tree[,filter]}: 
+    \item \textbf{-z calcappprotocol,stat[,filter]}: 
+    \item \textbf{-z camel,counter[,filter]}: 
+    \item \textbf{-z camel,srt[,filter]}: 
+    \item \textbf{-z collectd,tree[,filter]}: 
+    \item \textbf{-z componentstatusprotocol,stat[,filter]}: 
+    \item \textbf{-z conv,type[,filter]}: 
+    \item \textbf{-z credentials}: 
+    \item \textbf{-z dcerpc,srt,uuid,major.minor[,filter]}: 
+    \item \textbf{-z dests,tree[,filter]}: 
+    \item \textbf{-z dhcp,stat[,filter]}: 
+    \item \textbf{-z diameter,avp[,cmd.code,field,field,…​]}: 
+    \item \textbf{-z diameter,srt[,filter]}: 
+    \item \textbf{-z dns,tree[,filter]}: 
+    \item \textbf{-z endpoints,type[,filter]}: 
+    \item \textbf{-z enrp,stat[,filter]}: 
+    \item \textbf{-z expert[,error|,warn|,note|,chat|,comment][,filter]}: 
+    \item \textbf{-z f1ap,tree[,filter]}: 
+    \item \textbf{-z f5\_tmm\_dist,tree[,filter]}: 
+    \item \textbf{-z f5\_virt\_dist,tree[,filter]}: 
+    \item \textbf{-z fc,srt[,filter]}: 
+    \item \textbf{-z flow,name,mode[,filter]}: 
+    \item \textbf{-z follow,prot,mode,filter[,range]}: 
+    \item \textbf{-z fractalgeneratorprotocol,stat[,filter]}: 
+    \item \textbf{-z gsm\_a}: 
+    \item \textbf{-z gsm\_a,category[,filter]}: 
+    \item \textbf{-z gsm\_map,operation[,filter]}: 
+    \item \textbf{-z gtp,srt[,filter]}: 
+    \item \textbf{-z gtpv2,srt[,filter]}: 
+    \item \textbf{-z h225,counter[,filter]}: 
+    \item \textbf{-z h225\_ras,rtd[,filter]}: 
+    \item \textbf{-z hart\_ip,tree[,filter]}: 
+    \item \textbf{-z hosts[,ip][,ipv4][,ipv6]}: 
+    \item \textbf{-z hpfeeds,tree[,filter]}: 
+    \item \textbf{-z http,stat[,filter]}: 
+    \item \textbf{-z http,tree[,filter]}: 
+    \item \textbf{-z http\_req,tree[,filter]}: 
+    \item \textbf{-z http\_seq,tree[,filter]}: 
+    \item \textbf{-z http\_srv,tree[,filter]}: 
+    \item \textbf{-z http2,tree[,filter]}: 
+    \item \textbf{-z icmp,srt[,filter]}: 
+    \item \textbf{-z icmpv6,srt[,filter]}: 
+    \item \textbf{-z io,phs[,filter]}: 
+    \item \textbf{-z io,stat,interval[,filter][,filter][,filter]…​}: 
+    \item \textbf{-z io,stat,interval,"COUNT|SUM|MIN|MAX|AVG|LOAD(field)filter"}: 
+    \item \textbf{-z ip\_hosts,tree[,filter]}: 
+    \item \textbf{-z ip\_srcdst,tree[,filter]}: 
+    \item \textbf{-z ip\_ttl,tree[,filter]}: 
+    \item \textbf{-z ip6\_dests,tree[,filter]}: 
+    \item \textbf{-z ip6\_hosts,tree[,filter]}: 
+    \item \textbf{-z ip6\_ptype,tree[,filter]}: 
+    \item \textbf{-z ip6\_srcdst,tree[,filter]}: 
+    \item \textbf{-z ip6\_hop,tree[,filter]}: 
+    \item \textbf{-z isup\_msg,tree[,filter]}: 
+    \item \textbf{-z lbmr\_queue\_ads\_queue,tree[,filter]}: 
+    \item \textbf{-z lbmr\_queue\_ads\_source,tree[,filter]}: 
+    \item \textbf{-z lbmr\_queue\_queries\_queue,tree[,filter]}: 
+    \item \textbf{-z lbmr\_queue\_queries\_receiver,tree[,filter]}: 
+    \item \textbf{-z lbmr\_topic\_ads\_source,tree[,filter]}: 
+    \item \textbf{-z lbmr\_topic\_ads\_topic,tree[,filter]}: 
+    \item \textbf{-z lbmr\_topic\_ads\_transport,tree[,filter]}: 
+    \item \textbf{-z lbmr\_topic\_queries\_pattern,tree[,filter]}: 
+    \item \textbf{-z lbmr\_topic\_queries\_pattern\_receiver,tree[,filter]}: 
+    \item \textbf{-z lbmr\_topic\_queries\_receiver,tree[,filter]}: 
+    \item \textbf{-z lbmr\_topic\_queries\_topic,tree[,filter]}: 
+    \item \textbf{-z mac-lte,stat[,filter]}: 
+    \item \textbf{-z megaco,rtd[,filter]}: 
+    \item \textbf{-z mgcp,rtd[,filter]}: 
+    \item \textbf{-z mtp3,msus[,filter]}: 
+    \item \textbf{-z ncp,srt[,filter]}: 
+    \item \textbf{-z osmux,tree[,filter]}: 
+    \item \textbf{-z pingpongprotocol,stat[,filter]}: 
+    \item \textbf{-z plen,tree[,filter]}: 
+    \item \textbf{-z proto,colinfo,filter,field}: 
+    \item \textbf{-z ptype,tree[,filter]}: 
+    \item \textbf{-z radius,rtd[,filter]}: 
+    \item \textbf{-z rlc-lte,stat[,filter]}: 
+    \item \textbf{-z rpc,programs}: 
+    \item \textbf{-z rpc,srt,program,version[,filter]}: 
+    \item \textbf{-z rtp,streams}: 
+    \item \textbf{-z rtsp,stat[,filter]}: 
+    \item \textbf{-z rtsp,tree[,filter]}: 
+    \item \textbf{-z sametime,tree[,filter]}: 
+    \item \textbf{-z scsi,srt,cmdset[,filter]}: 
+    \item \textbf{-z sctp,stat}: 
+    \item \textbf{-z sip,stat[,filter]}: 
+    \item \textbf{-z smb,sids}: 
+    \item \textbf{-z smb,srt[,filter]}: 
+    \item \textbf{-z smb2,srt[,filter]}: 
+    \item \textbf{-z smpp\_commands,tree[,filter]}: 
+    \item \textbf{-z snmp,srt[,filter]}: 
+    \item \textbf{-z someip\_messages,tree[,filter]}: 
+    \item \textbf{-z someipsd\_entries,tree[,filter]}: 
+    \item \textbf{-z sv}: 
+    \item \textbf{-z ucp\_messages,tree[,filter]}: 
+    \item \textbf{-z wsp,stat[,filter]}: 
+\end{enumerate}
+
+Pese a esto, el programa no esta diseñado para la generación de estadísticas en tiempo real. Su principal objectivo es el de permitir a un operador de una red o desarolladores de aplicaciones ver lo que esta ocurriendo en la red con facilidad. La documentación del programa és util para poder tener mayor información de los protocolos de red, pero el programa no esta pensado para el proposito de generar estadísticas de los flujos en tiempo real \cite{wiresharkrealtimestats}.
 
 \subsection{Zeek}
 
