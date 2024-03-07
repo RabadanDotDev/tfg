@@ -1,4 +1,4 @@
-\section{Anàlisis herramientas de extracción de características}
+\section{Análisis herramientas de extracción de características}
 
 \subsection{CICFlowmeter}
 
@@ -190,6 +190,58 @@ Adicionalmente, existe un proyecto llamado Zeek FlowMeter el cual generara las m
 
 Según la investigación realizada, no parece existir una manera oficial para utilizar Zeek como una librería dentro de otro programa o hacer uso de memoria compartida. El software está diseñado para ser ejecutado de manera independiente y compartir información con otros a través de diferentes tipos de archivos de registros \cite{zeek_documentation_logging} y conexiones utilizando la red \cite{zeek_documentation_logwriters}. De esta manera, para hacer uso de los registros generados en algoritmos de \gls{ml}, es necesario pasar por varias capas de traducción en vez de generar directamente los datos en el formato necesario.
 
-\subsection{nprobe}
+\subsection{nProbe}
 
-a
+nProbe es un analizador de tráfico de red capaz de generar y recolectar flujos NetFlow y exportarlos a otros sistemas que agrupan estadísticas de estos como ntopng u otros \cite{nprobe_documentation}. Según la documentación, es capaz de analizar redes de varios gigabits sin provocar pérdidas o pérdidas muy moderadas en ciertos casos. A diferencia del resto de herramientas, el código fuente de nProbe no se encuentra públicamente disponible. Esto es debido a que, según los autores, hubo personas que hicieron un mal uso de este. 
+
+La cantidad de características que nProbe es capaz generar sin necesidad de plug-ins adicionales es relativamente extensa. Existen una propuesta de hacer uso de unas características específicas de forma estándar para poder comparar diferentes algoritmos de \gls{ml} \cite{DBLP:journals/corr/abs-2101-11315}. Las características por cada flujo en cuestión son:
+
+\begin{enumerate}
+    \item \textbf{IPV4\_SRC\_ADDR}: La dirección IPv4 de origen
+    \item \textbf{IPV4\_DST\_ADDR}: La dirección IPv4 de destino
+    \item \textbf{L4\_SRC\_PORT}: El puerto IPv4 de origen
+    \item \textbf{L4\_DST\_PORT}: El puerto IPv4 de destino
+    \item \textbf{PROTOCOL}: El identificador de protocolo IP según IANA \cite{ipprotocolnumbers}
+    \item \textbf{L7\_PROTO}: El protocolo de aplicación expresado en el formato AAA.BBB, siendo AAA el identificador del principal y BBB el del secundario. Los números vienen definidos según la documentación de nProbe \cite{nprobe_documentation_proto_app}
+    \item \textbf{IN\_BYTES}: El número de bytes enviados hacia el receptor
+    \item \textbf{OUT\_BYTES}: El número de bytes enviados hacia el emisor
+    \item \textbf{IN\_PKTS}: El número de paquetes enviados hacia el receptor
+    \item \textbf{OUT\_PKTS}: El número de paquetes enviados hacia el emisor
+    \item \textbf{FLOW\_DURATION\_MILLISECONDS}: La duración del flujo en milisegundos
+    \item \textbf{TCP\_FLAGS}: Los indicadores (ACK, PSH, etc.) vistos en la cabecera de todos los paquetes en el flujo TCP en ambas direcciones expresadas como un mapa de bits. Si en la representación binaria del valor hay un 1 en la posición respectiva, se ha visto. En caso contrario, no se ha detectado un paquete con el indicador activo.
+    \item \textbf{CLIENT\_TCP\_FLAGS}: TCP\_FLAGS, pero solo en la dirección del receptor
+    \item \textbf{SERVER\_TCP\_FLAGS}: TCP\_FLAGS, pero solo en la dirección del emisor
+    \item \textbf{DURATION\_IN}: Duración del flujo hacia el receptor en milisegundos
+    \item \textbf{DURATION\_OUT}: Duración del flujo hacia el emisor en milisegundos
+    \item \textbf{MIN\_TTL}: TTL máximo observado en cabeceras IP en el flujo
+    \item \textbf{MAX\_TTL}: TTL mínimo observado en cabeceras IP en el flujo
+    \item \textbf{LONGEST\_FLOW\_PKT}: Tamaño en bytes del paquete más grande del flujo
+    \item \textbf{SHORTEST\_FLOW\_PKT}: Tamaño en bytes del paquete más pequeño del flujo
+    \item \textbf{MIN\_IP\_PKT\_LEN}: Indicador de longitud más pequeño observado en la cabecera IPdel flujo
+    \item \textbf{MAX\_IP\_PKT\_LEN}: Indicador de longitud más grande observado en la cabecera IP del flujo
+    \item \textbf{SRC\_TO\_DST\_SECOND\_BYTES}: Bytes por segundo transmitidos desde el emisor al receptor
+    \item \textbf{DST\_TO\_SRC\_SECOND\_BYTES}: Bytes por segundo transmitidos desde el receptor al emisor
+    \item \textbf{RETRANSMITTED\_IN\_BYTES}: Bytes retransmitidos hacia el receptor
+    \item \textbf{RETRANSMITTED\_IN\_PKTS}: Paquetes retransmitidos hacia el emisor
+    \item \textbf{RETRANSMITTED\_OUT\_BYTES}: Bytes retransmitidos hacia el receptor
+    \item \textbf{RETRANSMITTED\_OUT\_PKTS}: Paquetes retransmitidos hacia el emisor
+    \item \textbf{SRC\_TO\_DST\_AVG\_THROUGHPUT}: Bits por segundo transmitidos desde el emisor al receptor
+    \item \textbf{DST\_TO\_SRC\_AVG\_THROUGHPUT}: Bits por segundo transmitidos desde el receptor al emisor
+    \item \textbf{NUM\_PKTS\_UP\_TO\_128\_BYTES}: Número de paquetes los cuales el tamaño a nivel IP es inferior o igual a 128 del flujo
+    \item \textbf{NUM\_PKTS\_128\_TO\_256\_BYTES}: Número de paquetes los cuales el tamaño a nivel IP es superior a 128 e inferior o igual a 256 del flujo
+    \item \textbf{NUM\_PKTS\_256\_TO\_512\_BYTES}: Número de paquetes los cuales el tamaño a nivel IP es superior a 256 e inferior o igual a 512 del flujo
+    \item \textbf{NUM\_PKTS\_512\_TO\_1024\_BYTES}: Número de paquetes los cuales el tamaño a nivel IP es superior a 512 e inferior o igual a 1024 del flujo
+    \item \textbf{NUM\_PKTS\_1024\_TO\_1514\_BYTES}: Número de paquetes los cuales el tamaño a nivel IP es superior a 1024 e inferior o igual a 1514 del flujo
+    \item \textbf{TCP\_WIN\_MAX\_IN}: Ventana máxima TCP observada del emisor al receptor
+    \item \textbf{TCP\_WIN\_MAX\_OUT}: Ventana máxima TCP observada del receptor al emisor
+    \item \textbf{ICMP\_TYPE}: Representación numérica del tipo ICMP * 256 + representación numerica del codigo ICMP, si aplica
+    \item \textbf{ICMP\_IPV4\_TYPE}: Representación numérica del tipo ICMP, si aplica.
+    \item \textbf{DNS\_QUERY\_ID}: Identificador numérico de la transacción de la petición DNS, si aplica
+    \item \textbf{DNS\_QUERY\_TYPE}: Representación numérica del tipo de la petición DNS, si aplica
+    \item \textbf{DNS\_TTL\_ANSWER}: TTL del primer registro A de la respuesta del DNS, si aplica
+    \item \textbf{FTP\_COMMAND\_RET\_CODE}: Código de respuesta del comando FTP, si aplica
+\end{enumerate}
+
+Como podemos ver, algunas características propuestas no son independientes, algunas están expresadas en diferentes unidades, pero son en esencia el mismo valor e incluso algunas son potencialmente iguales. El motivo específico por el cual se han escogido estas y no otras no está explicado en la fuente.
+
+nProbe, como Zeek, tiene soporte para extender su funcionamiento a través de scripts y exportar los flujos resultantes a Kafka y archivos. Además, no parece tampoco tener soporte para su uso como librería, sino que interactúa con otros programas a través de la red o archivos de registros si se configura de tal manera.
