@@ -182,16 +182,14 @@ Pese a esto, el programa no está diseñado para la generación de estadísticas
 
 \subsection{Zeek}
 
-a
+Zeek es un analizador de tráfico de red pasivo, de código abierto \cite{zeek_documentation}. Según la documentación, muchos operadores utilizan Zeek como herramienta de monitorización de la seguridad de la red. Es capaz de generar información comprensiva de todas las conexiones detectadas y de incluir metadatos de la actividad de la capa de aplicación. Ejemplos mostrados consisten en peticiones relativas a sesiones HTTP, DNS, entre otros. Además, Zeek es capaz de exportar estos datos a archivos JSON o tabulares para el postproceso de software externo o incluso escribir a bases de datos directamente. 
 
-\subsection{ntopng}
+Otras ventajas de Zeek consisten en su capacidad de ser fácilmente escalable para tratar tráfico de alto ancho de banda y la posibilidad de personalizar su funcionamiento a través de un lenguaje específico desarrollado para este. De esta manera, Zeek aparte de soportar la detección de intrusiones a través de firmas, es capaz de ofrecer detección de anomalías y análisis de comportamiento.
 
-a
+Adicionalmente, existe un proyecto llamado Zeek FlowMeter el cual generara las mismas características que CICFlowMeter, pero a través de un script en Zeek \cite{zeek_flowmeter}. El código es interpretado, pero una de las mejoras propuestas en el repositorio es compilar parte de este para acelerar el proceso. Otro punto relevante es la mención de que Zeek, al ejecutar por defecto en un hilo del procesador, no hace uso extensivo de la capacidad del sistema. La mejora propuesta es hacer un Zeek Cluster \cite{zeek_documentation_cluster} para poder utilizar la capacidad de procesamiento disponible. Sin embargo, esto puede llegar a introducir una mayor complejidad al sistema.
 
-\subsection{Argus}
+Según la investigación realizada, no parece existir una manera oficial para utilizar Zeek como una librería dentro de otro programa o hacer uso de memoria compartida. El software está diseñado para ser ejecutado de manera independiente y compartir información con otros a través de diferentes tipos de archivos de registros \cite{zeek_documentation_logging} y conexiones utilizando la red \cite{zeek_documentation_logwriters}. De esta manera, para hacer uso de los registros generados en algoritmos de \gls{ml}, es necesario pasar por varias capas de traducción en vez de generar directamente los datos en el formato necesario.
 
-a
-
-\subsection{Softflowd}
+\subsection{nprobe}
 
 a
