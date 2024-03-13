@@ -2,21 +2,20 @@
 
 \subsection{CICFlowmeter}
 
-CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost} \cite{icissp17} \cite{cicflowrepo}. Permite obtener información sobre flujos bidireccionales sobre IP, utilizan estos TCP o UDP a partir de trazas de red en archivos con el formato pcap. Por cada flujo, genera seis columnas identificativas y añade cierta información del flujo. 
+CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost} \cite{icissp17} \cite{cicflowrepo}. Permite obtener información sobre flujos bidireccionales sobre IP a partir de trazas de red en archivos con el formato pcap. Adicionalmente, los protocolos de transporte que soporta son TCP y UDP. Por cada flujo, genera seis columnas identificativas y añade cierta información del flujo. 
 
 \subsubsection{Features generadas}
 
-En el Readme del código fuente ofrecido, podemos encontrar las siguientes características generadas. Hay algunas que representan lo mismo, pero se obtienen de manera distinta como "Fwd Packet Length Mean" y "Fwd Segment Size Avg".
-
+En el Readme del código fuente ofrecido, podemos encontrar las siguientes características generadas. Hay algunas que representan lo mismo, pero se obtienen de manera distinta como 'Fwd Packet Length Mean' con respecto a 'Fwd Segment Size Avg'.
 
 \begin{enumerate}
-    \item \textbf{Flow ID}: Combinación de las otras columnas separadas por giones
+    \item \textbf{Flow ID}: Combinación de las otras columnas separadas por guiones
     \item \textbf{Src IP}: La dirección IP del remitente desde la cual se ha iniciado el flujo
     \item \textbf{Src Port}: La dirección IP del destinatario hacia la cual se ha dirigido el flujo
     \item \textbf{Dst IP}: El puerto origen o de retorno del remitente
     \item \textbf{Dst Port}: El puerto destino del destinatario
     \item \textbf{Protocol}: Identificador del protocolo sobre IP según definido por IANA \cite{ipprotocolnumbers}
-    \item \textbf{Timestamp}: Momento del inicio del flujo, expresado en dd/MM/yyyy hh:mm:ss de la zona horaria local. En la descripción se indica que 
+    \item \textbf{Timestamp}: Momento del inicio del flujo, expresado en dd/MM/yyyy hh:mm:ss de la zona horaria local.
     \item \textbf{Flow Duration}: Duracion del flujo, expresado en microsegundos
     \item \textbf{Total Fwd Packet}: Número total de paquetes hacia el destinatario
     \item \textbf{Total Bwd packets}: Número total de paquetes hacia el receptor
@@ -99,7 +98,7 @@ En el Readme del código fuente ofrecido, podemos encontrar las siguientes carac
 
 CICFlowMeter no soporta todos los posibles formatos que se pueden encontrar en un pcap. En caso de encontrar contenidos no soportados, estos son ignorados. Si accedemos al módulo que realiza la lectura de los paquetes (cic.cs.unb.ca.jnetpcap.PacketReader) podemos ver que hace uso de la librería jnetpcap. Para la capa de acceso a la red en la pila TCP/IP utiliza Ethernet, para la capa de red utiliza IP4 e IP6, para la de transporte utiliza TCP y UDP y finalmente añade un módulo de la capa de aplicación para poder entender datos de VPN. 
 
-Como veremos en INTRODUCIR REFERENCIA DATASET, necesitaríamos que tuviese soporte adicionalmente para DLT\_LINUX\_SLL. Este es un tipo especial de cabecera de nivel de acceso a la red para, entre otros, casos en los cuales se capturan trazas de diferentes orígenes.
+Como veremos en INTRODUCIR REFERENCIA DATASET, necesitaríamos que tuviese soporte adicionalmente para DLT\_LINUX\_SLL. Este es un tipo especial de cabecera de nivel de acceso a la red para cuando se generan trazas de diferentes orígenes o se quiere descartar información.
 
 \subsubsection{Limitantes i mejoras}
 
@@ -109,7 +108,7 @@ El primero consiste en que, en el momento de realizar extracción de caracterís
 
 El segundo trata sobre la documentación del código y su calidad. La mayor parte de funciones, clases y módulos se encuentran sin documentación, hay bloques de código comentados (puestos en forma de comentario para que sean ignorados en el momento de ejecución), en muchas ocasiones la indentación es confusa y el estilo no parece ser uniforme. 
 
-El último se basa en el lenguaje utilizado. Como podemos ver en la Tabla \ref{table:languagebench}, en muchos entornos Java no es el lenguaje más óptimo en tareas que requieran cómputo. Los programas creados en java son entre 2 y 5 veces más lentos que los creados en nim, rust, d o zig. Además de también utilizar alrededor más de diez veces la cantidad de memoria en el pico.
+El último se basa en el lenguaje utilizado. Como podemos ver en la Tabla \ref{table:languagebench}, en muchos entornos Java no es el lenguaje más óptimo en tareas que requieran cómputo. Los programas creados en java son entre 2 y 5 veces más lentos que los creados en nim, rust, d o zig. Además de también llegar a utilizar alrededor más de diez veces la cantidad de memoria.
 
 \begin{table}[]
     \resizebox{\textwidth}{!}{%
@@ -160,10 +159,10 @@ El último se basa en el lenguaje utilizado. Como podemos ver en la Tabla \ref{t
 
 \subsection{TShark}
 
-TShark es un analizador de protocolos de red \cite{tsharkmanual}. Permite capturar datos de la red o leer paquetes de un archivo de captura. Así como Wireshark \cite{wsharkmanual}, es capaz de leer una gran cantidad de formatos y protocolos. Además, a partir de una captura finalizada, puede calcular estadísticas sobre el tráfico capturado a través del parámetro "-z". Hay muchas opciones de generación de estadísticas, algunas que podrían ser relevantes son:
+TShark es un analizador de protocolos de red \cite{tsharkmanual}. Permite capturar datos de la red o leer paquetes de un archivo de captura. Así como Wireshark \cite{wsharkmanual}, es capaz de leer una gran cantidad de formatos y protocolos. Además, a partir de una captura finalizada, puede calcular estadísticas sobre el tráfico capturado a través del parámetro -z. Hay muchas opciones de generación de estadísticas, algunas que podrían ser relevantes son:
 
 \begin{enumerate} 
-    \item \textbf{-z conv,type[,filter]}: Genera una tabla que lista todas las conversaciones que se han detectado en la captura. "type" indica el tipo de conversación, la cual puede ser tanto por direcciones de acceso a la red (Bluetooth, Ethernet, ...) como de red o transporte (ip, tcp, udp, ...). Cada conversación es mostrada en una fila de la tabla, la cual muestra, en número de tramas/bytes transmitidos en cada dirección, en número total, el tiempo relativo de inicio y la duración.
+    \item \textbf{-z conv,type[,filter]}: Genera una tabla que lista todas las conversaciones que se han detectado en la captura. 'type' indica el tipo de conversación, la cual puede ser tanto por direcciones de acceso a la red (Bluetooth, Ethernet, ...) como de red o transporte (ip, tcp, udp, ...). Cada conversación es mostrada en una fila de la tabla, la cual muestra, en número de tramas/bytes transmitidos en cada dirección, en número total, el tiempo relativo de inicio y la duración.
     \item \textbf{-z dests,tree[,filter]}: Genera estadísticas por direcciones ipv4, transporte tcp/udp y/o puerto asociado. Da información del número de transmisiones por cada uno y la cadencia
     \item \textbf{-z endpoints,type[,filter]}: Genera una tabla por cada dirección del tipo seleccionado con información sobre el número de paquetes y bytes totales, recibidos y enviados.
     \item \textbf{-z flow,name,mode[,filter]}: Muestra un diagrama de los flujos de datos en ASCII
@@ -192,7 +191,7 @@ Según la investigación realizada, no parece existir una manera oficial para ut
 
 \subsection{nProbe}
 
-nProbe es un analizador de tráfico de red capaz de generar y recolectar flujos NetFlow y exportarlos a otros sistemas que agrupan estadísticas de estos como ntopng u otros \cite{nprobe_documentation}. Según la documentación, es capaz de analizar redes de varios gigabits sin provocar pérdidas o pérdidas muy moderadas en ciertos casos. A diferencia del resto de herramientas, el código fuente de nProbe no se encuentra públicamente disponible. Esto es debido a que, según los autores, hubo personas que hicieron un mal uso de este. 
+nProbe es un analizador de tráfico de red capaz de generar y recolectar flujos NetFlow y exportarlos a otros sistemas que agrupan estadísticas de estos como ntopng \cite{nprobe_documentation}. Según la documentación, es capaz de analizar redes de varios gigabits sin provocar pérdidas o pérdidas muy moderadas en ciertos casos. A diferencia del resto de herramientas, el código fuente de nProbe no se encuentra públicamente disponible. Esto es debido a que, según los autores, hubo personas que hicieron un mal uso de este. 
 
 La cantidad de características que nProbe es capaz generar sin necesidad de plug-ins adicionales es relativamente extensa. Existen una propuesta de hacer uso de unas características específicas de forma estándar para poder comparar diferentes algoritmos de \gls{ml} \cite{DBLP:journals/corr/abs-2101-11315}. Las características por cada flujo en cuestión son:
 
