@@ -50,3 +50,6 @@
 
 ## Result files
 **.pdf
+
+# venv
+.venv/
