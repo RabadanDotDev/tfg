@@ -4,6 +4,45 @@ En esta sección analizaremos cuatro datasets disponibles utilizados para aplica
 
 \subsection{CICDDos2019}
 
+\subsubsection{Descripción}
+
+CICDDos2019 es un dataset que contiene tráfico benigno, además de una serie de ataques DDoS típicos durante dos días. \cite{cicddos2019web}. En este se contienen trazas de red en formato pcap y csvs con estadísticas de los flujos generados a partir de CICFlowMeter y posteriormente etiquetados. Para poder ofrecer un dataset público, realista y, además de mantener la privacidad de las comunicaciones originales, se generó tráfico sintético modelado a partir del comportamiento real de los usuarios. En las referencias se menciona el sistema utilizado para generar el comportamiento lo más natural posible de 25 usuarios haciendo uso de HTTP, HTTPS, FTP, SSH y protocolos de correo.
+
+Los elementos de la red interna consisten en:
+
+\begin{enumerate}
+    \item Servidor web con Ubuntu 16.04 (192.168.50.1 en el primer día, 192.168.50.4 en el segundo día)
+    \item Firewall con Fortinet (205.174.165.81)
+    \item PC con Windows 7 (192.168.50.8 en el primer día, 192.168.50.9 en el segundo día)
+    \item PC con Windows Vista (192.168.50.5 en el primer día, 192.168.50.6 en el segundo día)
+    \item PC con Windows 8.1 (192.168.50.6 en el primer día, 192.168.50.7 en el segundo día)
+    \item PC con Windows 10 (192.168.50.7 en el primer día, 192.168.50.8 en el segundo día)
+\end{enumerate}
+
+Adicionalmente, se han generado ataques DDoS basados en reflejos (usar un sistema de terceros para amplificar un ataque) y DDoS basado en exploits (tomar ventaja de vulnerabilidades en los protocolos). Según la información disponible, estos consisten en:
+
+\begin{enumerate}
+    \item \textbf{MSSQL}: Generado el primer día de 10:53 a 10:42 y el segundo de 11:36 a 11:45
+    \item \textbf{SSDP}: Generado el segundo día de 12:27 a 12:37
+    \item \textbf{DNS}: Generado el segundo día de 10:52 a 11:05
+    \item \textbf{LDAP}: Generado el primer día de 10:21 a 10:30 y el segundo de 11:22 a 11:32
+    \item \textbf{NetBIOS}: Generado el primer día de 10:00 a 10:09 y el segundo de 11:50 a 12:00
+    \item \textbf{SNMP}: Generado el segundo día de 12:12 a 12:23
+    \item \textbf{PortMap}: Generado el primer día de 9:43 a 9:51
+    \item \textbf{WebDDoS}: Generado el segundo día de 13:18 a 13:29
+    \item \textbf{NTP}: Generado el segundo día de 10:35 a 10:45
+    \item \textbf{TFTP}: Generado el segundo día de 13:35 a 17:15
+    \item \textbf{SYN Flood}: Generado el primer día de 11:28 a 17:35 y segundo día de 13:29 a 13:34
+    \item \textbf{UDP Flood}: Generado el primer día de 10:53 a 11:03 y segundo día de 12:45 a 13:09
+    \item \textbf{UDP-Lag}: Generado el primer día de 11:14 a 11:24 y segundo día de 13:11 a 13:15
+\end{enumerate}
+
+\subsubsection{Contenidos csvs}
+
+(por hacer)
+
+\subsubsection{Contenidos pcaps}
+
 (por hacer)
 
 \subsection{BoT-IoT}
