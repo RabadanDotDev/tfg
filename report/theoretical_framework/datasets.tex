@@ -39,18 +39,45 @@ Adicionalmente, se han generado ataques DDoS basados en reflejos (usar un sistem
 
 \subsubsection{Contenidos csvs}
 
-El conjunto de datos procesados utilizando CICFlowMeter y etiquetado esta compuesto por una lista de archivos por cada uno de los dos dias en los que se generaron datos, el 3 de Noviembre de 2018 y el 1 de diciembre de 2018. En todos existen filas los cuales tienen valores vacíos en la columna "Flow Bytes/s"
+El conjunto de datos procesados utilizando CICFlowMeter y etiquetado está compuesto por una lista de archivos por cada uno de los dos días en los que se generaron datos, el 3 de noviembre de 2018 y el 1 de diciembre de 2018. Las características ofrecidas son las mismas que las mencionadas en la herramienta CICFlowMeter. En todas las filas existen valores con excepción de algunas en la columna "Flow Bytes/s".
 
-\begin{enumerate}
-    \item \textbf{Portmap.csv}, contienendo 4734 flujos benignos entre 09:18:16 y 10:01:42 y 186960 flujos de ataques basados en Portmap entre 09:18:19 y 10:01:48
-    \item \textbf{NetBIOS.csv}, contienendo 1321 flujos benignos entre 10:01:49 y 10:09:00 y 3454578 flujos de ataques basados en NetBIOS entre 10:01:48 y 10:09:00
-    \item \textbf{LDAP.csv}, contienendo 5124 flujos benignos entre 10:09:00 y 10:29:51, 202919 flujos de ataques basados en NetBIOS entre 10:09:00 y 10:18:39 y 1905191 flujos de ataques basados en LDAP entre 10:19:10 y 10:29:52
-    \item \textbf{MSSQL.csv}, contienendo 2794 flujos benignos entre 10:29:52 y 10:42:53, 9931 flujos de ataques basados en LDAP entre 10:29:52 y 10:31:59 y 5763061 flujos de ataques basados en MSSQL entre 10:32:02 y 10:42:57
-    \item \textbf{UDP.csv}, contienendo 3134 flujos benignos entre 10:42:57 y 11:01:38, 9931 flujos de ataques basados en MSSQL entre 10:42:57 y 10:51:59 y 3754680 flujos de ataques basados en UDP entre 10:52:00 y 11:01:43
-    \item \textbf{UDPLag.csv}, contienendo 4068 flujos benignos entre 11:01:44 y 11:30:17, 1873 flujos de ataques basados en UDP entre 11:01:43 y 11:12:58, 112475 flujos de ataques basados en UDPLag entre 11:13:03 y 11:27:53 y 606749 flujos de ataques basados en Syn entre 11:28:00 y 11:30:25
-    \item \textbf{Syn.csv}, contienendo 35790 flujos benignos entre 11:30:25 y 17:36:33 y 4284751 flujos de ataques basados en Syn entre 11:30:25 y 17:36:41
-\end{enumerate}
+Como podemos ver en las figuras \ref{fig:cicddos_2019_csv_03-11_file_results} y \ref{fig:cicddos_2019_csv_01-12_file_results}, los archivos no contienen únicamente ataques etiquetados con su mismo nombre y benignos, sino que algunos contienen entre uno y dos adicionales. Para el primero, las categorías adicionales provienen de otros archivos. Para el segundo, la categoría adicional en UDPLag.csv no tiene ningún archivo específico y su magnitud es de las más bajas. A pesar de esto, si miramos las líneas temporales respectivas en las figuras \ref{fig:cicddos_2019_csv_03-11_timeline} y \ref{fig:cicddos_2019_csv_01-12_timeline}, podemos ver que el único caso donde existen solapamientos es en el caso de WebDDoS y UDP-Lag.
 
+\begin{figure}[!htb]
+    \minipage{0.49\textwidth}
+      \includegraphics[width=\linewidth]{media/cicddos_2019_csv_03-11_file_results.png}
+      \captionsetup{justification=centering}
+      \caption{Número de flujos por archivo de las trazas de noviembre 3}\label{fig:cicddos_2019_csv_03-11_file_results}
+    \endminipage\hfill
+    \minipage{0.49\textwidth}
+      \includegraphics[width=\linewidth]{media/cicddos_2019_csv_01-12_file_results.png}
+      \captionsetup{justification=centering}
+      \caption{Número de flujos por archivo de las trazas de diciembre 1}\label{fig:cicddos_2019_csv_01-12_file_results}
+    \endminipage\hfill
+\end{figure}
+
+\begin{figure}[!htb]
+    \begin{center}
+        \includegraphics[width=1\linewidth]{media/cicddos_2019_csv_03-11_timeline.png}
+    \end{center}
+    \captionsetup{justification=centering}
+    \caption{Línea temporal de las trazas de noviembre 3 con los archivos (debajo) y los rangos de ataques en estos (arriba)}\label{fig:cicddos_2019_csv_03-11_timeline}
+\end{figure}
+\begin{figure}[!htb]
+    \begin{center}
+        \includegraphics[width=1\linewidth]{media/cicddos_2019_csv_01-12_timeline.png}
+    \end{center}
+    \captionsetup{justification=centering}
+    \caption{Línea temporal de las trazas de diciembre 1 con los archivos (debajo) y los rangos de ataques en estos (arriba)}\label{fig:cicddos_2019_csv_01-12_timeline}
+\end{figure}
+
+\begin{figure}[!htb]
+    \minipage{1\textwidth}
+      \includegraphics[width=\linewidth]{media/cicddos_2019_csv_day_results.png}
+      \captionsetup{justification=centering}
+      \caption{Número de flujos por archivo de las trazas de noviembre 3}\label{fig:cicddos_2019_csv_day_results}
+    \endminipage
+\end{figure}
 
 \subsubsection{Contenidos pcaps}
 

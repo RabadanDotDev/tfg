@@ -65,6 +65,7 @@ def generate_bars_labels_by_file(results: dict):
 
 def generate_histogram_labels_full(results):
     plt.clf()
+    fig, ax = plt.subplots(figsize=(12, 6))
     group_width = 0.8
     plot_data = {"BENIGN" : {
         'bar_x_position' : [],
