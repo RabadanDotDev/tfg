@@ -1,9 +1,25 @@
 import glob
 from datetime import datetime
+from pathlib import Path
+import json
 import pandas
+from datetime import date, datetime
+
+RESULT_FOLDER = Path("./tmp/")
+RESULT_FILENAME = "info_cicddos_2019.json"
+CSV_FOLDER = Path("/Datasets/CICDDoS2019/csv/")
+
+def json_serial(obj):
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError ("Type %s not serializable" % type(obj))
 
 def get_csvs_in_folder(folder: str):
     return glob.glob(f"{folder}/*.csv")
+
+def dump_as_json(file: str, object):
+    with open(file, 'w') as f:
+        f.write(json.dumps(object, default=json_serial))
 
 def analize_csv(file: str):
     df = pandas.read_csv(file, sep=',')
@@ -37,18 +53,21 @@ def analize_csv(file: str):
 
     print(f"{results}")
     return results
-    
 
 def main():
     results = {"03-11": {}, "01-12" : {}}
 
-    # Analize first file
-    for file in get_csvs_in_folder("/Datasets/CICDDoS2019/csv/03-11/"):
+    # Get info from first file
+    for file in get_csvs_in_folder(CSV_FOLDER / "03-11"):
         results["03-11"][file.split('/')[-1]] = analize_csv(file)
 
-    for file in get_csvs_in_folder("/Datasets/CICDDoS2019/csv/01-12/"):
+    # Get info from second file
+    for file in get_csvs_in_folder(CSV_FOLDER / "01-12"):
         results["01-12"][file.split('/')[-1]] = analize_csv(file)
-    print(f"{results}")
+
+    # Write results
+    RESULT_FOLDER.mkdir(parents=True, exist_ok=True)
+    dump_as_json(RESULT_FOLDER / RESULT_FILENAME, results)
 
 if __name__ == "__main__":
     main()

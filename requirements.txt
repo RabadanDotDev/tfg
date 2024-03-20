@@ -1,2 +1,4 @@
 pandas==2.2.1
 pip-chill==1.0.3
+matplotlib
+distinctipy

@@ -3,6 +3,6 @@ wget http://ftp.de.debian.org/debian/pool/contrib/m/msttcorefonts/ttf-mscorefont
 apt install -y /tmp/ttf-mscorefonts-installer_3.7_all.deb
 fc-cache -f -v
 
-/usr/local/python/current/bin/python -m venv .venv
+/usr/local/python/current/bin/python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
