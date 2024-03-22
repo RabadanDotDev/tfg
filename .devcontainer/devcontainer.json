@@ -16,6 +16,7 @@
 	"customizations": {},
 
 	"mounts": [
-		"source=${localEnv:HOME}/Datasets,target=/Datasets,type=bind,consistency=cached"
+		"source=${localEnv:HOME}/Datasets,target=/Datasets,type=bind,consistency=cached",
+		"source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,readonly,type=bind"
 	]
 }
