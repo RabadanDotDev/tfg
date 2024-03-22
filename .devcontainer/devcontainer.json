@@ -6,7 +6,10 @@
 		"ghcr.io/prulloac/devcontainer-features/latex:1": {
 			"packages": "fontspec,xcolor,babel-spanish,babel-catalan,xkeyval,imakeidx,tocloft,etoolbox,glossaries,glossaries-spanish,hyphen-spanish,titlesec,blindtext,caption,float"
 		},
-		"ghcr.io/devcontainers/features/python:1": {}
+		"ghcr.io/devcontainers/features/python:1": {},
+		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+			"packages": "tshark"
+		}
 	},
 
 	"forwardPorts": [],
