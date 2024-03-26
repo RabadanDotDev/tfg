@@ -71,17 +71,18 @@ Como podemos ver en las figuras \ref{fig:cicddos_2019_csv_03-11_file_results} y 
     \caption{Línea temporal de las trazas de diciembre 1 con los archivos (debajo) y los rangos de ataques en estos (arriba)}\label{fig:cicddos_2019_csv_01-12_timeline}
 \end{figure}
 
-\begin{figure}[!htb]
-    \minipage{1\textwidth}
-      \includegraphics[width=\linewidth]{media/cicddos_2019_csv_day_results.png}
-      \captionsetup{justification=centering}
-      \caption{Número de flujos por archivo de las trazas de noviembre 3}\label{fig:cicddos_2019_csv_day_results}
-    \endminipage
-\end{figure}
+%\begin{figure}[!htb]
+%    \minipage{1\textwidth}
+%      \includegraphics[width=\linewidth]{media/cicddos_2019_csv_day_results.png}
+%      \captionsetup{justification=centering}
+%      \caption{Número de flujos por archivo de las trazas de noviembre 3}\label{fig:cicddos_2019_csv_day_results}
+%    \endminipage
+%\end{figure}
 
 \subsubsection{Contenidos pcaps}
 
-(por hacer)
+El dataset CICDDos2019 ofrece un conjunto de trazas de red de los dos días en los que se generaron datos. Para el primer día (3 de noviembre), hay 145 archivos de unos 190.7 MiB cada uno y un último de 66.5 MiB. Para el segundo día (1 de diciembre), se ofrecen 818 archivos de 190.7 MiB cada uno y uno adicional de 3.7 MiB. En ambos casos, si intentamos abrir el último paquete con Wireshark o generamos cualquier análisis a través de tshark, se nos notifica que el paquete se encuentra "cortado". Esto es quizá causado porque, en el momento de generar las trazas, se cortó el proceso de captura precipitadamente.
+
 
 \subsection{BoT-IoT}
 
