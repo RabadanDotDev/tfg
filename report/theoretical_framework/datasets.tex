@@ -108,9 +108,12 @@ Se han generado histogramas con la distribución de la duración de los flujos, 
     \endminipage\hfill
 \end{figure}
 
-Si miramos la cantidad de información transmitida por las diferentes capas de red y de transporte en la tabla \ref{table:cicddos2019protocols}, podemos ver cómo la mayor parte del tráfico consiste en UDP, TCP y otro que tshark no ha podido identificar (data). De los 174.8 GiB transmitidos en total, menos de 10 MiB consisten en tráfico no IPv4. Adicionalmente, un 66.01\% de este tráfico es específicamente UDP, haciendo uso de posibles diversos protocolos en la siguiente capa. Es posible que la cantidad de protocolos sea engañosa, ya que es posible que este número haya sido exagerado a causa de ataques de escaneo en el dataset. Los otros dos puestos sobre la capa de red, consisten en 57.1 GiB (32.66\%) que tshark no pudo identificar y 2.2GiB (1.25\%) de tráfico TCP. 
+En la tabla \ref{table:cicddos2019protocolsip} podemos ver el resultado del análisis con tshark sobre la repartición de los diferentes protocolos de transporte sobre IPv4. Como podemos ver, nos indica que la mayoría (77.5\%) de los datos van sobre UDP y el resto se encuentra principalmente repartido entre protocolos que no ha podido identificar (14.26\%) y TCP (8.21\%). Adicionalmente, podemos observar que existen algunas tramas residuales de otros protocolos (SCTP, IBQP e IPX).
 
 \input{theoretical_framework/datasets_cicddos_protosip.tex}
+
+Si miramos la cantidad de información transmitida por las diferentes capas de red y de transporte en la tabla \ref{table:cicddos2019protocols}, podemos ver cómo la mayor parte del tráfico sigue consistiendo en UDP, TCP y otro no identificado (data). De los 174.8 GiB transmitidos en total, menos de 10 MiB consisten en tráfico no IPv4. Adicionalmente, un 66.01\% de este tráfico es específicamente UDP, haciendo uso de posibles diversos protocolos en la siguiente capa. Es posible que la cantidad de protocolos sea engañosa, ya que es posible que este número haya sido exagerado a causa de ataques de escaneo en el dataset. Los otros dos puestos sobre la capa de red, consisten en 57.1 GiB (32.66\%) que tshark no pudo identificar y 2.2GiB (1.25\%) de tráfico TCP. Cabe notar que en este análisis, los protocolos residuales detectados en la capa de transporte sobre IP son diferentes a los de la tabla \ref{table:cicddos2019protocolsip}.
+
 \input{theoretical_framework/datasets_cicddos_protos.tex}
 
 \subsection{BoT-IoT}
