@@ -33,7 +33,12 @@ En el dataset se han generado ataques mediante nmap, hping3, xprobe2, golden-eye
     \end{enumerate}
 \end{enumerate}
 
-Hay 46 características disponibles en el dataset y explicadas en una tabla tanto en el paper original como en el conjunto de datos descargables. Manteniendo la capitalización de la tabla dentro del conjunto de datos, las características consisten en:
+
+\subsubsection{Contenidos CSVs}
+
+El conjunto de datos procesados está separado en diferentes grupos. Por un lado, tenemos todos los flujos con sus características y etiquetados. Estos se encuentran en carpeta llamada "Entire Dataset", separados por incrementos de unos 220 MiB y en otra llamada "Ground Truth" separados por  el ataque que se encontraba activo en cada momento. Por otro lado, tenemos un muestreo del 5\%, el cual tiene algunos archivos CSV de flujos con características adicionales y otro con características seleccionadas. Adicionalmente, hay dos archivos adicionales basados en este último como división de entrenamiento y de test.
+
+En total, hay 46 características disponibles en el dataset y explicadas en una tabla tanto en el paper original como en el conjunto de datos descargables. Manteniendo la capitalización de la tabla dentro del conjunto de datos, las características consisten en:
 
 \begin{enumerate}
     \item \textbf{pkSeqID}: Identificador de fila
