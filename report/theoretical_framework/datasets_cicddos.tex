@@ -40,6 +40,22 @@ El conjunto de datos procesados utilizando CICFlowMeter y etiquetado está compu
 Como podemos ver en las figuras \ref{fig:cicddos_2019_csv_03-11_file_results} y \ref{fig:cicddos_2019_csv_01-12_file_results}, los archivos no contienen únicamente ataques etiquetados con su mismo nombre y benignos, sino que algunos contienen entre uno y dos adicionales. Para el primero, las categorías adicionales provienen de otros archivos. Para el segundo, la categoría adicional en UDPLag.csv no tiene ningún archivo específico y su magnitud es de las más bajas. A pesar de esto, si miramos las líneas temporales respectivas en las figuras \ref{fig:cicddos_2019_csv_03-11_timeline} y \ref{fig:cicddos_2019_csv_01-12_timeline}, podemos ver que el único caso donde existen solapamientos es en el caso de WebDDoS y UDP-Lag. Cabe notar que el tráfico benigno se encuentra infrarepresentado, cosa que es posible que no se corresponda con un entorno real, donde el tráfico sea normalmente benigno y los ataques sean relativamente raros e inesperados.
 
 \begin{figure}[!htb]
+  \begin{center}
+      \includegraphics[width=0.8\linewidth]{media/cicddos_2019_csv_03-11_timeline.png}
+  \end{center}
+  \captionsetup{justification=centering}
+  \caption{Línea temporal de las trazas de noviembre 3 con los archivos (debajo) y los rangos de ataques en estos (arriba)}\label{fig:cicddos_2019_csv_03-11_timeline}
+\end{figure}
+
+\begin{figure}[!htb]
+  \begin{center}
+      \includegraphics[width=1\linewidth]{media/cicddos_2019_csv_01-12_timeline.png}
+  \end{center}
+  \captionsetup{justification=centering}
+  \caption{Línea temporal de las trazas de diciembre 1 con los archivos (debajo) y los rangos de ataques en estos (arriba)}\label{fig:cicddos_2019_csv_01-12_timeline}
+\end{figure}
+
+\begin{figure}[!htb]
     \minipage{0.49\textwidth}
       \includegraphics[width=\linewidth]{media/cicddos_2019_csv_03-11_file_results.png}
       \captionsetup{justification=centering}
@@ -52,20 +68,6 @@ Como podemos ver en las figuras \ref{fig:cicddos_2019_csv_03-11_file_results} y 
     \endminipage\hfill
 \end{figure}
 
-\begin{figure}[!htb]
-    \begin{center}
-        \includegraphics[width=1\linewidth]{media/cicddos_2019_csv_03-11_timeline.png}
-    \end{center}
-    \captionsetup{justification=centering}
-    \caption{Línea temporal de las trazas de noviembre 3 con los archivos (debajo) y los rangos de ataques en estos (arriba)}\label{fig:cicddos_2019_csv_03-11_timeline}
-\end{figure}
-\begin{figure}[!htb]
-    \begin{center}
-        \includegraphics[width=1\linewidth]{media/cicddos_2019_csv_01-12_timeline.png}
-    \end{center}
-    \captionsetup{justification=centering}
-    \caption{Línea temporal de las trazas de diciembre 1 con los archivos (debajo) y los rangos de ataques en estos (arriba)}\label{fig:cicddos_2019_csv_01-12_timeline}
-\end{figure}
 
 %\begin{figure}[!htb]
 %    \minipage{1\textwidth}
