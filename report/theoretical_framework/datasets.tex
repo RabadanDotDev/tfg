@@ -110,6 +110,7 @@ Se han generado histogramas con la distribución de la duración de los flujos, 
 
 Si miramos la cantidad de información transmitida por las diferentes capas de red y de transporte en la tabla \ref{table:cicddos2019protocols}, podemos ver cómo la mayor parte del tráfico consiste en UDP, TCP y otro que tshark no ha podido identificar (data). De los 174.8 GiB transmitidos en total, menos de 10 MiB consisten en tráfico no IPv4. Adicionalmente, un 66.01\% de este tráfico es específicamente UDP, haciendo uso de posibles diversos protocolos en la siguiente capa. Es posible que la cantidad de protocolos sea engañosa, ya que es posible que este número haya sido exagerado a causa de ataques de escaneo en el dataset. Los otros dos puestos sobre la capa de red, consisten en 57.1 GiB (32.66\%) que tshark no pudo identificar y 2.2GiB (1.25\%) de tráfico TCP. 
 
+\input{theoretical_framework/datasets_cicddos_protosip.tex}
 \input{theoretical_framework/datasets_cicddos_protos.tex}
 
 \subsection{BoT-IoT}

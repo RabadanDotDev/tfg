@@ -7,11 +7,14 @@ import numpy as np
 
 CSV_FOLDER_FIRST_DAY = Path("./tmp/cicddos2019-pcap-03-11")
 CSV_FOLDER_SECOND_DAY = Path("./tmp/cicddos2019-pcap-01-12")
-TABLE_RESULT = Path("./report/theoretical_framework/datasets_cicddos_protos.tex")
+TABLE_RESULT_TREE = Path("./report/theoretical_framework/datasets_cicddos_protos.tex")
+TABLE_RESULT_IP = Path("./report/theoretical_framework/datasets_cicddos_protosip.tex")
 RESULT_FOLDER = Path("./tmp/")
 REPORT_MEDIA_FOLDER = Path("./report/media/")
 TREEPROTO_HEADER=5
 TREEPROTO_FOOTER=1
+IPPROTO_HEADER=5
+IPPROTO_FOOTER=2
 
 units = {"bytes": 1, "kB": 2**10, "MB": 2**20, "GB": 2**30, "TB": 2**40}
 def parse_size(size):
@@ -34,6 +37,9 @@ def get_conversations_csvs_in_folder(folder: str):
 
 def get_treeproto_txt_in_folder(folder: str):
     return glob.glob(f"{folder}/*.treeproto.txt")
+
+def get_ipproto_txt_in_folder(folder: str):
+    return glob.glob(f"{folder}/*.ipproto.txt")
 
 def read_dataframes(files: list[str]) -> pd.DataFrame:
     return pd.concat([pd.read_csv(file, skipinitialspace=True) for file in files])
@@ -249,7 +255,7 @@ def tree_proto_gen_tex_table(contents):
     lines.append(r'\end{table}')
 
     # Write file
-    with open(TABLE_RESULT, 'w') as f:
+    with open(TABLE_RESULT_TREE, 'w') as f:
         f.writelines(s + '\n' for s in lines)
 
 
@@ -267,9 +273,91 @@ def treeproto_evaluate_files():
     dump_as_json(RESULT_FOLDER / 'cicddos2019_tree_proto_combined.json', contents)
     tree_proto_gen_tex_table(contents)
 
+def ipproto_evaluate_file(file, contents):
+    lines = None
+    with open(file) as f:
+        lines = f.read().splitlines()[IPPROTO_HEADER:-IPPROTO_FOOTER]
+    for line in lines:
+        # Remove leading space
+        line = line.lstrip()
+
+        # Remove padding space
+        line = ' '.join(line.split())
+
+        # Separate by spaces
+        line = line.split()
+
+        # Remove "Protocol" and "Types" in the case of ['IP', 'Protocol', 'Types', ...]
+        if 'Protocol' in line:
+            line.remove('Protocol')
+        if 'Types' in line:
+            line.remove('Types')
+
+        # Extract protocol + count
+        protocol = line[0]
+        count = line[1]
+
+        # Include in contents
+        if not protocol in contents:
+            contents[protocol] = {'count': int(count)}
+        else:
+            contents[protocol]['count'] += int(count)
+
+    return contents
+
+def ipproto_compute_percentages(contents):
+    total = contents['IP']['count']
+
+    for key in contents:
+        contents[key]['percentage'] = contents[key]['count']/total*100
+
+    return contents
+
+def ip_proto_gen_tex_table(contents):
+    lines = []
+    # Generate opening lines
+    lines.append(r'%Generated with ' + __file__)
+    lines.append(r'\begin{table}[H]')
+    lines.append(r'    \begin{center}')
+    lines.append(r'        \begin{tabular}{|c | c c|} ')
+    lines.append(r'            \hline')
+    lines.append(r'            \textbf{Protocolo} & \textbf{Nº Tramas} & \textbf{Porcentaje}\\')
+    lines.append(r'            \hline\hline')
+
+    # Generate contents
+    for key in contents:
+        lines.append(f"{key} & {contents[key]['count']:.2e} & {contents[key]['percentage']:.3f} \\\\")
+    
+    # Generate closing lines
+    lines.append(r'            \hline')
+    lines.append(r'        \end{tabular}')
+    lines.append(r'    \end{center}')
+    lines.append(r'    \caption{Protocolos identificados analizando exclusivamente la capa IP en CICDDos2019}')
+    lines.append(r'    \label{table:cicddos2019protocolsip}')
+    lines.append(r'\end{table}')
+
+    # Write file
+    with open(TABLE_RESULT_IP, 'w') as f:
+        f.writelines(s + '\n' for s in lines)
+
+def ipproto_evaluate_files():
+    contents = {}
+
+    for file in get_ipproto_txt_in_folder(CSV_FOLDER_FIRST_DAY):
+        contents = ipproto_evaluate_file(file, contents)
+
+    for file in get_ipproto_txt_in_folder(CSV_FOLDER_SECOND_DAY):
+        contents = ipproto_evaluate_file(file, contents)
+
+    contents = ipproto_compute_percentages(contents)
+
+    dump_as_json(RESULT_FOLDER / 'cicddos2019_ip_proto_combined.json', contents)
+    ip_proto_gen_tex_table(contents)
+
 def main():
-    #conversation_evaluate()
+    conversation_evaluate()
     treeproto_evaluate_files()
+    ipproto_evaluate_files()
 
 if __name__ == "__main__":
     main()
