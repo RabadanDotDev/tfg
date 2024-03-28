@@ -41,7 +41,7 @@ Adicionalmente, se han generado ataques DDoS basados en reflejos (usar un sistem
 
 El conjunto de datos procesados utilizando CICFlowMeter y etiquetado está compuesto por una lista de archivos por cada uno de los dos días en los que se generaron datos, el 3 de noviembre de 2018 y el 1 de diciembre de 2018. Las características ofrecidas son las mismas que las mencionadas en la herramienta CICFlowMeter. En todas las filas existen valores con excepción de algunas en la columna "Flow Bytes/s". Los scripts utilizados para la extracción y representación de los datos son \texttt{extract\_info\_cicddos\_2019.py} y \texttt{plot\_info\_cicddos\_2019.py} disponibles en TODO DEFINIR.
 
-Como podemos ver en las figuras \ref{fig:cicddos_2019_csv_03-11_file_results} y \ref{fig:cicddos_2019_csv_01-12_file_results}, los archivos no contienen únicamente ataques etiquetados con su mismo nombre y benignos, sino que algunos contienen entre uno y dos adicionales. Para el primero, las categorías adicionales provienen de otros archivos. Para el segundo, la categoría adicional en UDPLag.csv no tiene ningún archivo específico y su magnitud es de las más bajas. A pesar de esto, si miramos las líneas temporales respectivas en las figuras \ref{fig:cicddos_2019_csv_03-11_timeline} y \ref{fig:cicddos_2019_csv_01-12_timeline}, podemos ver que el único caso donde existen solapamientos es en el caso de WebDDoS y UDP-Lag.
+Como podemos ver en las figuras \ref{fig:cicddos_2019_csv_03-11_file_results} y \ref{fig:cicddos_2019_csv_01-12_file_results}, los archivos no contienen únicamente ataques etiquetados con su mismo nombre y benignos, sino que algunos contienen entre uno y dos adicionales. Para el primero, las categorías adicionales provienen de otros archivos. Para el segundo, la categoría adicional en UDPLag.csv no tiene ningún archivo específico y su magnitud es de las más bajas. A pesar de esto, si miramos las líneas temporales respectivas en las figuras \ref{fig:cicddos_2019_csv_03-11_timeline} y \ref{fig:cicddos_2019_csv_01-12_timeline}, podemos ver que el único caso donde existen solapamientos es en el caso de WebDDoS y UDP-Lag. Cabe notar que el tráfico benigno se encuentra infrarepresentado, cosa que es posible que no se corresponda con un entorno real, donde el tráfico sea normalmente benigno y los ataques sean relativamente raros e inesperados.
 
 \begin{figure}[!htb]
     \minipage{0.49\textwidth}
@@ -56,14 +56,14 @@ Como podemos ver en las figuras \ref{fig:cicddos_2019_csv_03-11_file_results} y 
     \endminipage\hfill
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{media/cicddos_2019_csv_03-11_timeline.png}
     \end{center}
     \captionsetup{justification=centering}
     \caption{Línea temporal de las trazas de noviembre 3 con los archivos (debajo) y los rangos de ataques en estos (arriba)}\label{fig:cicddos_2019_csv_03-11_timeline}
 \end{figure}
-\begin{figure}[H]
+\begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{media/cicddos_2019_csv_01-12_timeline.png}
     \end{center}
@@ -107,6 +107,8 @@ Se han generado histogramas con la distribución de la duración de los flujos, 
       \caption{Distribución número de bytes en flujos en CICDDos2019}\label{fig:cicddos_2019_pcap_bytes_distribution}
     \endminipage\hfill
 \end{figure}
+
+Si miramos la cantidad de información transmitida por las diferentes capas de red y de transporte en la tabla \ref{table:cicddos2019protocols}, podemos ver cómo la mayor parte del tráfico consiste en UDP, TCP y otro que tshark no ha podido identificar (data). De los 174.8 GiB transmitidos en total, menos de 10 MiB consisten en tráfico no IPv4. Adicionalmente, un 66.01\% de este tráfico es específicamente UDP, haciendo uso de posibles diversos protocolos en la siguiente capa. Es posible que la cantidad de protocolos sea engañosa, ya que es posible que este número haya sido exagerado a causa de ataques de escaneo en el dataset. Los otros dos puestos sobre la capa de red, consisten en 57.1 GiB (32.66\%) que tshark no pudo identificar y 2.2GiB (1.25\%) de tráfico TCP. 
 
 \input{theoretical_framework/datasets_cicddos_protos.tex}
 
