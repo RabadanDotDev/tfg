@@ -117,3 +117,27 @@ El dataset BoT-IoT ofrece 344 archivos (69.4 GiB) de trazas de red por cada cate
 En los PCAP, aparecen direcciones IP diferentes del testbed (192.168.1.100.0/24) de las mencionadas en el paper original. Concretamente, podemos ver que aparecen adicionalmente 192.168.100.27, 192.168.100.46 y 192.168.100.55, además de la dirección de broadcast 192.168.100.255. Por otro lado, no se han detectado tráfico hacia o desde las máquinas del clúster VMWare con direcciones IP 192.168.1.100.(20, 22, 24). Respecto al número de direcciones IP únicas, podemos observar que aparecen 293 de estas, menos que en CICDDos2019.
 
 
+Para este dataset, también se han generado histogramas con la distribución de la duración de los flujos, número de tramas y número de bytes para poder compararlos con los futuros resultados de la herramienta y comprobar que son consistentes. Si observamos la figura \ref{fig:botiot_pcap_duration_distribution}, podemos notar que en este caso también hay muchos flujos los cuales su duración es relativamente corta y luego cierta variedad de flujos de mayor duración, siendo esta menor y pareciendo que hay ciertas agrupaciones. Si miramos la distribución del número de tramas, podemos ver en la figura \ref{fig:botiot_pcap_frames_distribution} que hay dos picos bajo 100 tramas y luego una agrupación más ancha entre 5 000 y  50 000 y otro pico entre 100 000 y 1 000 000. Respecto los bytes, podemos ver en la figura \ref{fig:botiot_pcap_bytes_distribution} que la situación es diferente. La cantidad de bytes en diferentes flujos, pese a que en algunos puntos haya valles, parece estar más repartida.
+
+
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[width=0.40\linewidth]{media/botiot_pcap_duration_distribution.png}
+    \end{center}
+    \captionsetup{justification=centering}
+    \caption{Distribución duraciones de flujos en BoT-IoT}\label{fig:botiot_pcap_duration_distribution}
+\end{figure}
+
+\begin{figure}[H]
+    \minipage{0.49\textwidth}
+      \includegraphics[width=\linewidth]{media/botiot_pcap_frames_distribution.png}
+      \captionsetup{justification=centering}
+      \caption{Distribución número de tramas en flujos en BoT-IoT}\label{fig:botiot_pcap_frames_distribution}
+    \endminipage\hfill
+    \minipage{0.49\textwidth}
+      \includegraphics[width=\linewidth]{media/botiot_pcap_bytes_distribution.png}
+      \captionsetup{justification=centering}
+      \caption{Distribución número de bytes en flujos en BoT-IoT}\label{fig:botiot_pcap_bytes_distribution}
+    \endminipage\hfill
+\end{figure}
+
