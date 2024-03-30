@@ -36,7 +36,27 @@ En el dataset se han generado ataques mediante nmap, hping3, xprobe2, golden-eye
 
 \subsubsection{Contenidos CSVs}
 
-El conjunto de datos procesados está separado en diferentes grupos. Por un lado, tenemos todos los flujos con sus características y etiquetados. Estos se encuentran en carpeta llamada "Entire Dataset", separados por incrementos de unos 220 MiB y en otra llamada "Ground Truth" separados por  el ataque que se encontraba activo en cada momento. Por otro lado, tenemos un muestreo del 5\%, el cual tiene algunos archivos CSV de flujos con características adicionales y otro con características seleccionadas. Adicionalmente, hay dos archivos adicionales basados en este último como división de entrenamiento y de test.
+El conjunto de datos procesados está separado en diferentes grupos. Por un lado, tenemos todos los flujos con sus características y etiquetados. Estos se encuentran en carpeta llamada 'Entire Dataset', separados por incrementos de unos 220 MiB y en otra llamada "Ground Truth" separados por  el ataque que se encontraba activo en cada momento. Por otro lado, tenemos un muestreo del 5\%, el cual tiene algunos archivos CSV de flujos con características adicionales y otro con características seleccionadas. Adicionalmente, hay dos archivos adicionales basados en este último como división de entrenamiento y de test. Los scripts utilizados para la extracción y representación de los datos son \texttt{extract\_info\_botiot\_csvs\_full\_dataset.py} y \texttt{plot\_info\_botiot\_csvs.py} disponibles en TODO DEFINIR.
+
+No hay ningún tipo de solapación en los archivos 'Ground Truth', los flujos etiquetados en cada uno consisten en flujos benignos y los ataques específicos. En la figura \ref{fig:botiot_results} podemos ver cómo los flujos consisten principalmente en ataques DoS y DDoS sobre TCP y UDP y de recolección de información. El tráfico Benigno, como podemos ver en este caso, también se encuentra infrarepresentado respecto al total, cosa que puede ser que no corresponda con un tráfico normal. 
+
+Si observamos la línea temporal de la figura \ref{fig:botiot_timeline}, podemos ver cómo las diferentes categorías de ataques están repartidas en el tiempo de manera distinta. En el caso de los ataques de recolección de información, el análisis de los servicios se extiende durante unos seis días y de detección del sistema operativo durante uno y medio. Para los casos de denegación de servicio, cada subcategoría dura alrededor de una hora. Finalmente, para los ataques de robo de información tienen una duración limitada. Las cantidades de tráfico visto y sus extensiones temporales son consistentes con la tipología de ataque. El escaneo se realiza durante mucho tiempo para tratar de pasar desapercibido. En la denegación se genera mucho volumen de tráfico en poco tiempo. Finalmente, en el robo de información se ejecuta el proceso de ataque específico en el menor tiempo y cantidad de tráfico posible.
+
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[width=0.49\linewidth]{media/botiot_csv_day_results.png}
+    \end{center}
+    \captionsetup{justification=centering}
+    \caption{Línea temporal de las trazas con categorias (debajo) y subcategorias (arriba)}\label{fig:botiot_results}
+\end{figure}
+
+\begin{figure}[!htb]
+    \begin{center}
+        \includegraphics[width=1\linewidth]{media/botiot_csv_timeline.png}
+    \end{center}
+    \captionsetup{justification=centering}
+    \caption{Línea temporal de las trazas con categorias (debajo) y subcategorias (arriba)}\label{fig:botiot_timeline}
+\end{figure}
 
 En total, hay 46 características disponibles en el dataset y explicadas en una tabla tanto en el paper original como en el conjunto de datos descargables. Manteniendo la capitalización de la tabla dentro del conjunto de datos, las características consisten en:
 
