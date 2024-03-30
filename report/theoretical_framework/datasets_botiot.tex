@@ -148,3 +148,18 @@ En la tabla \ref{table:botiotprotocolsip} podemos ver el resultado del análisis
 Si miramos la cantidad de información transmitida por las diferentes capas de red y de transporte en la tabla \ref{table:botiotprotocols}, podemos ver cómo la mayor parte del tráfico sigue consistiendo en UDP y TCP, teniendo algo de tráfico residual en ICMP, IGMP y no identificado (data). De los 64.2 GiB presentes, menos de 4 MiB no consisten en tráfico IPv4. En términos de bytes, UDP y TCP comprenden una cantidad similar (28.6 GiB y 32.5 GiB, respectivamente) a pesar de que haya casi el doble de tramas que utilizan UDP respecto TCP. De la misma manera que en CICDDos2019, los protocolos residuales detectados en la capa de transporte sobre IP son diferentes a los de la tabla \ref{table:botiotprotocolsip}.
 
 \input{theoretical_framework/datasets_botiot_protos.tex}
+
+Finalmente, si abrimos cualquier traza de red, podemos observar que solo se utiliza 'Ethernet II' para la capa de enlace, como podemos ver en la figura \ref{fig:botiot_pcap_ethii_packet}. Cabe notar que en algún caso aparecen paquetes marcados con una alerta, como en la figura \ref{fig:botiot_pcap_ethii_packet_warn}, indicando que el origen de la trama no debería contener una dirección de grupo.
+
+\begin{figure}[H]
+    \minipage{0.49\textwidth}
+      \includegraphics[width=\linewidth]{media/botiot_pcap_ethii_packet.png}
+      \captionsetup{justification=centering}
+      \caption{Paquete sin alerta en BoT-IoT}\label{fig:botiot_pcap_ethii_packet}
+    \endminipage\hfill
+    \minipage{0.49\textwidth}
+      \includegraphics[width=\linewidth]{media/botiot_pcap_ethii_packet_warn.png}
+      \captionsetup{justification=centering}
+      \caption{Paquete con alerta BoT-IoT}\label{fig:botiot_pcap_ethii_packet_warn}
+    \endminipage\hfill
+\end{figure}
