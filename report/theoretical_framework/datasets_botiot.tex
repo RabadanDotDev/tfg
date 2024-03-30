@@ -141,3 +141,10 @@ Para este dataset, también se han generado histogramas con la distribución de 
     \endminipage\hfill
 \end{figure}
 
+En la tabla \ref{table:botiotprotocolsip} podemos ver el resultado del análisis con tshark sobre la repartición de los diferentes protocolos de transporte sobre IPv4. Como podemos ver, nos indica que la mayoría (68.549\%) de los datos van sobre UDP y el resto se encuentra principalmente contenido en TCP (31.450\%). Hay tramas que no se han podido identificar, pero es una cantidad marginal (0.001\%). A diferencia de CICDDos2019, no tenemos otros protocolos residuales.
+
+\input{theoretical_framework/datasets_botiot_protosip.tex}
+
+Si miramos la cantidad de información transmitida por las diferentes capas de red y de transporte en la tabla \ref{table:botiotprotocols}, podemos ver cómo la mayor parte del tráfico sigue consistiendo en UDP y TCP, teniendo algo de tráfico residual en ICMP, IGMP y no identificado (data). De los 64.2 GiB presentes, menos de 4 MiB no consisten en tráfico IPv4. En términos de bytes, UDP y TCP comprenden una cantidad similar (28.6 GiB y 32.5 GiB, respectivamente) a pesar de que haya casi el doble de tramas que utilizan UDP respecto TCP. De la misma manera que en CICDDos2019, los protocolos residuales detectados en la capa de transporte sobre IP son diferentes a los de la tabla \ref{table:botiotprotocolsip}.
+
+\input{theoretical_framework/datasets_botiot_protos.tex}
