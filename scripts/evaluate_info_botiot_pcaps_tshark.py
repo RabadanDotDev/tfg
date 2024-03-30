@@ -68,8 +68,8 @@ def get_testbed_ips(conversations: pd.DataFrame) -> dict:
     res = {}
 
     res["internal_ips_total"] = list(pd.concat([
-        conversations[conversations['ip origin'].str.contains("192.168.50.")]['ip origin'],
-        conversations[conversations['ip dest'].str.contains("192.168.50.")]['ip dest'],
+        conversations[conversations['ip origin'].str.contains("192.168.100.")]['ip origin'],
+        conversations[conversations['ip dest'].str.contains("192.168.100.")]['ip dest'],
     ]).unique())
 
     return res

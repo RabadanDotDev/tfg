@@ -112,5 +112,8 @@ En total, hay 46 características disponibles en el dataset y explicadas en una 
 
 \subsubsection{Contenidos PCAPs}
 
-El dataset BoT-IoT ofrece 344 archivos (69.4 GiB) de trazas de red por cada categoria i subcategoria de ataque realizado. Tenemos por cada categoria, 48 archivos (9.7 GiB) de los ataques de recoleccion de información, 130 (25.9 GiB) para la denegación de servicio no distribuida, 150 (30.2 GiB) para la denegación de servicio distribuida y 16 (3.5 GiB) para el robo de información. Los archivos se encuentran divididos en carpetas según su categoria y su subcategoria.
+El dataset BoT-IoT ofrece 344 archivos (69.4 GiB) de trazas de red por cada categoría y subcategoría de ataque realizado. Tenemos, por cada categoría, 48 archivos (9.7 GiB) de los ataques de recolección de información, 130 (25.9 GiB) para la denegación de servicio no distribuida, 150 (30.2 GiB) para la denegación de servicio distribuida y 16 (3.5 GiB) para el robo de información. Los archivos se encuentran divididos en carpetas según su categoría y su subcategoría. Los scripts utilizados para la extracción de datos es \texttt{extract\_info\_botiot\_pcaps\_tshark.sh} y el utilizado para la representacion de estos es \texttt{evaluate\_info\_botiot\_pcaps\_tshark.py} disponibles en TODO DEFINIR.
+
+En los PCAP, aparecen direcciones IP diferentes del testbed (192.168.1.100.0/24) de las mencionadas en el paper original. Concretamente, podemos ver que aparecen adicionalmente 192.168.100.27, 192.168.100.46 y 192.168.100.55, además de la dirección de broadcast 192.168.100.255. Por otro lado, no se han detectado tráfico hacia o desde las máquinas del clúster VMWare con direcciones IP 192.168.1.100.(20, 22, 24). Respecto al número de direcciones IP únicas, podemos observar que aparecen 293 de estas, menos que en CICDDos2019.
+
 
