@@ -1,0 +1,43 @@
+\subsection{ToN-IoT}
+
+\subsubsection{Descripción}
+
+ToN es un dataset creado por la University of New South Wales Canberra, Australia \cite{9189760}. Para generarlo, se estructuró un entorno de red con tres capas llamadas Edge, Fog y Cloud para simular un entorno realista. Como tecnología de virtualización, se utiliza NSX-VMware, el cual permite definir una red a través de software (SDN), y para gestionar las máquinas virtuales se ha hecho uso de VMware vSphere hypervisor NFV.
+
+Para la capa Edge, tenemos diferentes dispositivos físicos, un servidor NSX VMWare y diferentes equipos de red. En esta capa, se incluyen diversos sensores IoT tanto simulados como reales y comunicados a través de MQTT. Adicionalmente, se incluyen hosts de usuarios como teléfonos móviles y un televisor. En esta capa, los dispositivos se les asigna una dirección IP en el rango 192.168.1.0/24 a través de DHCP.
+
+En la capa Fog tenemos diferentes máquinas virtualizadas, incluyendo dispositivos vulnerables, atacantes y middleware. Estos son:
+\begin{enumerate}
+  \item Diez máquinas atacantes con Kali Linux (192.168.1.30-39) con diferentes scripts de ataque.
+  \item Máquina virtual ofreciendo DVWA, una aplicación web vulnerable (192.168.1.192)
+  \item Máquina virtual con Metasploitable3, una distribución Linux específicamente diseñada para ser vulnerable contra la cual hacer pruebas. (192.168.1.194)
+  \item Máquina virtual con OWASP Security Shepherd, una plataforma conteniendo aplicaciones vulnerables sobre las cuales hacer pruebas (192.168.1.184)
+  \item Servidor Ubuntu ofreciendo diferentes servicios con FTP, HTTPS, etc. (192.168.1.190)
+  \item Un servidor para registrar registros de red de todos los servicios activos (192.168.1.180)
+  \item Máquina virtual con Windows 7 (192.168.1.193)
+  \item Máquina virtual con Windows 10 (192.168.1.195)
+\end{enumerate}
+
+La capa Cloud contiene varios servicios como un broker MQTT, una web vulnerable en PHP, entre servicios cloud para gestionar los mensajes. Esta capa recibe los datos de los dispositivos IoT para ser procesados.
+
+Los dispositivos IoT utilizados consisten en una nevera inteligente, una puerta de garaje remotamente controlada, un objeto con GPS, luces activadas por movimiento, un servicio Modbus con el que se comunican diferentes valores de registros, un termostato inteligente y un sistema de monitorización del clima
+
+Aparte del tráfico benigno, hay 8 ataques, los cuales se han realizado en el momento de generar datos. Estos consisten en:
+\begin{enumerate}
+  \item \textbf{Escaneo}: ataque basado en el escaneo de puertos para descubrir vectores de ataque potenciales. Se han utilizado nmap y nesus para escanear los puertos disponibles en los dispositivos IoT víctima en el rango 192.\-168.\-1.\-0/24 y en el broker MQTT. Las IP de los atacantes consisten en 192.\-168.\-1.\-30, 192.\-168.\-1.\-31, 192.\-168.\-1.\-32, 192.168.1.\-33 y 192.168.1.\-38
+  \item \textbf{Denegación de servicio}: ataque basado en saturar los recursos de un dispositivo para denegar el servicio legítimo. A través de scripts de Python y UFONet se ha tratado de generar ataques de denegación de servicio (dsitribuidos y no distribuidos). Las IP de los atacantes en los ataques no distribuidos son 192.\-168.\-1.\-30, 192.\-168.\-1.\-31 y 192.\-168.1.\-39. Los distribuidos se han realizado desde 192.\-168.\-1.\-30, 192.\-168.\-1.\-31 y 192.\-168.\-1.\-(34-38)
+  \item \textbf{Ransomware}: ataque basado en encriptar el sistema de ficheros y vender las claves de descifrado por un precio, "secuestrando" el sistema. El ataque se ha realizado a través del sistema con Metasploitable3 y las IP de los atacantes son 192.168.1.33 y 192.168.1.37.
+  \item \textbf{Puertas traseras}: ataque basado en generar en un sistema la capacidad de obtener acceso remoto no autorizado. Se ha utilizado Metasplotaible3 y los ataques se han generado desde 192.168.33 y 192.168.1.37
+  \item \textbf{Inyección}: ataque basado en inyectar datos maliciosos para manipular comandos de control e interrumpir el funcionamiento normal del sistema. Se han utilizado scripts en Bash para realizar la inyección y han participado los sistemas 192.168.1(30, 31, 33, 35, 36, 38).
+  \item \textbf{Cross-Site Scripting}: ataque basado en provocar la ejecución de código arbitrario en el navegador desde en una página web en otra. Se han utilizado scripts en Bash y la herramienta XSSer para generarlo desde 192.168.1.(32, 35, 36, 39).
+  \item \textbf{Descifrado de contraseñas}: ataque basado en fuerza bruta y/o diccionarios para descubrir las claves de acceso a dispositivos. Se han utilizado dos scripts con las herramientas CeWL y Hydra para los ataques de diccionario y fuerza bruta, respectivamente. Los dispositivos atacantes consisten en 192.168.1.(30, 31, 33, 35, 38).
+  \item \textbf{Man-In-The-Middle}: ataque basado en tratar de interponerse en medio de las comunicaciones entre dos dispositivos para interceptar información y potencialmente modificar los datos. Los ataques generados se han basado en el envenenamiento del cache ARP, redirección ICMP y robo de puertos. Las máquinas utilizadas han sido 192.168.1.(31, 32, 33, 34).
+\end{enumerate}
+
+\subsubsection{Contenidos CSVs}
+
+- ground truth/network dataset processed
+
+\subsubsection{Contenidos PCAPs y Bro files}
+
+(por hacer)
