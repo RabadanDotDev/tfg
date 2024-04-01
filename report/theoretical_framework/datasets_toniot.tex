@@ -58,6 +58,56 @@ Si observamos la línea temporal de la figura \ref{fig:toniot_timeline} podemos 
   \caption{Línea temporal de las trazas con los tipos de ataque en Ton-Iot)}\label{fig:toniot_timeline}
 \end{figure}
 
+En total, hay 46 características disponibles en el dataset y explicadas en el conjunto de datos descargables. Manteniendo el formato, las características consisten en:
+
+\begin{enumerate}
+  \item \textbf{ts}: Tiempo de inicio del flujo expresado en tiempo Unix con segundos.
+  \item \textbf{src\_ip}: Dirección IP de origen.
+  \item \textbf{src\_port}: Puerto IP de origen.
+  \item \textbf{dst\_ip}: Dirección IP de destino.
+  \item \textbf{dst\_proto}: Puerto IP de destino.
+  \item \textbf{proto}: Nombre del protocolo transporte utilizado.
+  \item \textbf{service}: Protocolos de aplicación detectados, como DNS, HTTP y SSL.
+  \item \textbf{duration}: Duración del flujo, calculado a partir de substraer el tiempo del último paquete detectado del primero.
+  \item \textbf{src\_bytes}: Bytes enviados por el emisor inicial como datos sobre TCP, si aplica.
+  \item \textbf{dst\_bytes}: Bytes enviados por el receptor como inicial como datos sobre TCP, si aplica.
+  \item \textbf{conn\_state}: Estado de la conexión, expresado como S0 (intento de conexión sin respuesta), S1 (conexión establecida) y REJ (conexión rechazada).
+  \item \textbf{missed\_byttes}: Bytes perdidos detectados en la conexión TCP.
+  \item \textbf{src\_pkts}: Número de paquetes enviados por el emisor inicial.
+  \item \textbf{src\_ip\_bytes}: Número de bytes enviados sobre IP por el emisor inicial.
+  \item \textbf{dst\_pkts}: Número de paquetes enviados por el receptor inicial.
+  \item \textbf{dst\_ip\_bytes}: Número de bytes enviados sobre IP por el receptor inicial.
+  \item \textbf{dns\_query}: Nombres pedidos en la petición DNS, si aplica.
+  \item \textbf{dns\_qclass}: Entero indicando las clases de la petición DNS realizada, si aplica.
+  \item \textbf{dns\_qtype}: Entero indicando los tipos de petición DNS realizada, si aplica.
+  \item \textbf{dns\_rcode}: Entero indicando el código de respuesta del DNS, si aplica.
+  \item \textbf{dns\_AA}: Indicador booleano si la respuesta del DNS es autoritativa, si aplica.
+  \item \textbf{dns\_RD}: Indicador booleano si la petición DNS pide recursividad, si aplica.
+  \item \textbf{dns\_RA}: Indicador booleano si el servidor DNS soporta recursividad, si aplica.
+  \item \textbf{dns\_rejected}: Indicador booleano si el servidor DNS ha rechazado la petición, si aplica.
+  \item \textbf{ssl\_version}: La versión SSL ofrecida por el servidor, si aplica
+  \item \textbf{ssl\_cipher}: El conjunto de cifrados SSL escogido por el servidor, si aplica.
+  \item \textbf{ssl\_resumed}: Indicador booleano indicando que la sesión SSL puede ser utilizada para generar conexiones, si aplica.
+  \item \textbf{ssl\_established}: Indicador booleano indicando si existe una sesión SSL establecida, si aplica.
+  \item \textbf{ssl\_subject}: Nombre del propietario del certificado SSL, si aplica.
+  \item \textbf{ssl\_issuer}: Emisor del certificado SSL y autoridad, si aplica.
+  \item \textbf{http\_trans\_depth}: Profundidad de la transferencia HTPP, si aplica.
+  \item \textbf{http\_method}: Método HTTP utilizado, si aplica.
+  \item \textbf{http\_uri}: URI utilizadas en la petición HTTP, si aplica.
+  \item \textbf{http\_version}: Versión HTTP utilizada, si aplica.
+  \item \textbf{http\_request\_body\_len}: Longitud de la petición HTTP, si aplica.
+  \item \textbf{http\_response\_body\_len}: Longitud de la respuesta HTTP, si aplica.
+  \item \textbf{http\_status\_code}: Codigo de respuesta de la petición HTTP, si aplica.
+  \item \textbf{http\_user\_agent}: Valores del agente de usuario en la petición HTTP, si aplica.
+  \item \textbf{http\_orig\_mime\_types}: Tipos de recursos pedidos en la petición HTTP, si aplica.
+  \item \textbf{http\_resp\_mime\_types}: Tipos de recursos devueltos en la petición HTTP, si aplica.
+  \item \textbf{weird\_name}: Nombres de las anomalías relacionadas con los protocolos ocurridos.
+  \item \textbf{weird\_addl}: Información adicional asociada a las anomalías.
+  \item \textbf{weird\_notice}: Indica si la anomalía se ha convertido en una notificación.
+  \item \textbf{label}: Indicador si el flujo es normal (0) o un ataque (1)
+  \item \textbf{type}: Nombre del tipo de flujo, siendo este normal o DoS, DDoS, etc.
+\end{enumerate}
+
 \subsubsection{Contenidos PCAPs y Bro files}
 
 (por hacer)
