@@ -110,10 +110,9 @@ En total, hay 46 características disponibles en el dataset y explicadas en el c
 
 \subsubsection{Contenidos PCAPs}
 
+El dataset TON-IoT ofrece 64 archivos (48.1 GiB) de trazas de red con tráfico normal y tráfico de con ataques entremezclados con tráfico normal. El tráfico sin ataques es alrededor de 15.6 GiB, un 32.43\% del total y el resto se encuentra repartido por cada tipo de ataque. El script utilizado para la extracción es \texttt{extract\_info\_toniot\_pcaps\_tshark.sh} y el utilizado para la representación de estos es \texttt{evaluate\_info\_toniot\_pcaps\_tshark.py} disponible en TODO DEFINIR.
 
-\input{theoretical_framework/datasets_toniot_protosip.tex}
-
-\input{theoretical_framework/datasets_toniot_protos.tex}
+En los PCAP, aparecen un total de 29 270 direcciones IP únicas, una cantidad mucho mayor que la que tenemos en los otros dos datasets. Aparte de las direcciones IP mencionadas explícitamente en el paper original, aparecen una dirección IP del posible router, la dirección IP de broadcast y 13 direcciones IP adicionales. Estas últimas son posiblemente los otros dispositivos IoT y dispositivos de usuarios, los cuales sus direcciones han sido asignadas por DHCP. Adicionalmente, hay 9 archivos, los cuales tshark ha notificado que tenían un corte en los datos.
 
 % archivos pcap cortados 
 %"/Datasets/TON-IoT/Raw_datasets/network_data/Network_dataset_pcaps/normal_attack_pcaps/Injection_normal/injection_normal1.pcap"
@@ -125,3 +124,49 @@ En total, hay 46 características disponibles en el dataset y explicadas en el c
 %"/Datasets/TON-IoT/Raw_datasets/network_data/Network_dataset_pcaps/normal_attack_pcaps/password_normal/password_normal1.pcap"
 %"/Datasets/TON-IoT/Raw_datasets/network_data/Network_dataset_pcaps/normal_pcaps/normal_IoT_2.pcap" 
 %"/Datasets/TON-IoT/Raw_datasets/network_data/Network_dataset_pcaps/normal_pcaps/normal_IoT_3.pcap" 
+
+Para este dataset, también se han generado diferentes histogramas para asegurar la consistencia de la herramienta. En este dataset, como podemos ver en la figura \ref{fig:toniot_pcap_duration_distribution}, los flujos se concentran principalmente en tiempos cortos, con dos agrupaciones en el centro y en las más elevadas. Sin embargo, los rangos son distintos, comparado con las figuras \ref{fig:cicddos_2019_pcap_duration_distribution} y \ref{fig:botiot_pcap_duration_distribution}. En las anteriores, el rango se comprendía entre 0 y 10 000 en el primer caso y 0 y 2000 en el segundo. En este, el rango es mucho más extenso, llegando hasta 100 000. Si miramos los números de tramas y bytes de las figuras \ref{fig:toniot_pcap_frames_distribution} y \ref{fig:toniot_pcap_frames_distribution}, podemos ver que sigue una forma descendiente, conciertos puntos más planos y algún pico. Esta distribución es distinta a la que nos hemos encontrado en BoT-IoT, donde había agrupaciones de tamaños, y de CICDDos2019, donde había un pico pronunciado al final del gráfico.
+
+\begin{figure}[H]
+  \begin{center}
+      \includegraphics[width=0.49\linewidth]{media/toniot_pcap_duration_distribution.png}
+  \end{center}
+  \captionsetup{justification=centering}
+  \caption{Distribución duraciones de flujos en TON-IoT}\label{fig:toniot_pcap_duration_distribution}
+\end{figure}
+
+\begin{figure}[H]
+  \minipage{0.49\textwidth}
+    \includegraphics[width=\linewidth]{media/toniot_pcap_frames_distribution.png}
+    \captionsetup{justification=centering}
+    \caption{Distribución número de tramas en flujos en TON-IoT}\label{fig:toniot_pcap_frames_distribution}
+  \endminipage\hfill
+  \minipage{0.49\textwidth}
+    \includegraphics[width=\linewidth]{media/toniot_pcap_bytes_distribution.png}
+    \captionsetup{justification=centering}
+    \caption{Distribución número de bytes en flujos en TON-IoT}\label{fig:toniot_pcap_bytes_distribution}
+  \endminipage\hfill
+\end{figure}
+
+En la tabla \ref{table:toniotprotocolsip} podemos ver el resultado del análisis con tshark sobre la repartición de los diferentes protocolos de transporte sobre IPv4. A diferencia de los otros casos, la mayoría de tramas en este dataset van sobre TCP (90.154\%) y tiene cierto tráfico que se puede considerar residual en UDP (5.982\%) y no identificado (3.864\%).
+
+\input{theoretical_framework/datasets_toniot_protosip.tex}
+
+La tabla \ref{table:botiotprotocols}, que contiene las tres primeras capas de protocolos identificados en BoT-IoT, es de mayor tamaño que en los casos anteriores. Esto es debido a que aparece el uso de "sll" (no confundir con SSL) aparte del tráfico sobre Ethernet. Si abrimos los ficheros con WireShark, podemos observar que este consiste en el tipo "Linux cooked capture", el cual puede contener paquetes IP como en la figura \ref{fig:toniot_pcap_ssl_ip_packet} o paquetes Ethernet como en la figura \ref{fig:toniot_pcap_ssl_eth_packet}. Se puede observar en esta última que WireShark no es capaz de reconocer los contenidos de la siguiente capa. Esta capa de enlace no es una capa de enlace real, sino que es una especial para guardar trazas de red de forma más flexible. 
+
+\begin{figure}[H]
+  \minipage{0.49\textwidth}
+  \includegraphics[width=\linewidth]{media/toniot_pcap_ssl_ip_packet.png}
+  \captionsetup{justification=centering}
+  \caption{Paquete SLL sin ETHII en TON-IOT}\label{fig:toniot_pcap_ssl_ip_packet}
+  \endminipage\hfill
+  \minipage{0.49\textwidth}
+    \includegraphics[width=\linewidth]{media/toniot_pcap_ssl_eth_packet.png}
+    \captionsetup{justification=centering}
+    \caption{Paquete SLL con EthII en TIN-IOT}\label{fig:toniot_pcap_ssl_eth_packet}
+  \endminipage\hfill
+\end{figure}
+
+Podemos ver que la mayoría de los datos expresados en la tabla \ref{table:botiotprotocols} están encapsulados en SLL (34.4 GiB) y no se incluyen las cabeceras Ethernet originales, sino que aparece la capa IP directamente (22.8 GiB) y a continuación TCP (21.7 GiB). De todas maneras, hay una cantidad considerable de tramas (11.3 GiB), las cuales sí que incluyen la capa Ethernet. Adicionalmente, parte de los datos no utilizan SLL como encapsulación, sino que hacen uso de Ethernet como en los otros datasets (8.4 GiB). 
+
+\input{theoretical_framework/datasets_toniot_protos.tex}
