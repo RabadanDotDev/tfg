@@ -9,7 +9,8 @@
 		"ghcr.io/devcontainers/features/python:1": {},
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
 			"packages": "tshark"
-		}
+		},
+		"ghcr.io/devcontainers/features/rust:1": {}
 	},
 
 	"forwardPorts": [],
