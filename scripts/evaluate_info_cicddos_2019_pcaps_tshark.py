@@ -250,7 +250,7 @@ def tree_proto_gen_tex_table(contents):
     lines.append(r'            \hline')
     lines.append(r'        \end{tabular}')
     lines.append(r'    \end{center}')
-    lines.append(r'    \caption{Primeras tres capas de protocolos identificados en CICDDos2019}')
+    lines.append(r'    \caption{Primeras tres capas de protocolos identificados en CIC-DDos2019}')
     lines.append(r'    \label{table:cicddos2019protocols}')
     lines.append(r'\end{table}')
 
@@ -332,7 +332,7 @@ def ip_proto_gen_tex_table(contents):
     lines.append(r'            \hline')
     lines.append(r'        \end{tabular}')
     lines.append(r'    \end{center}')
-    lines.append(r'    \caption{Protocolos identificados analizando exclusivamente la capa IP en CICDDos2019}')
+    lines.append(r'    \caption{Protocolos identificados analizando exclusivamente la capa IP en CIC-DDos2019}')
     lines.append(r'    \label{table:cicddos2019protocolsip}')
     lines.append(r'\end{table}')
 
