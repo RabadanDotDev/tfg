@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 use clap::{Parser, Subcommand};
+use packet_pincer::PcapList;
 use pcap::Device;
 
 #[derive(Parser, Debug)]
@@ -30,6 +31,8 @@ fn main() {
 
     match settings.analysis {
         Commands::OfflineAnalysis { traces_dir } => {
+            let _pcap_path_list = PcapList::from(&traces_dir);
+            println!("{:?}", _pcap_path_list);
             todo!()
         },
         Commands::OnlineAnalysis { network_interface: _ } => {
