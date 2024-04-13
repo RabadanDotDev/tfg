@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use pcap::{Active, Capture, Offline, Packet, PacketHeader};
+use pcap::{Active, Capture, Linktype, Offline, Packet, PacketHeader};
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
@@ -45,22 +45,25 @@ impl PacketCapture {
     /// in the case of device captures.
     pub fn try_process_next<F>(&mut self, process_packet: &mut F) -> bool
     where
-        F: FnMut(PacketOrigin, &Packet<'_>) -> (),
+        F: FnMut(PacketOrigin, Linktype, &Packet<'_>) -> (),
     {
         match self {
             Self::FileCapture(file_capture_list) => {
                 file_capture_list.try_process_next(process_packet)
             }
-            Self::DeviceCapture(capture) => match capture.next_packet() {
-                Ok(packet) => {
-                    process_packet(PacketOrigin::Device(), &packet);
-                    true
+            Self::DeviceCapture(capture) => {
+                let datalink = capture.get_datalink();
+                match capture.next_packet() {
+                    Ok(packet) => {
+                        process_packet(PacketOrigin::Device(), datalink, &packet);
+                        true
+                    }
+                    Err(err) => {
+                        println!("Error on extracting next packet from device: {}", err);
+                        false
+                    }
                 }
-                Err(err) => {
-                    println!("Error on extracting next packet from device: {}", err);
-                    false
-                }
-            },
+            }
         }
     }
 }
@@ -123,7 +126,7 @@ impl FileCaptureList {
     /// Process next packet with the given clousure if it exists.
     fn try_process_next<F>(&mut self, process_packet: &mut F) -> bool
     where
-        F: FnMut(PacketOrigin, &Packet<'_>) -> (),
+        F: FnMut(PacketOrigin, Linktype, &Packet<'_>) -> (),
     {
         loop {
             match self.current_capture {
@@ -137,23 +140,27 @@ impl FileCaptureList {
                         self.current_capture = Some(next_capture);
                     }
                 },
-                Some(ref mut current_capture) => match current_capture.capture.next_packet() {
-                    Err(err) => {
-                        println!(
-                            "Could not extract next packet of current capture from path {}: {}",
-                            current_capture.capture_path.display(),
-                            err
-                        );
-                        self.current_capture = None;
+                Some(ref mut current_capture) => {
+                    let datalink = current_capture.capture.get_datalink();
+                    match current_capture.capture.next_packet() {
+                        Err(err) => {
+                            println!(
+                                "Could not extract next packet of current capture from path {}: {}",
+                                current_capture.capture_path.display(),
+                                err
+                            );
+                            self.current_capture = None;
+                        }
+                        Ok(packet) => {
+                            process_packet(
+                                PacketOrigin::File(current_capture.capture_path.as_path()),
+                                datalink,
+                                &packet,
+                            );
+                            return true;
+                        }
                     }
-                    Ok(packet) => {
-                        process_packet(
-                            PacketOrigin::File(current_capture.capture_path.as_path()),
-                            &packet,
-                        );
-                        return true;
-                    }
-                },
+                }
             }
         }
     }

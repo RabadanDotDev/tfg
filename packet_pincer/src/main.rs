@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use packet_pincer::{Device, Packet, PacketCapture, PacketOrigin};
+use packet_pincer::{try_parse_packet, FlowIdentifier, Device, Linktype, Packet, PacketCapture, PacketOrigin};
 use std::{path::PathBuf, process::exit, sync::mpsc::channel};
 
 #[derive(Parser, Debug)]
@@ -42,7 +42,16 @@ fn main() {
     };
 
     let mut packet_count: i32 = 0;
-    let mut process = |_p: PacketOrigin, _a: &Packet<'_>| {
+    let mut valid_count: i32 = 0;
+    let mut ignored_count: i32 = 0;
+    let mut process = |_p: PacketOrigin, link_type: Linktype, packet: &Packet<'_>| {
+        match try_parse_packet(link_type, packet) {
+            Some(packet) => match FlowIdentifier::from_sliced_packet(packet) {
+                Some(_flow_identifier) => valid_count = valid_count + 1,
+                None => ignored_count = ignored_count + 1
+            }
+            None => ignored_count = ignored_count + 1,
+        }
         packet_count = packet_count + 1;
     };
 
@@ -66,5 +75,7 @@ fn main() {
         }
     }
 
-    println!("{} packets have been processed", packet_count)
+    println!("{} packets have been processed", packet_count);
+    println!("{} packets were valid", valid_count);
+    println!("{} packets were invalid", ignored_count);
 }
