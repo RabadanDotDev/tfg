@@ -1,17 +1,8 @@
-use chrono::{DateTime, Utc};
-use pcap::{Active, Capture, Linktype, Offline, Packet, PacketHeader};
+use pcap::{Active, Capture, Linktype, Offline, Packet};
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
-fn get_datetime_of_packet(packet_header: &PacketHeader) -> DateTime<Utc> {
-    DateTime::from_timestamp(
-        packet_header.ts.tv_sec,
-        (packet_header.ts.tv_usec * 1_000)
-            .try_into()
-            .expect("Packet headers with invalid timestamps are not supported"),
-    )
-    .expect("Packet headers with invalid timestamps are not supported")
-}
+use crate::packet_parse::get_datetime_of_packet;
 
 /// Packet origin
 pub enum PacketOrigin<'a> {
