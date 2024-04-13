@@ -1,7 +1,7 @@
-use std::path::PathBuf;
 use clap::{Parser, Subcommand};
-use packet_pincer::PcapList;
-use pcap::Device;
+use packet_pincer::OfflineCaptureList;
+use pcap::{Device, Packet};
+use std::path::{Path, PathBuf};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -31,11 +31,27 @@ fn main() {
 
     match settings.analysis {
         Commands::OfflineAnalysis { traces_dir } => {
-            let _pcap_path_list = PcapList::from(&traces_dir);
-            println!("{:?}", _pcap_path_list);
+            let mut pcap_path_list = OfflineCaptureList::from(&traces_dir);
+
+            let mut process_state: i32 = 0;
+            let mut process = |_p: &Path, a: &Packet<'_>| {
+                println!(
+                    "{:?} - {:?} - {:?}",
+                    process_state, a.header.ts.tv_sec, a.header.ts.tv_usec
+                );
+                process_state = process_state + 1;
+            };
+
+            pcap_path_list.try_process_next(&mut process);
+            pcap_path_list.try_process_next(&mut process);
+            pcap_path_list.try_process_next(&mut process);
+            pcap_path_list.try_process_next(&mut process);
+
             todo!()
-        },
-        Commands::OnlineAnalysis { network_interface: _ } => {
+        }
+        Commands::OnlineAnalysis {
+            network_interface: _,
+        } => {
             todo!()
         }
     }
