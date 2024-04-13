@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
-use packet_pincer::{PacketOrigin, PacketCapture, Packet, Device};
-use std::{path::PathBuf, process::exit};
+use packet_pincer::{Device, Packet, PacketCapture, PacketOrigin};
+use std::{path::PathBuf, process::exit, sync::mpsc::channel};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -25,14 +25,11 @@ enum Commands {
     },
 }
 
-
 fn main() {
     let settings = Settings::parse();
 
     let mut packet_capture = match settings.analysis {
-        Commands::OfflineAnalysis { traces_dir } => {
-            PacketCapture::from_directory(&traces_dir)
-        }
+        Commands::OfflineAnalysis { traces_dir } => PacketCapture::from_directory(&traces_dir),
         Commands::OnlineAnalysis { network_interface } => {
             match PacketCapture::from_device(network_interface) {
                 Ok(capture) => capture,
@@ -45,15 +42,29 @@ fn main() {
     };
 
     let mut packet_count: i32 = 0;
-    let mut process = |_p: PacketOrigin, a: &Packet<'_>| {
-        println!(
-            "{:?} - timestamp: {:?}.{:?}",
-            packet_count, a.header.ts.tv_sec, a.header.ts.tv_usec
-        );
+    let mut process = |_p: PacketOrigin, _a: &Packet<'_>| {
         packet_count = packet_count + 1;
     };
 
+    // Setup SIGINT, SIGTERM and SIGHUP handling
+    // TODO: handle faster termination if there are no packets being sent on a device capture
+    let (tx, rx) = channel();
+    ctrlc::set_handler(move || tx.send(()).expect("Could not send signal on channel."))
+        .expect("Error setting Ctrl-C handler");
+
+    // Loop until completion or interrupted
     loop {
-        packet_capture.try_process_next(&mut process);
+        match rx.try_recv() {
+            Ok(_) => {
+                println!("Interrupt caught. Terminating...");
+                break;
+            }
+            Err(_) => match packet_capture.try_process_next(&mut process) {
+                true => continue,
+                false => break,
+            },
+        }
     }
+
+    println!("{} packets have been processed", packet_count)
 }

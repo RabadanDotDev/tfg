@@ -41,7 +41,8 @@ impl PacketCapture {
         Ok(Self::DeviceCapture(capture))
     }
 
-    /// Try process next packet if possible
+    /// Try process next packet if possible. Blocks until a packet is received
+    /// in the case of device captures.
     pub fn try_process_next<F>(&mut self, process_packet: &mut F) -> bool
     where
         F: FnMut(PacketOrigin, &Packet<'_>) -> (),
@@ -53,9 +54,12 @@ impl PacketCapture {
             Self::DeviceCapture(capture) => match capture.next_packet() {
                 Ok(packet) => {
                     process_packet(PacketOrigin::Device(), &packet);
-                    return true;
+                    true
                 }
-                Err(_) => return false,
+                Err(err) => {
+                    println!("Error on extracting next packet from device: {}", err);
+                    false
+                }
             },
         }
     }
@@ -125,11 +129,24 @@ impl FileCaptureList {
             match self.current_capture {
                 None => match self.captures_iterator.next() {
                     None => return false,
-                    Some(next_capture) => self.current_capture = Some(next_capture),
+                    Some(next_capture) => {
+                        println!(
+                            "Current capture path changed to {}",
+                            next_capture.capture_path.display()
+                        );
+                        self.current_capture = Some(next_capture);
+                    }
                 },
-                Some(ref mut current_capture) => match current_capture.capture.next_packet().ok() {
-                    None => self.current_capture = None,
-                    Some(packet) => {
+                Some(ref mut current_capture) => match current_capture.capture.next_packet() {
+                    Err(err) => {
+                        println!(
+                            "Could not extract next packet of current capture from path {}: {}",
+                            current_capture.capture_path.display(),
+                            err
+                        );
+                        self.current_capture = None;
+                    }
+                    Ok(packet) => {
                         process_packet(
                             PacketOrigin::File(current_capture.capture_path.as_path()),
                             &packet,
