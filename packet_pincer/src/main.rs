@@ -1,7 +1,6 @@
 use clap::{Parser, Subcommand};
-use packet_pincer::OfflineCaptureList;
-use pcap::{Device, Packet};
-use std::path::{Path, PathBuf};
+use packet_pincer::{PacketOrigin, PacketCapture, Packet, Device};
+use std::{path::PathBuf, process::exit};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -26,33 +25,35 @@ enum Commands {
     },
 }
 
+
 fn main() {
     let settings = Settings::parse();
 
-    match settings.analysis {
+    let mut packet_capture = match settings.analysis {
         Commands::OfflineAnalysis { traces_dir } => {
-            let mut pcap_path_list = OfflineCaptureList::from(&traces_dir);
-
-            let mut process_state: i32 = 0;
-            let mut process = |_p: &Path, a: &Packet<'_>| {
-                println!(
-                    "{:?} - {:?} - {:?}",
-                    process_state, a.header.ts.tv_sec, a.header.ts.tv_usec
-                );
-                process_state = process_state + 1;
-            };
-
-            pcap_path_list.try_process_next(&mut process);
-            pcap_path_list.try_process_next(&mut process);
-            pcap_path_list.try_process_next(&mut process);
-            pcap_path_list.try_process_next(&mut process);
-
-            todo!()
+            PacketCapture::from_directory(&traces_dir)
         }
-        Commands::OnlineAnalysis {
-            network_interface: _,
-        } => {
-            todo!()
+        Commands::OnlineAnalysis { network_interface } => {
+            match PacketCapture::from_device(network_interface) {
+                Ok(capture) => capture,
+                Err(error) => {
+                    println!("Could not open device: {}", error);
+                    exit(1)
+                }
+            }
         }
+    };
+
+    let mut packet_count: i32 = 0;
+    let mut process = |_p: PacketOrigin, a: &Packet<'_>| {
+        println!(
+            "{:?} - timestamp: {:?}.{:?}",
+            packet_count, a.header.ts.tv_sec, a.header.ts.tv_usec
+        );
+        packet_count = packet_count + 1;
+    };
+
+    loop {
+        packet_capture.try_process_next(&mut process);
     }
 }
