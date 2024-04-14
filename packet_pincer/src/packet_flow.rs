@@ -1,9 +1,9 @@
 use chrono::{DateTime, TimeDelta, Utc};
 use etherparse::SlicedPacket;
 use priority_queue::PriorityQueue;
-use std::{cmp::Reverse, collections::HashMap};
+use std::{cmp::Reverse, collections::HashMap, io::{BufWriter, Error, Write}};
 
-use crate::{flow_statistic::{FlowStatistic, Include}, get_datetime_of_packet, try_parse_packet, FlowIdentifier};
+use crate::{flow_statistic::{FlowStatistics, FlowStat}, get_datetime_of_packet, try_parse_packet, FlowIdentifier};
 
 /// The commulative information of the flow of information between two hosts
 #[derive(Debug)]
@@ -12,7 +12,7 @@ pub struct Flow {
     identifier: FlowIdentifier,
     first_packet_time: DateTime<Utc>,
     last_packet_time: DateTime<Utc>,
-    statistics: FlowStatistic
+    statistics: FlowStatistics
 }
 
 impl Flow {
@@ -24,7 +24,7 @@ impl Flow {
     ) -> Flow {
         let packet_time = get_datetime_of_packet(packet_header)
             .expect("Packet headers with invalid timestamps are not supported");
-        let mut statistics = FlowStatistic::new();
+        let mut statistics = FlowStatistics::new();
         statistics.include(&packet_header, &sliced_packet);
 
         Flow {
@@ -45,6 +45,24 @@ impl Flow {
         self.last_packet_time =
             packet_time.expect("Packet headers with invalid timestamps are not supported");
         self.statistics.include(&packet_header, &sliced_packet);
+    }
+
+    /// Write the header for separated information values of the flows to the given writer
+    pub fn write_csv_header<T: ?Sized + std::io::Write>(writer: &mut BufWriter<T>) -> Result<(), Error> {
+        FlowIdentifier::write_csv_header(writer)?;
+        write!(writer, ",")?;
+        FlowStatistics::write_csv_header(writer)?;
+        write!(writer, "\n")?;
+        Ok(())
+    }
+    
+    /// Write the coma separated information values of the flow to the given writer
+    pub fn write_csv_value<T: ?Sized + std::io::Write>(&self, writer: &mut BufWriter<T>) -> Result<(), Error> {
+        self.identifier.write_csv_value(writer)?;
+        write!(writer, ",")?;
+        self.statistics.write_csv_value(writer)?;
+        write!(writer, "\n")?;
+        Ok(())
     }
 }
 

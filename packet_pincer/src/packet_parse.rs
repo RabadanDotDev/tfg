@@ -3,6 +3,7 @@ use chrono::Utc;
 use etherparse::IpNumber;
 use etherparse::SlicedPacket;
 use std::hash::{Hash, Hasher};
+use std::io::{BufWriter, Error, Write};
 use std::net::IpAddr;
 
 use pcap::PacketHeader;
@@ -61,7 +62,7 @@ impl FlowIdentifier {
     }
 
     /// Try to extract the relevant flow identifiers from the sliced packet
-    pub fn from_sliced_packet(packet: &SlicedPacket) -> Option<FlowIdentifier> {
+    pub(crate) fn from_sliced_packet(packet: &SlicedPacket) -> Option<FlowIdentifier> {
         let source_ip: IpAddr;
         let source_port: u16;
         let dest_ip: IpAddr;
@@ -106,6 +107,21 @@ impl FlowIdentifier {
             dest_port,
             transport_protocol,
         })
+    }
+
+    pub(crate) fn write_csv_header<T: ?Sized + std::io::Write>(writer: &mut BufWriter<T>) -> Result<(), Error> {
+        write!(writer, "source_ip,source_port,dest_ip,dest_port,is_tcp,is_udp")?;
+        Ok(())
+    }
+    
+    pub(crate) fn write_csv_value<T: ?Sized + std::io::Write>(&self, writer: &mut BufWriter<T>) -> Result<(), Error> {
+        write!(writer, "{},{},{},{},", self.source_ip, self.source_port, self.dest_ip, self.dest_port)?;
+        match self.transport_protocol {
+            IpNumber::TCP => write!(writer, "{},{}", 1, 0)?,
+            IpNumber::UDP => write!(writer, "{},{}", 0, 1)?,
+            _ => write!(writer, "{},{}", 0, 0)?,
+        }
+        Ok(())
     }
 }
 

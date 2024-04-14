@@ -1,11 +1,14 @@
 use chrono::TimeDelta;
 use clap::{Parser, Subcommand};
-use packet_pincer::{Device, FlowGroup, Linktype, PacketCapture, PacketOrigin};
-use std::{path::PathBuf, process::exit, sync::mpsc::channel};
+use packet_pincer::{Device, Flow, FlowGroup, Linktype, PacketCapture, PacketOrigin};
+use std::{fs::File, io::BufWriter, path::PathBuf, process::exit, sync::mpsc::channel};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Settings {
+    #[arg(short, long)]
+    pub csv_output: Option<PathBuf>,
+
     #[command(subcommand)]
     pub analysis: Commands,
 }
@@ -24,6 +27,10 @@ enum Commands {
         #[arg(short, long, value_name = "INTERFACE")]
         network_interface: Device,
     },
+}
+
+fn create_csv_output(path: Option<PathBuf>) -> Option<BufWriter<File>> {
+    Some(BufWriter::new(File::create(path?).expect("Unable to create file")))
 }
 
 fn main() {
@@ -47,6 +54,12 @@ fn main() {
     let mut ignored_count: i32 = 0;
     let mut closed_flow_count: i32 = 0;
 
+    let mut csv_writer = create_csv_output(settings.csv_output);
+
+    if let Some(ref mut w) = csv_writer {
+        _ = Flow::write_csv_header( w);
+    }
+
     let mut flows = FlowGroup::new();
     let mut process = |_p: PacketOrigin, link_type: Linktype, packet: &pcap::Packet<'_>| {
         if flows.include(link_type, packet) {
@@ -57,7 +70,9 @@ fn main() {
         packet_count = packet_count + 1;
 
         while let Some(flow) = flows.pop_oldest_flow_if_older_than(TimeDelta::seconds(300)) {
-            println!("{} - {:?}", closed_flow_count, flow);
+            if let Some(ref mut w) = csv_writer {
+                _ = flow.write_csv_value( w);
+            }
             closed_flow_count = closed_flow_count + 1;
         }
     };
@@ -77,12 +92,15 @@ fn main() {
             }
             Err(_) => match packet_capture.try_process_next(&mut process) {
                 false => break,
-                true => {},
+                true => {}
             },
         }
     }
 
-    while let Some(_flow) = flows.pop_oldest_flow() {
+    while let Some(flow) = flows.pop_oldest_flow() {
+        if let Some(ref mut w) = csv_writer {
+            _ = flow.write_csv_value( w);
+        }
         closed_flow_count = closed_flow_count + 1;
     }
 
