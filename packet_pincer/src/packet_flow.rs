@@ -9,9 +9,9 @@ use crate::{get_datetime_of_packet, try_parse_packet, FlowIdentifier};
 #[derive(Debug)]
 #[allow(dead_code)]
 pub struct Flow {
-    pub identifier: FlowIdentifier,
-    pub first_packet_time: DateTime<Utc>,
-    pub last_packet_time: DateTime<Utc>,
+    identifier: FlowIdentifier,
+    first_packet_time: DateTime<Utc>,
+    last_packet_time: DateTime<Utc>,
 }
 
 impl Flow {

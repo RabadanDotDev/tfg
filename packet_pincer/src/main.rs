@@ -1,6 +1,5 @@
 use chrono::TimeDelta;
 use clap::{Parser, Subcommand};
-use libc::printf;
 use packet_pincer::{Device, FlowGroup, Linktype, PacketCapture, PacketOrigin};
 use std::{path::PathBuf, process::exit, sync::mpsc::channel};
 
@@ -57,7 +56,7 @@ fn main() {
         }
         packet_count = packet_count + 1;
 
-        while let Some(flow) = flows.pop_oldest_flow_if_older_than(TimeDelta::seconds(300)) {
+        while let Some(_flow) = flows.pop_oldest_flow_if_older_than(TimeDelta::seconds(300)) {
             closed_flow_count = closed_flow_count + 1;
         }
     };
@@ -82,7 +81,7 @@ fn main() {
         }
     }
 
-    while let Some(flow) = flows.pop_oldest_flow() {
+    while let Some(_flow) = flows.pop_oldest_flow() {
         closed_flow_count = closed_flow_count + 1;
     }
 
