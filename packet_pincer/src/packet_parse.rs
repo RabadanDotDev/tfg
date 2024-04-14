@@ -1,45 +1,65 @@
-use std::hash::{Hash, Hasher};
-use std::net::IpAddr;
 use chrono::DateTime;
 use chrono::Utc;
-use etherparse::SlicedPacket;
 use etherparse::IpNumber;
+use etherparse::SlicedPacket;
+use std::hash::{Hash, Hasher};
+use std::net::IpAddr;
 
 use pcap::PacketHeader;
-use pcap::{Packet, Linktype};
+use pcap::{Linktype, Packet};
 
 /// Converts the timestamp of the of the packet to a Datetime<Utc> if its valid
 pub fn get_datetime_of_packet(packet_header: &PacketHeader) -> Option<DateTime<Utc>> {
     DateTime::from_timestamp(
         packet_header.ts.tv_sec,
-        (packet_header.ts.tv_usec * 1_000)
-            .try_into().ok()?
+        (packet_header.ts.tv_usec * 1_000).try_into().ok()?,
     )
 }
 
 /// Try to parse the given packet in the given link type.
-pub fn try_parse_packet<'a>(link_type: Linktype, packet: &'a Packet<'_>) -> Option<SlicedPacket<'a>> {
+pub fn try_parse_packet<'a>(
+    link_type: Linktype,
+    packet: &'a Packet<'_>,
+) -> Option<SlicedPacket<'a>> {
     match link_type {
         Linktype::ETHERNET => match SlicedPacket::from_ethernet(packet.data) {
             Ok(value) => Some(value),
-            Err(_err) => None
+            Err(_err) => None,
         },
         Linktype::LINUX_SLL => None, // TODO: implement sll suport
-        _ => None
+        _ => None,
     }
 }
 
 /// An identifier for a comunication between two hosts
 #[derive(Debug, Clone, Copy)]
 pub struct FlowIdentifier {
-    source_ip: IpAddr,
-    source_port: u16,
-    dest_ip: IpAddr,
-    dest_port: u16,
-    transport_protocol: IpNumber,
+    pub source_ip: IpAddr,
+    pub source_port: u16,
+    pub dest_ip: IpAddr,
+    pub dest_port: u16,
+    pub transport_protocol: IpNumber,
 }
 
 impl FlowIdentifier {
+    #[cfg(test)]
+    // Create a new flow identifier from the given params
+    pub(crate) fn new(
+        source_ip: IpAddr,
+        source_port: u16,
+        dest_ip: IpAddr,
+        dest_port: u16,
+        transport_protocol: IpNumber,
+    ) -> FlowIdentifier {
+        FlowIdentifier {
+            source_ip,
+            source_port,
+            dest_ip,
+            dest_port,
+            transport_protocol,
+        }
+    }
+
     /// Try to extract the relevant flow identifiers from the sliced packet
     pub fn from_sliced_packet(packet: &SlicedPacket) -> Option<FlowIdentifier> {
         let source_ip: IpAddr;
@@ -61,7 +81,7 @@ impl FlowIdentifier {
                     transport_protocol = v.header().next_header();
                 }
             },
-            None => return None
+            None => return None,
         }
 
         match &packet.transport {
@@ -74,27 +94,32 @@ impl FlowIdentifier {
                     source_port = header.source_port();
                     dest_port = header.destination_port();
                 }
-                _ => return None
-            }
-            None => return None
+                _ => return None,
+            },
+            None => return None,
         }
 
-        Some(FlowIdentifier{
+        Some(FlowIdentifier {
             source_ip,
             source_port,
             dest_ip,
             dest_port,
-            transport_protocol
+            transport_protocol,
         })
     }
 }
 
 impl PartialEq for FlowIdentifier {
     fn eq(&self, other: &Self) -> bool {
-        self.transport_protocol == other.transport_protocol && (
-            (self.source_ip == other.source_ip && self.source_port == other.source_port && self.dest_ip == other.dest_ip && self.dest_port == other.dest_port) ||
-            (self.source_ip == other.dest_ip && self.source_port == other.dest_port && self.dest_ip == other.source_ip && self.dest_port == other.source_port)
-        )
+        self.transport_protocol == other.transport_protocol
+            && ((self.source_ip == other.source_ip
+                && self.source_port == other.source_port
+                && self.dest_ip == other.dest_ip
+                && self.dest_port == other.dest_port)
+                || (self.source_ip == other.dest_ip
+                    && self.source_port == other.dest_port
+                    && self.dest_ip == other.source_ip
+                    && self.dest_port == other.source_port))
     }
 }
 
@@ -129,14 +154,14 @@ mod tests {
 
     #[test]
     fn test_eq_transport_pair() {
-        let request = FlowIdentifier{
+        let request = FlowIdentifier {
             source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
             source_port: 1234,
             dest_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
             dest_port: 80,
             transport_protocol: IpNumber::TCP,
         };
-        let reply = FlowIdentifier{
+        let reply = FlowIdentifier {
             source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
             source_port: 80,
             dest_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
@@ -151,21 +176,21 @@ mod tests {
     }
     #[test]
     fn test_different_transport_pairs() {
-        let id1 = FlowIdentifier{
+        let id1 = FlowIdentifier {
             source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
             source_port: 1234,
             dest_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
             dest_port: 80,
             transport_protocol: IpNumber::TCP,
         };
-        let id2 = FlowIdentifier{
+        let id2 = FlowIdentifier {
             source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
             source_port: 1234,
             dest_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
             dest_port: 80,
             transport_protocol: IpNumber::UDP,
         };
-        let id3 = FlowIdentifier{
+        let id3 = FlowIdentifier {
             source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
             source_port: 1234,
             dest_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),

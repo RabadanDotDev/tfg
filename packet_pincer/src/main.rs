@@ -1,4 +1,6 @@
+use chrono::TimeDelta;
 use clap::{Parser, Subcommand};
+use libc::printf;
 use packet_pincer::{Device, FlowGroup, Linktype, PacketCapture, PacketOrigin};
 use std::{path::PathBuf, process::exit, sync::mpsc::channel};
 
@@ -44,6 +46,8 @@ fn main() {
     let mut packet_count: i32 = 0;
     let mut valid_count: i32 = 0;
     let mut ignored_count: i32 = 0;
+    let mut closed_flow_count: i32 = 0;
+
     let mut flows = FlowGroup::new();
     let mut process = |_p: PacketOrigin, link_type: Linktype, packet: &pcap::Packet<'_>| {
         if flows.include(link_type, packet) {
@@ -52,6 +56,10 @@ fn main() {
             ignored_count = ignored_count + 1
         }
         packet_count = packet_count + 1;
+
+        while let Some(flow) = flows.pop_oldest_flow_if_older_than(TimeDelta::seconds(300)) {
+            closed_flow_count = closed_flow_count + 1;
+        }
     };
 
     // Setup SIGINT, SIGTERM and SIGHUP handling
@@ -68,13 +76,18 @@ fn main() {
                 break;
             }
             Err(_) => match packet_capture.try_process_next(&mut process) {
-                true => continue,
                 false => break,
+                true => {},
             },
         }
+    }
+
+    while let Some(flow) = flows.pop_oldest_flow() {
+        closed_flow_count = closed_flow_count + 1;
     }
 
     println!("{} packets have been processed", packet_count);
     println!("{} packets were valid", valid_count);
     println!("{} packets were invalid", ignored_count);
+    println!("{} flows closed", closed_flow_count);
 }
