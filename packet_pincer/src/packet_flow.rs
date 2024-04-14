@@ -3,7 +3,7 @@ use etherparse::SlicedPacket;
 use priority_queue::PriorityQueue;
 use std::{cmp::Reverse, collections::HashMap};
 
-use crate::{get_datetime_of_packet, try_parse_packet, FlowIdentifier};
+use crate::{flow_statistic::{FlowStatistic, Include}, get_datetime_of_packet, try_parse_packet, FlowIdentifier};
 
 /// The commulative information of the flow of information between two hosts
 #[derive(Debug)]
@@ -12,6 +12,7 @@ pub struct Flow {
     identifier: FlowIdentifier,
     first_packet_time: DateTime<Utc>,
     last_packet_time: DateTime<Utc>,
+    statistics: FlowStatistic
 }
 
 impl Flow {
@@ -19,15 +20,18 @@ impl Flow {
     pub fn from<'a>(
         identifier: FlowIdentifier,
         packet_header: &pcap::PacketHeader,
-        _sliced_packet: SlicedPacket<'a>,
+        sliced_packet: SlicedPacket<'a>,
     ) -> Flow {
         let packet_time = get_datetime_of_packet(packet_header)
             .expect("Packet headers with invalid timestamps are not supported");
+        let mut statistics = FlowStatistic::new();
+        statistics.include(&packet_header, &sliced_packet);
 
         Flow {
             identifier,
             first_packet_time: packet_time,
             last_packet_time: packet_time,
+            statistics
         }
     }
 
@@ -35,11 +39,12 @@ impl Flow {
     pub fn include<'a>(
         &mut self,
         packet_header: &pcap::PacketHeader,
-        _sliced_packet: SlicedPacket<'a>,
+        sliced_packet: SlicedPacket<'a>,
     ) {
         let packet_time = get_datetime_of_packet(packet_header);
         self.last_packet_time =
             packet_time.expect("Packet headers with invalid timestamps are not supported");
+        self.statistics.include(&packet_header, &sliced_packet);
     }
 }
 
@@ -48,7 +53,7 @@ impl Flow {
 pub struct FlowGroup {
     flows: HashMap<FlowIdentifier, Flow>,
     flows_queue: PriorityQueue<FlowIdentifier, Reverse<DateTime<Utc>>>,
-    latest_time: Option<DateTime<Utc>>
+    latest_time: Option<DateTime<Utc>>,
 }
 
 impl FlowGroup {
@@ -57,7 +62,7 @@ impl FlowGroup {
         FlowGroup {
             flows: HashMap::new(),
             flows_queue: PriorityQueue::new(),
-            latest_time: None
+            latest_time: None,
         }
     }
 
@@ -95,13 +100,13 @@ impl FlowGroup {
         return true;
     }
 
-    /// From the flow that has been the most time without receiving a packet, 
+    /// From the flow that has been the most time without receiving a packet,
     /// get the timestamp when the last packet was received
     pub fn get_oldest_time(&self) -> Option<DateTime<Utc>> {
         Some(self.flows_queue.peek()?.1.0)
     }
 
-    /// Try popping oldest flow if it has passed more time than `time_delta` 
+    /// Try popping oldest flow if it has passed more time than `time_delta`
     /// between last packet received on it and the last packet in general
     pub fn pop_oldest_flow_if_older_than(&mut self, time_delta: TimeDelta) -> Option<Flow> {
         if let Some((oldest_time, latest_time)) = self.get_oldest_time().zip(self.latest_time) {
@@ -145,7 +150,7 @@ mod tests {
 
         // Common packet data
         let link_type = pcap::Linktype::ETHERNET;
-        let payload = [1,2,3,4,5,6,7,8];
+        let payload = [1, 2, 3, 4, 5, 6, 7, 8];
 
         // First packet
         {
@@ -155,26 +160,25 @@ mod tests {
                 21,
                 IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
                 1234,
-                IpNumber::UDP
+                IpNumber::UDP,
             );
 
-            let origin = 
-                PacketBuilder::ethernet2([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12])
+            let origin = PacketBuilder::ethernet2([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12])
                 .ipv4([192, 168, 1, 1], [192, 168, 1, 2], 20)
                 .udp(21, 1234);
 
             let mut packet_payload = Vec::<u8>::with_capacity(origin.size(payload.len()));
             origin.write(&mut packet_payload, &payload).unwrap();
-            let packet_1 = pcap::Packet{
+            let packet_1 = pcap::Packet {
                 header: &pcap::PacketHeader {
                     ts: timeval {
                         tv_sec: 0,
-                        tv_usec: 0
+                        tv_usec: 0,
                     },
                     caplen: packet_payload.len().try_into().unwrap(),
-                    len: packet_payload.len().try_into().unwrap()
+                    len: packet_payload.len().try_into().unwrap(),
                 },
-                data: &packet_payload
+                data: &packet_payload,
             };
 
             // Include first packet on the group
@@ -192,7 +196,9 @@ mod tests {
         }
 
         // Try popping
-        assert!(flow_group.pop_oldest_flow_if_older_than(TimeDelta::microseconds(3)).is_none());
+        assert!(flow_group
+            .pop_oldest_flow_if_older_than(TimeDelta::microseconds(3))
+            .is_none());
 
         // Second packet
 
@@ -202,27 +208,26 @@ mod tests {
             1234,
             IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
             21,
-            IpNumber::UDP
+            IpNumber::UDP,
         );
 
         {
-            let origin = 
-                PacketBuilder::ethernet2([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12])
+            let origin = PacketBuilder::ethernet2([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12])
                 .ipv4([192, 168, 1, 2], [192, 168, 1, 1], 20)
                 .udp(1234, 21);
 
             let mut packet_payload = Vec::<u8>::with_capacity(origin.size(payload.len()));
             origin.write(&mut packet_payload, &payload).unwrap();
-            let packet_1 = pcap::Packet{
+            let packet_1 = pcap::Packet {
                 header: &pcap::PacketHeader {
                     ts: timeval {
                         tv_sec: 0,
-                        tv_usec: 1
+                        tv_usec: 1,
                     },
                     caplen: packet_payload.len().try_into().unwrap(),
-                    len: packet_payload.len().try_into().unwrap()
+                    len: packet_payload.len().try_into().unwrap(),
                 },
-                data: &packet_payload
+                data: &packet_payload,
             };
 
             // Include first packet on the group
@@ -232,7 +237,10 @@ mod tests {
             assert_eq!(flow_group.flows.len(), 1);
             assert_eq!(flow_group.flows_queue.len(), 1);
             assert!(flow_group.flows.contains_key(&flow_identifier_second));
-            assert_eq!(flow_group.flows_queue.peek().unwrap().0, &flow_identifier_second);
+            assert_eq!(
+                flow_group.flows_queue.peek().unwrap().0,
+                &flow_identifier_second
+            );
             assert_eq!(flow_group.get_oldest_time().unwrap().timestamp(), 0);
             assert_eq!(flow_group.get_oldest_time().unwrap().timestamp_micros(), 1);
             assert_eq!(flow_group.latest_time.unwrap().timestamp(), 0);
@@ -240,7 +248,9 @@ mod tests {
         }
 
         // Try popping
-        assert!(flow_group.pop_oldest_flow_if_older_than(TimeDelta::microseconds(3)).is_none());
+        assert!(flow_group
+            .pop_oldest_flow_if_older_than(TimeDelta::microseconds(3))
+            .is_none());
 
         // Third packet
         {
@@ -250,26 +260,25 @@ mod tests {
                 21,
                 IpAddr::V4(Ipv4Addr::new(192, 168, 1, 4)),
                 1234,
-                IpNumber::UDP
+                IpNumber::UDP,
             );
 
-            let origin = 
-                PacketBuilder::ethernet2([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12])
+            let origin = PacketBuilder::ethernet2([1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12])
                 .ipv4([192, 168, 1, 3], [192, 168, 1, 4], 20)
                 .udp(21, 1234);
 
             let mut packet_payload = Vec::<u8>::with_capacity(origin.size(payload.len()));
             origin.write(&mut packet_payload, &payload).unwrap();
-            let packet_1 = pcap::Packet{
+            let packet_1 = pcap::Packet {
                 header: &pcap::PacketHeader {
                     ts: timeval {
                         tv_sec: 0,
-                        tv_usec: 10
+                        tv_usec: 10,
                     },
                     caplen: packet_payload.len().try_into().unwrap(),
-                    len: packet_payload.len().try_into().unwrap()
+                    len: packet_payload.len().try_into().unwrap(),
                 },
-                data: &packet_payload
+                data: &packet_payload,
             };
 
             // Include first packet on the group
@@ -279,7 +288,10 @@ mod tests {
             assert_eq!(flow_group.flows.len(), 2);
             assert_eq!(flow_group.flows_queue.len(), 2);
             assert!(flow_group.flows.contains_key(&flow_identifier));
-            assert_eq!(flow_group.flows_queue.peek().unwrap().0, &flow_identifier_second);
+            assert_eq!(
+                flow_group.flows_queue.peek().unwrap().0,
+                &flow_identifier_second
+            );
             assert_eq!(flow_group.get_oldest_time().unwrap().timestamp(), 0);
             assert_eq!(flow_group.get_oldest_time().unwrap().timestamp_micros(), 1);
             assert_eq!(flow_group.latest_time.unwrap().timestamp(), 0);
@@ -287,6 +299,8 @@ mod tests {
         }
 
         // Try popping
-        assert!(flow_group.pop_oldest_flow_if_older_than(TimeDelta::microseconds(3)).is_some());
+        assert!(flow_group
+            .pop_oldest_flow_if_older_than(TimeDelta::microseconds(3))
+            .is_some());
     }
 }

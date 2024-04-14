@@ -5,6 +5,7 @@
 mod packet_capture;
 mod packet_parse;
 mod packet_flow;
+mod flow_statistic;
 
 pub use crate::packet_capture::PacketCapture;
 pub use crate::packet_capture::PacketOrigin;

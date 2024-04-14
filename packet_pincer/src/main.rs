@@ -56,7 +56,8 @@ fn main() {
         }
         packet_count = packet_count + 1;
 
-        while let Some(_flow) = flows.pop_oldest_flow_if_older_than(TimeDelta::seconds(300)) {
+        while let Some(flow) = flows.pop_oldest_flow_if_older_than(TimeDelta::seconds(300)) {
+            println!("{} - {:?}", closed_flow_count, flow);
             closed_flow_count = closed_flow_count + 1;
         }
     };
