@@ -91,14 +91,14 @@ impl FileCaptureList {
                     .ok()
                     .and_then(|packet| Some((path, packet.header.to_owned())))
             })
-            .map(|(path, packet_header)| (path, get_datetime_of_packet(&packet_header)))
+            .map(|(path, packet_header)| (get_datetime_of_packet(&packet_header), path))
             .collect();
 
         // Sort the list
-        paths.sort();
+        paths.sort_by_key(|(time, _capture)| time.expect("Packet headers with invalid timestamps are not supported"));
 
         // Open sorted captures
-        let captures_iterator = paths.into_iter().filter_map(|(capture_path, _time)| {
+        let captures_iterator = paths.into_iter().filter_map(|(_time, capture_path )| {
             Capture::from_file(&capture_path).ok().and_then(|capture| {
                 Some(FileCapture {
                     capture_path,
