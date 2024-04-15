@@ -45,7 +45,7 @@ enum Commands {
 
 fn create_packet_capture_from_settings(command: &Commands) -> PacketCapture {
     match &command {
-        Commands::OfflineAnalysis { traces_dir } => PacketCapture::from_directory(&traces_dir),
+        Commands::OfflineAnalysis { traces_dir } => PacketCapture::from_directory(traces_dir),
         Commands::OnlineAnalysis { network_interface } => {
             match PacketCapture::from_device(network_interface.clone()) {
                 Ok(capture) => capture,
@@ -69,7 +69,7 @@ fn create_termination_channel() -> Receiver<()> {
     let (tx, rx) = channel();
     ctrlc::set_handler(move || tx.send(()).expect("Could not send signal on channel."))
         .expect("Error setting Ctrl-C handler");
-    return rx;
+    rx
 }
 
 fn evaluate_packet(
@@ -80,16 +80,16 @@ fn evaluate_packet(
     packet: &pcap::Packet<'_>,
 ) {
     if flows.include(link_type, packet) {
-        execution_stats.valid_count = execution_stats.valid_count + 1
+        execution_stats.valid_count += 1
     } else {
-        execution_stats.ignored_count = execution_stats.ignored_count + 1
+        execution_stats.ignored_count += 1
     }
 
     while let Some(flow) = flows.pop_oldest_flow_if_older_than(TimeDelta::seconds(300)) {
         if let Some(ref mut w) = csv_writer {
             _ = flow.write_csv_value(w);
         }
-        execution_stats.flow_count = execution_stats.flow_count + 1;
+        execution_stats.flow_count += 1;
     }
 }
 
@@ -102,7 +102,7 @@ fn close_remaining_flows(
         if let Some(ref mut w) = csv_writer {
             _ = flow.write_csv_value(w);
         }
-        execution_stats.flow_count = execution_stats.flow_count + 1;
+        execution_stats.flow_count += 1;
     }
 }
 
@@ -120,11 +120,12 @@ fn evaluate_packets(
             break;
         }
 
-        if !packet_capture.try_process_next(
+        let process_packet =
             &mut |_p: PacketOrigin, link_type: pcap::Linktype, packet: &pcap::Packet<'_>| {
                 evaluate_packet(execution_stats, flows, csv_writer, link_type, packet);
-            },
-        ) {
+            };
+
+        if !packet_capture.try_process_next(process_packet) {
             break;
         }
     }

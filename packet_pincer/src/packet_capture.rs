@@ -23,7 +23,7 @@ pub enum PacketCapture {
 impl PacketCapture {
     /// Create a `PacketCapture`` from the valid files under a given directory
     pub fn from_directory(directory: &Path) -> PacketCapture {
-        return Self::FileCapture(FileCaptureList::from(directory));
+        Self::FileCapture(FileCaptureList::from(directory))
     }
 
     /// Create a `PacketCapture from a capture device
@@ -32,11 +32,10 @@ impl PacketCapture {
         Ok(Self::DeviceCapture(capture))
     }
 
-    /// Try process next packet if possible. Blocks until a packet is received
-    /// in the case of device captures.
+    /// Try process next packet if possible. Blocks until a packet is read
     pub fn try_process_next<F>(&mut self, process_packet: &mut F) -> bool
     where
-        F: FnMut(PacketOrigin, Linktype, &Packet<'_>) -> (),
+        F: FnMut(PacketOrigin, Linktype, &Packet<'_>),
     {
         match self {
             Self::FileCapture(file_capture_list) => {
@@ -83,28 +82,30 @@ impl FileCaptureList {
             .filter_map(|path| {
                 Capture::from_file(&path)
                     .ok()
-                    .and_then(|capture| Some((path, capture)))
+                    .map(|capture| (path, capture))
             })
             .filter_map(|(path, mut capture)| {
                 capture
                     .next_packet()
                     .ok()
-                    .and_then(|packet| Some((path, packet.header.to_owned())))
+                    .map(|packet| (path, packet.header.to_owned()))
             })
             .map(|(path, packet_header)| (get_datetime_of_packet(&packet_header), path))
             .collect();
 
         // Sort the list
-        paths.sort_by_key(|(time, _capture)| time.expect("Packet headers with invalid timestamps are not supported"));
+        paths.sort_by_key(|(time, _capture)| {
+            time.expect("Packet headers with invalid timestamps are not supported")
+        });
 
         // Open sorted captures
-        let captures_iterator = paths.into_iter().filter_map(|(_time, capture_path )| {
-            Capture::from_file(&capture_path).ok().and_then(|capture| {
-                Some(FileCapture {
+        let captures_iterator = paths.into_iter().filter_map(|(_time, capture_path)| {
+            Capture::from_file(&capture_path)
+                .ok()
+                .map(|capture| FileCapture {
                     capture_path,
                     capture,
                 })
-            })
         });
 
         // Construct
@@ -117,7 +118,7 @@ impl FileCaptureList {
     /// Process next packet with the given clousure if it exists.
     fn try_process_next<F>(&mut self, process_packet: &mut F) -> bool
     where
-        F: FnMut(PacketOrigin, Linktype, &Packet<'_>) -> (),
+        F: FnMut(PacketOrigin, Linktype, &Packet<'_>),
     {
         loop {
             match self.current_capture {
