@@ -1,6 +1,6 @@
 use chrono::TimeDelta;
 use clap::{Parser, Subcommand};
-use packet_pincer::{Device, Flow, FlowGroup, Linktype, PacketCapture, PacketOrigin};
+use packet_pincer::{Flow, FlowGroup, PacketCapture, PacketOrigin};
 use std::{
     fs::File,
     io::BufWriter,
@@ -39,7 +39,7 @@ enum Commands {
     OnlineAnalysis {
         /// Sets the network interface to capture traces from
         #[arg(short, long, value_name = "INTERFACE")]
-        network_interface: Device,
+        network_interface: pcap::Device,
     },
 }
 
@@ -76,7 +76,7 @@ fn evaluate_packet(
     execution_stats: &mut ExecutionStats,
     flows: &mut FlowGroup,
     csv_writer: &mut Option<BufWriter<File>>,
-    link_type: Linktype,
+    link_type: pcap::Linktype,
     packet: &pcap::Packet<'_>,
 ) {
     if flows.include(link_type, packet) {
@@ -121,7 +121,7 @@ fn evaluate_packets(
         }
 
         if !packet_capture.try_process_next(
-            &mut |_p: PacketOrigin, link_type: Linktype, packet: &pcap::Packet<'_>| {
+            &mut |_p: PacketOrigin, link_type: pcap::Linktype, packet: &pcap::Packet<'_>| {
                 evaluate_packet(execution_stats, flows, csv_writer, link_type, packet);
             },
         ) {

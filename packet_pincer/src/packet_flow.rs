@@ -3,7 +3,7 @@ use etherparse::SlicedPacket;
 use priority_queue::PriorityQueue;
 use std::{cmp::Reverse, collections::HashMap, io::{BufWriter, Error, Write}};
 
-use crate::{flow_statistic::{FlowStatistics, FlowStat}, get_datetime_of_packet, try_parse_packet, FlowIdentifier};
+use crate::{flow_statistic::{FlowStat, FlowStatistics}, packet_parse::{get_datetime_of_packet, try_parse_packet, FlowIdentifier}};
 
 /// The commulative information of the flow of information between two hosts
 #[derive(Debug)]
