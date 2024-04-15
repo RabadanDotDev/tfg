@@ -1,3 +1,4 @@
+use log::{debug, error, info};
 use pcap::{Active, Capture, Linktype, Offline, Packet};
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
@@ -49,7 +50,7 @@ impl PacketCapture {
                         true
                     }
                     Err(err) => {
-                        println!("Error on extracting next packet from device: {}", err);
+                        error!("Error on extracting next packet from device: {}", err);
                         false
                     }
                 }
@@ -125,7 +126,7 @@ impl FileCaptureList {
                 None => match self.captures_iterator.next() {
                     None => return false,
                     Some(next_capture) => {
-                        println!(
+                        info!(
                             "Current capture path changed to {}",
                             next_capture.capture_path.display()
                         );
@@ -136,8 +137,8 @@ impl FileCaptureList {
                     let datalink = current_capture.capture.get_datalink();
                     match current_capture.capture.next_packet() {
                         Err(err) => {
-                            println!(
-                                "Could not extract next packet of current capture from path {}: {}",
+                            debug!(
+                                "Finishing capture extraction from \"{}\" because: {}",
                                 current_capture.capture_path.display(),
                                 err
                             );

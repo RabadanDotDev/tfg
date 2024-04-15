@@ -1,5 +1,7 @@
 use chrono::TimeDelta;
 use clap::{Parser, Subcommand};
+use env_logger::Env;
+use log::{error, info};
 use packet_pincer::{Flow, FlowGroup, PacketCapture, PacketOrigin};
 use std::{
     fs::File,
@@ -48,9 +50,12 @@ fn create_packet_capture_from_settings(command: &Commands) -> PacketCapture {
         Commands::OfflineAnalysis { traces_dir } => PacketCapture::from_directory(traces_dir),
         Commands::OnlineAnalysis { network_interface } => {
             match PacketCapture::from_device(network_interface.clone()) {
-                Ok(capture) => capture,
-                Err(error) => {
-                    println!("Could not open device: {}", error);
+                Ok(capture) => {
+                    info!("Device {} opened sucessfully", network_interface.name);
+                    capture
+                }
+                Err(err) => {
+                    error!("Could not open device: {}", err);
                     exit(1)
                 }
             }
@@ -116,7 +121,7 @@ fn evaluate_packets(
     loop {
         // TODO: handle faster termination if there are no packets being sent on a device capture
         if termination_channel.try_recv().is_ok() {
-            println!("Interrupt caught. Terminating...");
+            info!("Termination signal received");
             break;
         }
 
@@ -134,6 +139,7 @@ fn evaluate_packets(
 }
 
 fn main() {
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
     let settings = Settings::parse();
 
     let termination_channel = create_termination_channel();
@@ -150,7 +156,7 @@ fn main() {
         &mut packet_capture,
     );
 
-    println!("{} packets were valid", execution_stats.valid_count);
-    println!("{} packets were ignored", execution_stats.ignored_count);
-    println!("{} flows detected", execution_stats.flow_count);
+    info!("{} packets were valid", execution_stats.valid_count);
+    info!("{} packets were ignored", execution_stats.ignored_count);
+    info!("{} flows detected", execution_stats.flow_count);
 }
