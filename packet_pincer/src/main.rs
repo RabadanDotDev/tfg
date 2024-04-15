@@ -11,17 +11,20 @@ use std::{
     sync::mpsc::{channel, Receiver},
 };
 
+const MAX_LINES_FOR_CSV_FILE: u64 = 10_000_000;
+
 #[derive(Default)]
 struct ExecutionStats {
-    valid_count: i64,
-    ignored_count: i64,
-    flow_count: i64,
+    valid_count: u64,
+    ignored_count: u64,
+    flow_count: u64,
+    current_lines_written: u64,
 }
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Settings {
-    /// Write flow statistics to the given file
+    /// Base directory path to write csv output files
     #[arg(short, long)]
     pub csv_output: Option<PathBuf>,
 
@@ -63,9 +66,11 @@ fn create_packet_capture_from_settings(command: &Commands) -> PacketCapture {
     }
 }
 
-fn create_csv_output(path: Option<PathBuf>) -> Option<BufWriter<File>> {
-    let mut w = BufWriter::new(File::create(path?).expect("Unable to create file"));
-    Flow::write_csv_header(&mut w).ok()?;
+fn create_csv_output(mut path: PathBuf) -> Option<BufWriter<File>> {
+    let timestamp = chrono::offset::Utc::now().timestamp_millis();
+    path.set_extension(format!("{}.csv", timestamp));
+    let mut w = BufWriter::new(File::create(path).expect("Unable to create file"));
+    let _ = Flow::write_csv_header(&mut w);
     Some(w)
 }
 
@@ -77,47 +82,17 @@ fn create_termination_channel() -> Receiver<()> {
     rx
 }
 
-fn evaluate_packet(
-    execution_stats: &mut ExecutionStats,
-    flows: &mut FlowGroup,
-    csv_writer: &mut Option<BufWriter<File>>,
-    link_type: pcap::Linktype,
-    packet: &pcap::Packet<'_>,
-) {
-    if flows.include(link_type, packet) {
-        execution_stats.valid_count += 1
-    } else {
-        execution_stats.ignored_count += 1
-    }
-
-    while let Some(flow) = flows.pop_oldest_flow_if_older_than(TimeDelta::seconds(300)) {
-        if let Some(ref mut w) = csv_writer {
-            _ = flow.write_csv_value(w);
-        }
-        execution_stats.flow_count += 1;
-    }
-}
-
-fn close_remaining_flows(
-    execution_stats: &mut ExecutionStats,
-    flows: &mut FlowGroup,
-    csv_writer: &mut Option<BufWriter<File>>,
-) {
-    while let Some(flow) = flows.pop_oldest_flow() {
-        if let Some(ref mut w) = csv_writer {
-            _ = flow.write_csv_value(w);
-        }
-        execution_stats.flow_count += 1;
-    }
-}
-
 fn evaluate_packets(
     termination_channel: Receiver<()>,
+    csv_output: Option<PathBuf>,
     execution_stats: &mut ExecutionStats,
     flows: &mut FlowGroup,
-    csv_writer: &mut Option<BufWriter<File>>,
     packet_capture: &mut PacketCapture,
 ) {
+    let mut csv_writer = csv_output
+        .as_ref()
+        .and_then(|path| create_csv_output(path.clone()));
+
     loop {
         // TODO: handle faster termination if there are no packets being sent on a device capture
         if termination_channel.try_recv().is_ok() {
@@ -125,17 +100,50 @@ fn evaluate_packets(
             break;
         }
 
-        let process_packet =
-            &mut |_p: PacketOrigin, link_type: pcap::Linktype, packet: &pcap::Packet<'_>| {
-                evaluate_packet(execution_stats, flows, csv_writer, link_type, packet);
-            };
+        let process_packet = &mut |_p: PacketOrigin,
+                                   link_type: pcap::Linktype,
+                                   packet: &pcap::Packet<'_>| {
+            if flows.include(link_type, packet) {
+                execution_stats.valid_count += 1
+            } else {
+                execution_stats.ignored_count += 1
+            }
+
+            while let Some(flow) = flows.pop_oldest_flow_if_older_than(TimeDelta::seconds(300)) {
+                if let Some(ref mut w) = csv_writer {
+                    _ = flow.write_csv_value(w);
+                    execution_stats.current_lines_written += 1;
+                    if MAX_LINES_FOR_CSV_FILE <= execution_stats.current_lines_written {
+                        csv_writer = csv_output
+                            .as_ref()
+                            .and_then(|path| create_csv_output(path.clone()));
+                        execution_stats.current_lines_written = 0;
+                    }
+                }
+
+                execution_stats.flow_count += 1;
+            }
+        };
 
         if !packet_capture.try_process_next(process_packet) {
             break;
         }
     }
 
-    close_remaining_flows(execution_stats, flows, csv_writer);
+    while let Some(flow) = flows.pop_oldest_flow() {
+        if let Some(ref mut w) = csv_writer {
+            _ = flow.write_csv_value(w);
+        }
+        execution_stats.flow_count += 1;
+        execution_stats.current_lines_written += 1;
+
+        if MAX_LINES_FOR_CSV_FILE <= execution_stats.current_lines_written {
+            csv_writer = csv_output
+                .as_ref()
+                .and_then(|path| create_csv_output(path.clone()));
+            execution_stats.current_lines_written = 0;
+        }
+    }
 }
 
 fn main() {
@@ -145,14 +153,13 @@ fn main() {
     let termination_channel = create_termination_channel();
     let mut execution_stats = ExecutionStats::default();
     let mut flows = FlowGroup::new();
-    let mut csv_writer = create_csv_output(settings.csv_output);
     let mut packet_capture = create_packet_capture_from_settings(&settings.analysis);
 
     evaluate_packets(
         termination_channel,
+        settings.csv_output,
         &mut execution_stats,
         &mut flows,
-        &mut csv_writer,
         &mut packet_capture,
     );
 
