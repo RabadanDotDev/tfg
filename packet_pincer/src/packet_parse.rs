@@ -35,11 +35,11 @@ pub fn try_parse_packet<'a>(
 /// An identifier for a comunication between two hosts
 #[derive(Debug, Clone, Copy)]
 pub struct FlowIdentifier {
-    source_ip: IpAddr,
-    source_port: u16,
-    dest_ip: IpAddr,
-    dest_port: u16,
-    transport_protocol: IpNumber,
+    pub(crate) source_ip: IpAddr,
+    pub(crate) source_port: u16,
+    pub(crate) dest_ip: IpAddr,
+    pub(crate) dest_port: u16,
+    pub(crate) transport_protocol: IpNumber,
 }
 
 impl FlowIdentifier {

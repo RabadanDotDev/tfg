@@ -8,17 +8,20 @@ use priority_queue::PriorityQueue;
 use std::{
     cmp::Reverse,
     collections::HashMap,
+    fs::write,
     io::{BufWriter, Error, Write},
+    rc::Rc,
 };
 
 /// The commulative information of the flow of information between two hosts
 #[derive(Debug)]
 #[allow(dead_code)]
 pub struct Flow {
-    identifier: FlowIdentifier,
-    first_packet_time: DateTime<Utc>,
-    last_packet_time: DateTime<Utc>,
+    pub(crate) identifier: FlowIdentifier,
+    pub(crate) first_packet_time: DateTime<Utc>,
+    pub(crate) last_packet_time: DateTime<Utc>,
     statistics: FlowStatistics,
+    label: Option<Rc<str>>,
 }
 
 impl Flow {
@@ -38,7 +41,13 @@ impl Flow {
             first_packet_time: packet_time,
             last_packet_time: packet_time,
             statistics,
+            label: None,
         }
+    }
+
+    /// Assign a label to the flow
+    pub fn set_label(&mut self, label: Rc<str>) {
+        self.label = Some(label);
     }
 
     /// Accomulate information to the flow with a given pcap packet header and its sliced contents
@@ -52,10 +61,15 @@ impl Flow {
     /// Write the header for separated information values of the flows to the given writer
     pub fn write_csv_header<T: ?Sized + std::io::Write>(
         writer: &mut BufWriter<T>,
+        label_column: bool,
     ) -> Result<(), Error> {
         FlowIdentifier::write_csv_header(writer)?;
         write!(writer, ",")?;
         FlowStatistics::write_csv_header(writer)?;
+        if label_column {
+            write!(writer, ",")?;
+            write!(writer, "label")?;
+        }
         writeln!(writer)?;
         Ok(())
     }
@@ -64,10 +78,18 @@ impl Flow {
     pub fn write_csv_value<T: ?Sized + std::io::Write>(
         &self,
         writer: &mut BufWriter<T>,
+        label_column: bool,
     ) -> Result<(), Error> {
         self.identifier.write_csv_value(writer)?;
         write!(writer, ",")?;
         self.statistics.write_csv_value(writer)?;
+        if label_column {
+            write!(writer, ",")?;
+            match &self.label {
+                None => write!(writer, ""),
+                Some(v) => write!(writer, "{}", v),
+            }?;
+        }
         writeln!(writer)?;
         Ok(())
     }

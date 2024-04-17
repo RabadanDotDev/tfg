@@ -2,7 +2,7 @@ use chrono::TimeDelta;
 use clap::{Parser, Subcommand};
 use env_logger::Env;
 use log::{error, info};
-use packet_pincer::{Flow, FlowGroup, PacketCapture, PacketOrigin};
+use packet_pincer::{Flow, FlowGroup, GroundTruth, PacketCapture, PacketOrigin};
 use std::{
     fs::File,
     io::BufWriter,
@@ -26,7 +26,13 @@ struct ExecutionStats {
 struct Settings {
     /// Base directory path to write csv output files
     #[arg(short, long)]
-    pub csv_output: Option<PathBuf>,
+    pub output_base_csv: Option<PathBuf>,
+
+    /// File in a csv format indicating the tags that should be tried to be
+    /// assigned to the flows. It should contain the colums source_ip, dest_ip,
+    /// timestamp_micro_start, timestamp_micro_end and label
+    #[arg(short, long)]
+    pub ground_truth_csv: Option<PathBuf>,
 
     #[command(subcommand)]
     pub analysis: Commands,
@@ -66,11 +72,11 @@ fn create_packet_capture_from_settings(command: &Commands) -> PacketCapture {
     }
 }
 
-fn create_csv_output(mut path: PathBuf) -> Option<BufWriter<File>> {
+fn create_csv_output(mut path: PathBuf, label_column: bool) -> Option<BufWriter<File>> {
     let timestamp = chrono::offset::Utc::now().timestamp_millis();
     path.set_extension(format!("{}.csv", timestamp));
     let mut w = BufWriter::new(File::create(path).expect("Unable to create file"));
-    let _ = Flow::write_csv_header(&mut w);
+    let _ = Flow::write_csv_header(&mut w, label_column);
     Some(w)
 }
 
@@ -85,14 +91,58 @@ fn create_termination_channel() -> Receiver<()> {
 fn evaluate_packets(
     termination_channel: Receiver<()>,
     csv_output: Option<PathBuf>,
+    ground_truth: Option<GroundTruth>,
     execution_stats: &mut ExecutionStats,
     flows: &mut FlowGroup,
     packet_capture: &mut PacketCapture,
 ) {
+    // Define flow label assignation
+    let assign_flow_label = |flow: &mut Flow| {
+        if let Some(ref ground_truth) = ground_truth {
+            match ground_truth.find_label(&flow) {
+                Some(label) => flow.set_label(label),
+                None => flow.set_label("benign".into()),
+            }
+        }
+    };
+
+    // Init csv writer
     let mut csv_writer = csv_output
         .as_ref()
-        .and_then(|path| create_csv_output(path.clone()));
+        .and_then(|path| create_csv_output(path.clone(), ground_truth.is_some()));
 
+    // Define writing a closed flow to file
+    let mut write_closed_flow = |flow: Flow| {
+        if let Some(ref mut w) = csv_writer {
+            _ = flow.write_csv_value(w, ground_truth.is_some());
+            execution_stats.current_lines_written += 1;
+            if MAX_LINES_FOR_CSV_FILE <= execution_stats.current_lines_written {
+                csv_writer = csv_output
+                    .as_ref()
+                    .and_then(|path| create_csv_output(path.clone(), ground_truth.is_some()));
+                execution_stats.current_lines_written = 0;
+            }
+        }
+    };
+
+    // Define packet processing
+    let process_packet = &mut |_p: PacketOrigin,
+                               link_type: pcap::Linktype,
+                               packet: &pcap::Packet<'_>| {
+        if flows.include(link_type, packet) {
+            execution_stats.valid_count += 1
+        } else {
+            execution_stats.ignored_count += 1
+        }
+
+        while let Some(mut flow) = flows.pop_oldest_flow_if_older_than(TimeDelta::seconds(300)) {
+            execution_stats.flow_count += 1;
+            assign_flow_label(&mut flow);
+            write_closed_flow(flow);
+        }
+    };
+
+    // Evaluate packets until running out of them or being interrupted
     loop {
         // TODO: handle faster termination if there are no packets being sent on a device capture
         if termination_channel.try_recv().is_ok() {
@@ -100,49 +150,17 @@ fn evaluate_packets(
             break;
         }
 
-        let process_packet = &mut |_p: PacketOrigin,
-                                   link_type: pcap::Linktype,
-                                   packet: &pcap::Packet<'_>| {
-            if flows.include(link_type, packet) {
-                execution_stats.valid_count += 1
-            } else {
-                execution_stats.ignored_count += 1
-            }
-
-            while let Some(flow) = flows.pop_oldest_flow_if_older_than(TimeDelta::seconds(300)) {
-                if let Some(ref mut w) = csv_writer {
-                    _ = flow.write_csv_value(w);
-                    execution_stats.current_lines_written += 1;
-                    if MAX_LINES_FOR_CSV_FILE <= execution_stats.current_lines_written {
-                        csv_writer = csv_output
-                            .as_ref()
-                            .and_then(|path| create_csv_output(path.clone()));
-                        execution_stats.current_lines_written = 0;
-                    }
-                }
-
-                execution_stats.flow_count += 1;
-            }
-        };
-
         if !packet_capture.try_process_next(process_packet) {
+            info!("Packet capture has no more packets to process");
             break;
         }
     }
 
-    while let Some(flow) = flows.pop_oldest_flow() {
-        if let Some(ref mut w) = csv_writer {
-            _ = flow.write_csv_value(w);
-        }
+    // Close remaining flows
+    while let Some(mut flow) = flows.pop_oldest_flow() {
         execution_stats.flow_count += 1;
-        execution_stats.current_lines_written += 1;
-
-        if MAX_LINES_FOR_CSV_FILE <= execution_stats.current_lines_written {
-            csv_writer = csv_output
-                .as_ref()
-                .and_then(|path| create_csv_output(path.clone()));
-            execution_stats.current_lines_written = 0;
-        }
+        assign_flow_label(&mut flow);
+        write_closed_flow(flow);
     }
 }
 
@@ -154,10 +172,21 @@ fn main() {
     let mut execution_stats = ExecutionStats::default();
     let mut flows = FlowGroup::new();
     let mut packet_capture = create_packet_capture_from_settings(&settings.analysis);
+    let ground_truth = match settings.ground_truth_csv {
+        Some(path) => match GroundTruth::from_file(path) {
+            Ok(ground_truth) => Some(ground_truth),
+            Err(err) => {
+                error!("Error loading ground truth: {}", err);
+                exit(2);
+            }
+        },
+        None => None,
+    };
 
     evaluate_packets(
         termination_channel,
-        settings.csv_output,
+        settings.output_base_csv,
+        ground_truth,
         &mut execution_stats,
         &mut flows,
         &mut packet_capture,
