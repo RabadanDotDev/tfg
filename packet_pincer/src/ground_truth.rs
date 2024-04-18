@@ -227,9 +227,7 @@ mod tests {
 
     #[test]
     fn test_sorted_label_list_add_sorted() {
-        let mut list = SortedLabelList::new();
-        list.push(Label::from(2, 3, " ".to_string()).unwrap())
-            .unwrap();
+        let mut list = SortedLabelList::new(Label::from(2, 3, " ".to_string()).unwrap());
         list.push(Label::from(0, 1, " ".to_string()).unwrap())
             .unwrap();
         assert_eq!(
@@ -239,254 +237,68 @@ mod tests {
     }
 
     #[test]
+    #[rustfmt::skip]
     fn test_sorted_label_list_prevents_overlap() {
-        let mut list = SortedLabelList::new();
-        list.push(Label::from(10, 20, " ".to_string()).unwrap())
-            .unwrap();
+        let mut list = SortedLabelList::new(Label::from(10, 20, " ".to_string()).unwrap());
 
         // Overlap with one that starts before
-        assert!(list
-            .push(Label::from(0, 10, " ".to_string()).unwrap())
-            .is_err());
-        assert!(list
-            .push(Label::from(0, 15, " ".to_string()).unwrap())
-            .is_err());
-        assert!(list
-            .push(Label::from(0, 20, " ".to_string()).unwrap())
-            .is_err());
-        assert!(list
-            .push(Label::from(0, 25, " ".to_string()).unwrap())
-            .is_err());
+        assert!(list.push(Label::from(0, 10, " ".to_string()).unwrap()).is_err());
+        assert!(list.push(Label::from(0, 15, " ".to_string()).unwrap()).is_err());
+        assert!(list.push(Label::from(0, 20, " ".to_string()).unwrap()).is_err());
+        assert!(list.push(Label::from(0, 25, " ".to_string()).unwrap()).is_err());
 
         // Overlap with one that starts after
-        assert!(list
-            .push(Label::from(5, 30, " ".to_string()).unwrap())
-            .is_err());
-        assert!(list
-            .push(Label::from(10, 30, " ".to_string()).unwrap())
-            .is_err());
-        assert!(list
-            .push(Label::from(15, 30, " ".to_string()).unwrap())
-            .is_err());
-        assert!(list
-            .push(Label::from(20, 30, " ".to_string()).unwrap())
-            .is_err());
+        assert!(list.push(Label::from(05, 30, " ".to_string()).unwrap()).is_err());
+        assert!(list.push(Label::from(10, 30, " ".to_string()).unwrap()).is_err());
+        assert!(list.push(Label::from(15, 30, " ".to_string()).unwrap()).is_err());
+        assert!(list.push(Label::from(20, 30, " ".to_string()).unwrap()).is_err());
     }
 
     #[test]
+    #[rustfmt::skip]
     fn test_overlap_indicies() {
-        let mut list = SortedLabelList::new();
-        list.push(Label::from(01, 10, " ".to_string()).unwrap())
-            .unwrap();
+        let mut list = SortedLabelList::new(Label::from(01, 10, " ".to_string()).unwrap());
         list.push(Label::from(20, 30, " ".to_string()).unwrap())
             .unwrap();
         list.push(Label::from(40, 50, " ".to_string()).unwrap())
             .unwrap();
 
         // Test different empty points
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(00).unwrap(),
-                DateTime::from_timestamp_micros(00).unwrap()
-            ),
-            None
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(11).unwrap(),
-                DateTime::from_timestamp_micros(19).unwrap()
-            ),
-            None
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(31).unwrap(),
-                DateTime::from_timestamp_micros(39).unwrap()
-            ),
-            None
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(51).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            None
-        );
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(00).unwrap()), None);
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(11).unwrap(), DateTime::from_timestamp_micros(19).unwrap()), None);
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(31).unwrap(), DateTime::from_timestamp_micros(39).unwrap()), None);
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(51).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), None);
 
         // Test extending from the left
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(0).unwrap(),
-                DateTime::from_timestamp_micros(01).unwrap()
-            ),
-            Some((0, 0))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(0).unwrap(),
-                DateTime::from_timestamp_micros(05).unwrap()
-            ),
-            Some((0, 0))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(0).unwrap(),
-                DateTime::from_timestamp_micros(10).unwrap()
-            ),
-            Some((0, 0))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(0).unwrap(),
-                DateTime::from_timestamp_micros(15).unwrap()
-            ),
-            Some((0, 0))
-        );
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(01).unwrap()), Some((0, 0))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(05).unwrap()), Some((0, 0))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(10).unwrap()), Some((0, 0))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(15).unwrap()), Some((0, 0)));
 
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(0).unwrap(),
-                DateTime::from_timestamp_micros(20).unwrap()
-            ),
-            Some((0, 1))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(0).unwrap(),
-                DateTime::from_timestamp_micros(25).unwrap()
-            ),
-            Some((0, 1))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(0).unwrap(),
-                DateTime::from_timestamp_micros(30).unwrap()
-            ),
-            Some((0, 1))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(0).unwrap(),
-                DateTime::from_timestamp_micros(35).unwrap()
-            ),
-            Some((0, 1))
-        );
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(20).unwrap()), Some((0, 1))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(25).unwrap()), Some((0, 1))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(30).unwrap()), Some((0, 1))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(35).unwrap()), Some((0, 1)));
 
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(0).unwrap(),
-                DateTime::from_timestamp_micros(40).unwrap()
-            ),
-            Some((0, 2))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(0).unwrap(),
-                DateTime::from_timestamp_micros(45).unwrap()
-            ),
-            Some((0, 2))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(0).unwrap(),
-                DateTime::from_timestamp_micros(50).unwrap()
-            ),
-            Some((0, 2))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(0).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            Some((0, 2))
-        );
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(40).unwrap()), Some((0, 2))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(45).unwrap()), Some((0, 2))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(50).unwrap()), Some((0, 2))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((0, 2)));
 
         // Test extending from the right
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(50).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            Some((2, 2))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(45).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            Some((2, 2))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(40).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            Some((2, 2))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(35).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            Some((2, 2))
-        );
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(50).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((2, 2))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(45).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((2, 2))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(40).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((2, 2))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(35).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((2, 2)));
 
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(30).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            Some((1, 2))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(25).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            Some((1, 2))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(20).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            Some((1, 2))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(15).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            Some((1, 2))
-        );
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(30).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((1, 2))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(25).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((1, 2))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(20).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((1, 2))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(15).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((1, 2)));
 
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(10).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            Some((0, 2))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(05).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            Some((0, 2))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(01).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            Some((0, 2))
-        );
-        assert_eq!(
-            list.find_overlap_indicies(
-                DateTime::from_timestamp_micros(00).unwrap(),
-                DateTime::from_timestamp_micros(55).unwrap()
-            ),
-            Some((0, 2))
-        );
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(10).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((0, 2))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(05).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((0, 2))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(01).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((0, 2))); 
+        assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((0, 2)));
     }
 }
