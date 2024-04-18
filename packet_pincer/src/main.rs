@@ -3,6 +3,7 @@ use clap::{Parser, Subcommand};
 use env_logger::Env;
 use log::{error, info};
 use packet_pincer::{Flow, FlowGroup, GroundTruth, PacketCapture, PacketOrigin};
+
 use std::{
     fs::File,
     io::BufWriter,
@@ -129,10 +130,11 @@ fn evaluate_packets(
     let process_packet = &mut |_p: PacketOrigin,
                                link_type: pcap::Linktype,
                                packet: &pcap::Packet<'_>| {
-        if flows.include(link_type, packet) {
-            execution_stats.valid_count += 1
-        } else {
-            execution_stats.ignored_count += 1
+        match flows.include(link_type, packet) {
+            Ok(()) => execution_stats.valid_count += 1,
+            Err(_) => {
+                execution_stats.ignored_count += 1;
+            }
         }
 
         while let Some(mut flow) = flows.pop_oldest_flow_if_older_than(TimeDelta::seconds(300)) {

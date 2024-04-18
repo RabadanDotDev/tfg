@@ -1,6 +1,6 @@
 use crate::{
     flow_statistic::{FlowStat, FlowStatistics},
-    packet_parse::{try_parse_packet, FlowIdentifier},
+    packet_parse::{try_parse_packet, FlowIdentifier, ParseError},
 };
 use chrono::{DateTime, TimeDelta, Utc};
 use etherparse::SlicedPacket;
@@ -104,18 +104,17 @@ impl FlowGroup {
     }
 
     /// Accomulate information to the correct flow given a packet and its respective link type
-    pub fn include(&mut self, link_type: pcap::Linktype, packet: &pcap::Packet<'_>) -> bool {
+    pub fn include(
+        &mut self,
+        link_type: pcap::Linktype,
+        packet: &pcap::Packet<'_>,
+    ) -> Result<(), ParseError> {
         // Slice packet
-        let sliced_packet = match try_parse_packet(link_type, packet) {
-            Some(sliced_packet) => sliced_packet,
-            None => return false,
-        };
+        let sliced_packet = try_parse_packet(link_type, packet)?;
 
         // Extract identification
-        let flow_identifier = match FlowIdentifier::from_sliced_packet(&sliced_packet) {
-            Some(flow_identifier) => flow_identifier,
-            None => return false,
-        };
+        let (flow_identifier, _fragmentation_information) =
+            FlowIdentifier::from_sliced_packet(&sliced_packet)?;
 
         // Store flow
         match self.flows.get_mut(&flow_identifier) {
@@ -136,7 +135,7 @@ impl FlowGroup {
             }
         }
 
-        true
+        Ok(())
     }
 
     /// From the flow that has been the most time without receiving a packet,
@@ -227,7 +226,7 @@ mod tests {
             };
 
             // Include first packet on the group
-            flow_group.include(link_type, &packet_1);
+            let _ = flow_group.include(link_type, &packet_1);
 
             // Assert
             assert_eq!(flow_group.flows.len(), 1);
@@ -276,7 +275,7 @@ mod tests {
             };
 
             // Include first packet on the group
-            flow_group.include(link_type, &packet_1);
+            let _ = flow_group.include(link_type, &packet_1);
 
             // Assert
             assert_eq!(flow_group.flows.len(), 1);
@@ -327,7 +326,7 @@ mod tests {
             };
 
             // Include first packet on the group
-            flow_group.include(link_type, &packet_1);
+            let _ = flow_group.include(link_type, &packet_1);
 
             // Assert
             assert_eq!(flow_group.flows.len(), 2);

@@ -1,5 +1,6 @@
 use chrono::DateTime;
 use chrono::Utc;
+use etherparse::err::packet::SliceError;
 use etherparse::IpNumber;
 use etherparse::SlicedPacket;
 use std::hash::{Hash, Hasher};
@@ -8,6 +9,17 @@ use std::net::IpAddr;
 
 use pcap::PacketHeader;
 use pcap::{Linktype, Packet};
+
+#[derive(Debug)]
+pub enum ParseError {
+    UnsupportedLinkType,
+    ErrorOnSlicingPacket(SliceError),
+    MissingNetworkLayer,
+    MissingTransportLayer,
+    UnsupportedTransportLayer,
+}
+
+pub struct FragmentationInformation(());
 
 /// Converts the timestamp of the of the packet to a Datetime<Utc> if its valid
 pub fn get_datetime_of_packet(packet_header: &PacketHeader) -> Option<DateTime<Utc>> {
@@ -21,14 +33,14 @@ pub fn get_datetime_of_packet(packet_header: &PacketHeader) -> Option<DateTime<U
 pub fn try_parse_packet<'a>(
     link_type: Linktype,
     packet: &'a Packet<'_>,
-) -> Option<SlicedPacket<'a>> {
+) -> Result<SlicedPacket<'a>, ParseError> {
     match link_type {
         Linktype::ETHERNET => match SlicedPacket::from_ethernet(packet.data) {
-            Ok(value) => Some(value),
-            Err(_err) => None,
+            Ok(value) => Ok(value),
+            Err(err) => Err(ParseError::ErrorOnSlicingPacket(err)),
         },
-        Linktype::LINUX_SLL => None, // TODO: implement sll suport
-        _ => None,
+        Linktype::LINUX_SLL => Err(ParseError::UnsupportedLinkType), // TODO: implement sll suport
+        _ => Err(ParseError::UnsupportedLinkType),
     }
 }
 
@@ -62,7 +74,9 @@ impl FlowIdentifier {
     }
 
     /// Try to extract the relevant flow identifiers from the sliced packet
-    pub(crate) fn from_sliced_packet(packet: &SlicedPacket) -> Option<FlowIdentifier> {
+    pub(crate) fn from_sliced_packet(
+        packet: &SlicedPacket,
+    ) -> Result<(FlowIdentifier, FragmentationInformation), ParseError> {
         let source_ip: IpAddr;
         let source_port: u16;
         let dest_ip: IpAddr;
@@ -82,8 +96,16 @@ impl FlowIdentifier {
                     transport_protocol = v.header().next_header();
                 }
             },
-            None => return None,
+            None => return Err(ParseError::MissingNetworkLayer),
         }
+
+        // TODO check if its fragmented, try reassembling the packet or storing
+        // the fragment it should discard older fragments after some iterations
+        // there are double fragmentations, where there the same packet
+        // fragments are sent twice, it should be ignored, held or another
+        // action? or maybe just keep them until they get eventually discarded.
+        // if there are detected repeated fragments, before the reassembly,
+        // they should be counted
 
         match &packet.transport {
             Some(header) => match header {
@@ -95,18 +117,21 @@ impl FlowIdentifier {
                     source_port = header.source_port();
                     dest_port = header.destination_port();
                 }
-                _ => return None,
+                _ => return Err(ParseError::UnsupportedTransportLayer),
             },
-            None => return None,
+            None => return Err(ParseError::MissingTransportLayer),
         }
 
-        Some(FlowIdentifier {
-            source_ip,
-            source_port,
-            dest_ip,
-            dest_port,
-            transport_protocol,
-        })
+        Ok((
+            FlowIdentifier {
+                source_ip,
+                source_port,
+                dest_ip,
+                dest_port,
+                transport_protocol,
+            },
+            FragmentationInformation(()),
+        ))
     }
 
     pub(crate) fn write_csv_header<T: ?Sized + std::io::Write>(

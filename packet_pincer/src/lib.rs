@@ -13,3 +13,4 @@ pub use crate::packet_capture::PacketCapture;
 pub use crate::packet_capture::PacketOrigin;
 pub use crate::packet_flow::Flow;
 pub use crate::packet_flow::FlowGroup;
+pub use crate::packet_parse::ParseError;
