@@ -1,6 +1,6 @@
 use crate::{
     flow_statistic::{FlowStat, FlowStatistics},
-    packet_parse::{get_datetime_of_packet, try_parse_packet, FlowIdentifier},
+    packet_parse::{try_parse_packet, FlowIdentifier},
 };
 use chrono::{DateTime, TimeDelta, Utc};
 use etherparse::SlicedPacket;
@@ -17,9 +17,7 @@ use std::{
 #[allow(dead_code)]
 pub struct Flow {
     pub(crate) identifier: FlowIdentifier,
-    pub(crate) first_packet_time: DateTime<Utc>,
-    pub(crate) last_packet_time: DateTime<Utc>,
-    statistics: FlowStatistics,
+    pub(crate) statistics: FlowStatistics,
     label: Option<Rc<str>>,
 }
 
@@ -30,17 +28,13 @@ impl Flow {
         packet_header: &pcap::PacketHeader,
         sliced_packet: SlicedPacket,
     ) -> Flow {
-        let packet_time = get_datetime_of_packet(packet_header)
-            .expect("Packet headers with invalid timestamps are not supported");
-        let mut statistics = FlowStatistics::new();
-        statistics.include(packet_header, &sliced_packet);
+        let statistics = FlowStatistics::from_packet(packet_header, &sliced_packet);
+        let label = None;
 
         Flow {
             identifier,
-            first_packet_time: packet_time,
-            last_packet_time: packet_time,
             statistics,
-            label: None,
+            label,
         }
     }
 
@@ -51,9 +45,6 @@ impl Flow {
 
     /// Accomulate information to the flow with a given pcap packet header and its sliced contents
     pub fn include(&mut self, packet_header: &pcap::PacketHeader, sliced_packet: SlicedPacket) {
-        let packet_time = get_datetime_of_packet(packet_header);
-        self.last_packet_time =
-            packet_time.expect("Packet headers with invalid timestamps are not supported");
         self.statistics.include(packet_header, &sliced_packet);
     }
 
@@ -130,16 +121,18 @@ impl FlowGroup {
         match self.flows.get_mut(&flow_identifier) {
             None => {
                 let flow = Flow::from(flow_identifier, packet.header, sliced_packet);
-                self.flows_queue
-                    .push(flow_identifier, Reverse(flow.last_packet_time));
-                self.latest_time = Some(flow.last_packet_time);
+                self.flows_queue.push(
+                    flow_identifier,
+                    Reverse(flow.statistics.flow_times.last_packet_time),
+                );
                 self.flows.insert(flow_identifier, flow);
             }
             Some(flow) => {
                 flow.include(packet.header, sliced_packet);
-                self.flows_queue
-                    .change_priority(&flow_identifier, Reverse(flow.last_packet_time));
-                self.latest_time = Some(flow.last_packet_time);
+                self.flows_queue.change_priority(
+                    &flow_identifier,
+                    Reverse(flow.statistics.flow_times.last_packet_time),
+                );
             }
         }
 

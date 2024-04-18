@@ -63,7 +63,7 @@ impl GroundTruth {
             flow.identifier.dest_ip,
         )) {
             None => None,
-            Some(list) => list.find_label(flow.first_packet_time, flow.last_packet_time),
+            Some(list) => list.find_label(flow.statistics.flow_times.first_packet_time, flow.statistics.flow_times.last_packet_time),
         }
     }
 }
