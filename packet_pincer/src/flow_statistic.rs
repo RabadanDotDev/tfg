@@ -33,6 +33,7 @@ impl FlowStat for FlowStatistics {
         }
     }
     fn include(&mut self, packet_header: &pcap::PacketHeader, sliced_packet: &SlicedPacket) {
+        self.flow_times.include(packet_header, sliced_packet);
         self.packet_count.include(packet_header, sliced_packet);
         self.byte_count.include(packet_header, sliced_packet);
     }
@@ -82,6 +83,8 @@ impl FlowStat for FlowTimes {
         write!(writer, "first_packet_time")?;
         write!(writer, ",")?;
         write!(writer, "last_packet_time")?;
+        write!(writer, ",")?;
+        write!(writer, "duration")?;
         Ok(())
     }
     fn write_csv_value<T: ?Sized + std::io::Write>(
@@ -91,6 +94,9 @@ impl FlowStat for FlowTimes {
         write!(writer, "{}", self.first_packet_time.timestamp_micros())?;
         write!(writer, ",")?;
         write!(writer, "{}", self.last_packet_time.timestamp_micros())?;
+        write!(writer, ",")?;
+        let duration = (self.last_packet_time-self.first_packet_time).num_microseconds().ok_or(Error::new(std::io::ErrorKind::Other, "Overflow"))?;
+        write!(writer, "{}", duration)?;
         Ok(())
     }
 }
