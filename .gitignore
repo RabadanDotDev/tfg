@@ -57,3 +57,4 @@ venv/
 
 # temp results
 tmp/
+**/test.*.csv
