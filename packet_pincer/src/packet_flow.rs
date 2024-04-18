@@ -8,7 +8,6 @@ use priority_queue::PriorityQueue;
 use std::{
     cmp::Reverse,
     collections::HashMap,
-    fs::write,
     io::{BufWriter, Error, Write},
     rc::Rc,
 };

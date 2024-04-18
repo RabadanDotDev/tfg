@@ -1,10 +1,14 @@
-use core::fmt;
 use std::{
-    borrow::BorrowMut, cmp::Ordering, collections::HashMap, error::Error, hash::Hash, net::IpAddr,
-    path::PathBuf, rc::Rc,
+    cmp::{max, min, Ordering},
+    collections::{hash_map::Entry, HashMap},
+    error::Error,
+    hash::Hash,
+    net::IpAddr,
+    path::PathBuf,
+    rc::Rc,
 };
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, TimeDelta, Utc};
 use serde::Deserialize;
 
 use crate::Flow;
@@ -41,14 +45,13 @@ impl GroundTruth {
             )?;
 
             // Store label
-            if !flows.contains_key(&host_pair) {
-                flows.insert(host_pair, SortedLabelList::new(label));
-            } else {
-                let sorted_label_list = flows.get_mut(&host_pair).unwrap();
-                sorted_label_list.push(label)?;
+            match flows.entry(host_pair) {
+                Entry::Vacant(e) => {
+                    e.insert(SortedLabelList::new(label));
+                }
+                Entry::Occupied(mut e) => e.get_mut().push(label)?,
             }
         }
-
         // Construct
         Ok(GroundTruth { flows })
     }
@@ -121,7 +124,7 @@ impl SortedLabelList {
             .unwrap_or_else(|e| e);
         if previous != 0 {
             if let Some(element) = self.0.get(previous - 1) {
-                if dbg!(first_time <= element.end) {
+                if first_time <= element.end {
                     previous -= 1;
                 }
             }
@@ -134,7 +137,7 @@ impl SortedLabelList {
             .unwrap_or_else(|e| e);
         match self.0.get(next) {
             Some(element) => {
-                if dbg!(last_time < element.start) {
+                if last_time < element.start {
                     if next == 0 {
                         return None;
                     } else {
@@ -143,7 +146,7 @@ impl SortedLabelList {
                 }
             }
             None => {
-                if dbg!(next == 0) {
+                if next == 0 {
                     return None;
                 } else {
                     next -= 1;
@@ -152,14 +155,22 @@ impl SortedLabelList {
         }
 
         if next < previous {
-            return None;
+            None
         } else {
             Some((previous, next))
         }
     }
 
     fn find_label(&self, first_time: DateTime<Utc>, last_time: DateTime<Utc>) -> Option<Rc<str>> {
-        todo!();
+        let (first, second) = self.find_overlap_indicies(first_time, last_time)?;
+
+        // Find the label that overlaps the most
+        let (label, _overlap) = self.0[first..second + 1]
+            .iter()
+            .map(|label| (label, label.compute_overlap(first_time, last_time)))
+            .max_by_key(|pair| pair.1)?;
+
+        Some(label.label.clone())
     }
 }
 
@@ -175,7 +186,7 @@ impl SortedLabelList {
 struct Label {
     start: DateTime<Utc>,
     end: DateTime<Utc>,
-    label: String,
+    label: Rc<str>,
 }
 
 impl PartialOrd for Label {
@@ -215,14 +226,23 @@ impl Label {
             return Err("End timestamp cannot be previous than start timestamp".into());
         }
 
+        let label = Rc::from(label);
         Ok(Label { start, end, label })
+    }
+
+    fn compute_overlap(&self, start: DateTime<Utc>, end: DateTime<Utc>) -> TimeDelta {
+        if self.end < start || end < self.start {
+            TimeDelta::microseconds(0)
+        } else {
+            let overlap_start = max(self.start, start);
+            let overlap_end = min(self.end, end);
+            overlap_end - overlap_start
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use chrono::Date;
-
     use super::*;
 
     #[test]
@@ -269,7 +289,7 @@ mod tests {
         assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(31).unwrap(), DateTime::from_timestamp_micros(39).unwrap()), None);
         assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(51).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), None);
 
-        // Test extending from the left
+        // Test extending from the left 
         assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(01).unwrap()), Some((0, 0))); 
         assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(05).unwrap()), Some((0, 0))); 
         assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(10).unwrap()), Some((0, 0))); 
@@ -285,7 +305,7 @@ mod tests {
         assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(50).unwrap()), Some((0, 2))); 
         assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((0, 2)));
 
-        // Test extending from the right
+        // Test extending from the right 
         assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(50).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((2, 2))); 
         assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(45).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((2, 2))); 
         assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(40).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((2, 2))); 
@@ -300,5 +320,37 @@ mod tests {
         assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(05).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((0, 2))); 
         assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(01).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((0, 2))); 
         assert_eq!(list.find_overlap_indicies(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(55).unwrap()), Some((0, 2)));
+    }
+
+    #[test]
+    #[rustfmt::skip]
+    fn test_find_overlap_indicies() {
+        let mut list = SortedLabelList::new(Label::from(01, 10, "first".to_string()).unwrap());
+        list.push(Label::from(20, 30, "second".to_string()).unwrap())
+            .unwrap();
+        list.push(Label::from(40, 51, "third".to_string()).unwrap())
+            .unwrap();
+
+        // No match
+        assert_eq!(list.find_label(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(00).unwrap()), None);
+
+        // Exact match
+        assert_eq!(list.find_label(DateTime::from_timestamp_micros(01).unwrap(), DateTime::from_timestamp_micros(10).unwrap()).unwrap(), "first".into());
+
+        // Partial left match
+        assert_eq!(list.find_label(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(05).unwrap()).unwrap(), "first".into());
+
+        // Partial right match
+        assert_eq!(list.find_label(DateTime::from_timestamp_micros(05).unwrap(), DateTime::from_timestamp_micros(15).unwrap()).unwrap(), "first".into());
+
+        // Bigger/inside match
+        assert_eq!(list.find_label(DateTime::from_timestamp_micros(05).unwrap(), DateTime::from_timestamp_micros(5).unwrap()).unwrap(), "first".into());
+        assert_eq!(list.find_label(DateTime::from_timestamp_micros(0).unwrap(), DateTime::from_timestamp_micros(15).unwrap()).unwrap(), "first".into());
+
+        // Multiple matches
+        assert_eq!(list.find_label(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(20).unwrap()).unwrap(), "first".into());
+        assert_eq!(list.find_label(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(30).unwrap()).unwrap(), "second".into());
+        assert_eq!(list.find_label(DateTime::from_timestamp_micros(00).unwrap(), DateTime::from_timestamp_micros(60).unwrap()).unwrap(), "third".into());
+
     }
 }
