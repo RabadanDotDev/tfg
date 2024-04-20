@@ -1,6 +1,6 @@
 use crate::{
     flow_statistic::{FlowStat, FlowStatistics},
-    packet_parse::{try_parse_packet, TransportFlowIdentifier, ParseError},
+    packet_parse::{try_parse_packet, FlowIdentifier, ParseError, TransportFlowIdentifier},
 };
 use chrono::{DateTime, TimeDelta, Utc};
 use priority_queue::PriorityQueue;
@@ -42,7 +42,11 @@ impl TransportFlow {
     }
 
     /// Accomulate information to the flow with a given pcap packet header and its sliced contents
-    pub fn include(&mut self, packet_header: &pcap::PacketHeader, sliced_packet: etherparse::SlicedPacket) {
+    pub fn include(
+        &mut self,
+        packet_header: &pcap::PacketHeader,
+        sliced_packet: etherparse::SlicedPacket,
+    ) {
         self.statistics.include(packet_header, &sliced_packet);
     }
 
@@ -117,26 +121,26 @@ impl FlowGroup {
         // Store flow
         match flow_identifier {
             FlowIdentifier::TransportFlowIdentifier(transport_flow_identifier) => {
-        match self.transport_flows.get_mut(&transport_flow_identifier) {
-            None => {
+                match self.transport_flows.get_mut(&transport_flow_identifier) {
+                    None => {
                         let flow = TransportFlow::from(
                             transport_flow_identifier,
                             packet.header,
                             sliced_packet,
                         );
-                self.transport_flows_queue.push(
-                    transport_flow_identifier,
-                    Reverse(flow.statistics.flow_times.last_packet_time),
-                );
-                self.transport_flows.insert(transport_flow_identifier, flow);
-            }
-            Some(flow) => {
-                flow.include(packet.header, sliced_packet);
-                self.transport_flows_queue.change_priority(
-                    &transport_flow_identifier,
-                    Reverse(flow.statistics.flow_times.last_packet_time),
-                );
-            }
+                        self.transport_flows_queue.push(
+                            transport_flow_identifier,
+                            Reverse(flow.statistics.flow_times.last_packet_time),
+                        );
+                        self.transport_flows.insert(transport_flow_identifier, flow);
+                    }
+                    Some(flow) => {
+                        flow.include(packet.header, sliced_packet);
+                        self.transport_flows_queue.change_priority(
+                            &transport_flow_identifier,
+                            Reverse(flow.statistics.flow_times.last_packet_time),
+                        );
+                    }
                 }
             }
             FlowIdentifier::NetworkFlowIdentifier(_) => {
@@ -155,7 +159,10 @@ impl FlowGroup {
 
     /// Try popping oldest flow if it has passed more time than `time_delta`
     /// between last packet received on it and the last packet in general
-    pub fn pop_oldest_flow_if_older_than(&mut self, time_delta: TimeDelta) -> Option<TransportFlow> {
+    pub fn pop_oldest_flow_if_older_than(
+        &mut self,
+        time_delta: TimeDelta,
+    ) -> Option<TransportFlow> {
         if let Some((oldest_time, latest_time)) = self.get_oldest_time().zip(self.latest_time) {
             if time_delta < latest_time - oldest_time {
                 let (flow_identifier, _) = self.transport_flows_queue.pop().unwrap();
@@ -241,7 +248,10 @@ mod tests {
             assert_eq!(flow_group.transport_flows.len(), 1);
             assert_eq!(flow_group.transport_flows_queue.len(), 1);
             assert!(flow_group.transport_flows.contains_key(&flow_identifier));
-            assert_eq!(flow_group.transport_flows_queue.peek().unwrap().0, &flow_identifier);
+            assert_eq!(
+                flow_group.transport_flows_queue.peek().unwrap().0,
+                &flow_identifier
+            );
             assert_eq!(flow_group.get_oldest_time().unwrap().timestamp(), 0);
             assert_eq!(flow_group.get_oldest_time().unwrap().timestamp_micros(), 0);
             assert_eq!(flow_group.latest_time.unwrap().timestamp(), 0);
@@ -289,7 +299,9 @@ mod tests {
             // Assert
             assert_eq!(flow_group.transport_flows.len(), 1);
             assert_eq!(flow_group.transport_flows_queue.len(), 1);
-            assert!(flow_group.transport_flows.contains_key(&flow_identifier_second));
+            assert!(flow_group
+                .transport_flows
+                .contains_key(&flow_identifier_second));
             assert_eq!(
                 flow_group.transport_flows_queue.peek().unwrap().0,
                 &flow_identifier_second

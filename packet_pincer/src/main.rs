@@ -2,7 +2,7 @@ use chrono::TimeDelta;
 use clap::{Parser, Subcommand};
 use env_logger::Env;
 use log::{error, info};
-use packet_pincer::{TransportFlow, FlowGroup, GroundTruth, PacketCapture, PacketOrigin};
+use packet_pincer::{FlowGroup, GroundTruth, PacketCapture, PacketOrigin, TransportFlow};
 
 use std::{
     fs::File,
