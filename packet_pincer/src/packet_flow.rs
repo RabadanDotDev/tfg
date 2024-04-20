@@ -111,13 +111,19 @@ impl FlowGroup {
         let sliced_packet = try_parse_packet(link_type, packet)?;
 
         // Extract identification
-        let (transport_flow_identifier, _fragmentation_information) =
-            TransportFlowIdentifier::from_sliced_packet(&sliced_packet)?;
+        let (flow_identifier, _fragmentation_information) =
+            FlowIdentifier::from_sliced_packet(&sliced_packet)?;
 
         // Store flow
+        match flow_identifier {
+            FlowIdentifier::TransportFlowIdentifier(transport_flow_identifier) => {
         match self.transport_flows.get_mut(&transport_flow_identifier) {
             None => {
-                let flow = TransportFlow::from(transport_flow_identifier, packet.header, sliced_packet);
+                        let flow = TransportFlow::from(
+                            transport_flow_identifier,
+                            packet.header,
+                            sliced_packet,
+                        );
                 self.transport_flows_queue.push(
                     transport_flow_identifier,
                     Reverse(flow.statistics.flow_times.last_packet_time),
@@ -131,6 +137,11 @@ impl FlowGroup {
                     Reverse(flow.statistics.flow_times.last_packet_time),
                 );
             }
+                }
+            }
+            FlowIdentifier::NetworkFlowIdentifier(_) => {
+                return Err(ParseError::MissingTransportLayer)
+            } // TODO try reassemble packet/store it if its fragmented
         }
 
         Ok(())

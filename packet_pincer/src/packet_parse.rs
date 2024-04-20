@@ -9,27 +9,38 @@ use std::net::IpAddr;
 use pcap::PacketHeader;
 use pcap::{Linktype, Packet};
 
+/// Error when trying to parse a packet
 #[derive(Debug)]
 pub enum ParseError {
+    /// Tried to parse a packet with an unsupported link type
     UnsupportedLinkType,
+    /// etherparse encounered an error while parsing the packet
     ErrorOnSlicingPacket(SliceError),
+    /// Could not find the network packet when it was expected
     MissingNetworkLayer,
+    /// Could not find the transport layer when it was expected
     MissingTransportLayer,
+    /// Tried to parse a packet with an unsupported transport layer
     UnsupportedTransportLayer,
 }
 
-pub enum FragmentationInformation{
+/// Indication about the fragmentation status of an associated value
+pub enum FragmentationInformation {
+    /// There is no fragmentation
     NoFragmentation,
+    /// The packet is an IPv4 packet that couldn't be reassembled yet
     FragmentedIpv4Packet,
-    ReassembledIPv4Packet
-}
-
-pub enum FlowIdentifier {
-    TransportFlowIdentifier(TransportFlowIdentifier),
-    NetworkFlowIdentifier(NetworkFlowIdentifier)
+    /// The packet is an IPv4 packet that was reassembled from its parts
+    ReassembledIPv4Packet,
 }
 
 /// An identifier for a comunication between two hosts
+pub enum FlowIdentifier {
+    TransportFlowIdentifier(TransportFlowIdentifier),
+    NetworkFlowIdentifier(NetworkFlowIdentifier),
+}
+
+/// An identifier for a comunication between two hosts in the transport layer
 #[derive(Debug, Clone, Copy)]
 pub struct TransportFlowIdentifier {
     pub(crate) source_ip: IpAddr,
@@ -39,10 +50,11 @@ pub struct TransportFlowIdentifier {
     pub(crate) transport_protocol: IpNumber,
 }
 
+/// An identifier for a comunication between two hosts in the network layer
 pub struct NetworkFlowIdentifier {
-    source_ip: IpAddr,
-    dest_ip: IpAddr,
-    identifier: u32,
+    pub(crate) source_ip: IpAddr,
+    pub(crate) dest_ip: IpAddr,
+    pub(crate) identifier: u32,
 }
 
 /// Converts the timestamp of the of the packet to a Datetime<Utc> if its valid
@@ -68,35 +80,14 @@ pub fn try_parse_packet<'a>(
     }
 }
 
-impl TransportFlowIdentifier {
-    #[cfg(test)]
-    // Create a new flow identifier from the given params
-    pub(crate) fn new(
-        source_ip: IpAddr,
-        source_port: u16,
-        dest_ip: IpAddr,
-        dest_port: u16,
-        transport_protocol: IpNumber,
-    ) -> TransportFlowIdentifier {
-        TransportFlowIdentifier {
-            source_ip,
-            source_port,
-            dest_ip,
-            dest_port,
-            transport_protocol,
-        }
-    }
-
+impl FlowIdentifier {
     /// Try to extract the relevant flow identifiers from the sliced packet
     pub(crate) fn from_sliced_packet(
         packet: &etherparse::SlicedPacket,
-    ) -> Result<(TransportFlowIdentifier, FragmentationInformation), ParseError> {
+    ) -> Result<(FlowIdentifier, FragmentationInformation), ParseError> {
         let source_ip: IpAddr;
-        let source_port: u16;
         let dest_ip: IpAddr;
-        let dest_port: u16;
         let transport_protocol: IpNumber;
-        let fragmentation_information;
 
         match &packet.net {
             Some(header) => match header {
@@ -104,29 +95,29 @@ impl TransportFlowIdentifier {
                     source_ip = IpAddr::V4(v.header().source_addr());
                     dest_ip = IpAddr::V4(v.header().destination_addr());
                     transport_protocol = v.header().protocol();
-                    fragmentation_information = if v.header().is_fragmenting_payload() {
-                        FragmentationInformation::FragmentedIpv4Packet
-                    } else {
-                        FragmentationInformation::NoFragmentation
+
+                    if v.header().is_fragmenting_payload() {
+                        return Ok((
+                            FlowIdentifier::NetworkFlowIdentifier(NetworkFlowIdentifier {
+                                source_ip,
+                                dest_ip,
+                                identifier: v.header().identification().into(),
+                            }),
+                            FragmentationInformation::FragmentedIpv4Packet,
+                        ));
                     }
                 }
                 etherparse::NetSlice::Ipv6(v) => {
                     source_ip = IpAddr::V6(v.header().source_addr());
                     dest_ip = IpAddr::V6(v.header().destination_addr());
                     transport_protocol = v.header().next_header();
-                    fragmentation_information = FragmentationInformation::NoFragmentation;
                 }
             },
             None => return Err(ParseError::MissingNetworkLayer),
         }
 
-        // TODO check if its fragmented, try reassembling the packet or storing
-        // the fragment it should discard older fragments after some iterations
-        // there are double fragmentations, where there the same packet
-        // fragments are sent twice, it should be ignored, held or another
-        // action? or maybe just keep them until they get eventually discarded.
-        // if there are detected repeated fragments, before the reassembly,
-        // they should be counted
+        let source_port: u16;
+        let dest_port: u16;
 
         match &packet.transport {
             Some(header) => match header {
@@ -144,15 +135,35 @@ impl TransportFlowIdentifier {
         }
 
         Ok((
-            TransportFlowIdentifier {
+            FlowIdentifier::TransportFlowIdentifier(TransportFlowIdentifier {
                 source_ip,
                 source_port,
                 dest_ip,
                 dest_port,
                 transport_protocol,
-            },
-            fragmentation_information,
+            }),
+            FragmentationInformation::NoFragmentation,
         ))
+    }
+}
+
+impl TransportFlowIdentifier {
+    #[cfg(test)]
+    // Create a new flow identifier from the given params
+    pub(crate) fn new(
+        source_ip: IpAddr,
+        source_port: u16,
+        dest_ip: IpAddr,
+        dest_port: u16,
+        transport_protocol: IpNumber,
+    ) -> TransportFlowIdentifier {
+        TransportFlowIdentifier {
+            source_ip,
+            source_port,
+            dest_ip,
+            dest_port,
+            transport_protocol,
+        }
     }
 
     pub(crate) fn write_csv_header<T: ?Sized + std::io::Write>(
