@@ -2,7 +2,7 @@ use chrono::TimeDelta;
 use clap::{Parser, Subcommand};
 use env_logger::Env;
 use log::{error, info};
-use packet_pincer::{Flow, FlowGroup, GroundTruth, PacketCapture, PacketOrigin};
+use packet_pincer::{TransportFlow, FlowGroup, GroundTruth, PacketCapture, PacketOrigin};
 
 use std::{
     fs::File,
@@ -77,7 +77,7 @@ fn create_csv_output(mut path: PathBuf, label_column: bool) -> Option<BufWriter<
     let timestamp = chrono::offset::Utc::now().timestamp_millis();
     path.set_extension(format!("{}.csv", timestamp));
     let mut w = BufWriter::new(File::create(path).expect("Unable to create file"));
-    let _ = Flow::write_csv_header(&mut w, label_column);
+    let _ = TransportFlow::write_csv_header(&mut w, label_column);
     Some(w)
 }
 
@@ -98,7 +98,7 @@ fn evaluate_packets(
     packet_capture: &mut PacketCapture,
 ) {
     // Define flow label assignation
-    let assign_flow_label = |flow: &mut Flow| {
+    let assign_flow_label = |flow: &mut TransportFlow| {
         if let Some(ref ground_truth) = ground_truth {
             match ground_truth.find_label(flow) {
                 Some(label) => flow.set_label(label),
@@ -113,7 +113,7 @@ fn evaluate_packets(
         .and_then(|path| create_csv_output(path.clone(), ground_truth.is_some()));
 
     // Define writing a closed flow to file
-    let mut write_closed_flow = |flow: Flow| {
+    let mut write_closed_flow = |flow: TransportFlow| {
         if let Some(ref mut w) = csv_writer {
             _ = flow.write_csv_value(w, ground_truth.is_some());
             execution_stats.current_lines_written += 1;

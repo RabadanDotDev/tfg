@@ -2,7 +2,6 @@ use chrono::DateTime;
 use chrono::Utc;
 use etherparse::err::packet::SliceError;
 use etherparse::IpNumber;
-use etherparse::SlicedPacket;
 use std::hash::{Hash, Hasher};
 use std::io::{BufWriter, Error, Write};
 use std::net::IpAddr;
@@ -19,7 +18,32 @@ pub enum ParseError {
     UnsupportedTransportLayer,
 }
 
-pub struct FragmentationInformation(());
+pub enum FragmentationInformation{
+    NoFragmentation,
+    FragmentedIpv4Packet,
+    ReassembledIPv4Packet
+}
+
+pub enum FlowIdentifier {
+    TransportFlowIdentifier(TransportFlowIdentifier),
+    NetworkFlowIdentifier(NetworkFlowIdentifier)
+}
+
+/// An identifier for a comunication between two hosts
+#[derive(Debug, Clone, Copy)]
+pub struct TransportFlowIdentifier {
+    pub(crate) source_ip: IpAddr,
+    pub(crate) source_port: u16,
+    pub(crate) dest_ip: IpAddr,
+    pub(crate) dest_port: u16,
+    pub(crate) transport_protocol: IpNumber,
+}
+
+pub struct NetworkFlowIdentifier {
+    source_ip: IpAddr,
+    dest_ip: IpAddr,
+    identifier: u32,
+}
 
 /// Converts the timestamp of the of the packet to a Datetime<Utc> if its valid
 pub fn get_datetime_of_packet(packet_header: &PacketHeader) -> Option<DateTime<Utc>> {
@@ -33,9 +57,9 @@ pub fn get_datetime_of_packet(packet_header: &PacketHeader) -> Option<DateTime<U
 pub fn try_parse_packet<'a>(
     link_type: Linktype,
     packet: &'a Packet<'_>,
-) -> Result<SlicedPacket<'a>, ParseError> {
+) -> Result<etherparse::SlicedPacket<'a>, ParseError> {
     match link_type {
-        Linktype::ETHERNET => match SlicedPacket::from_ethernet(packet.data) {
+        Linktype::ETHERNET => match etherparse::SlicedPacket::from_ethernet(packet.data) {
             Ok(value) => Ok(value),
             Err(err) => Err(ParseError::ErrorOnSlicingPacket(err)),
         },
@@ -44,17 +68,7 @@ pub fn try_parse_packet<'a>(
     }
 }
 
-/// An identifier for a comunication between two hosts
-#[derive(Debug, Clone, Copy)]
-pub struct FlowIdentifier {
-    pub(crate) source_ip: IpAddr,
-    pub(crate) source_port: u16,
-    pub(crate) dest_ip: IpAddr,
-    pub(crate) dest_port: u16,
-    pub(crate) transport_protocol: IpNumber,
-}
-
-impl FlowIdentifier {
+impl TransportFlowIdentifier {
     #[cfg(test)]
     // Create a new flow identifier from the given params
     pub(crate) fn new(
@@ -63,8 +77,8 @@ impl FlowIdentifier {
         dest_ip: IpAddr,
         dest_port: u16,
         transport_protocol: IpNumber,
-    ) -> FlowIdentifier {
-        FlowIdentifier {
+    ) -> TransportFlowIdentifier {
+        TransportFlowIdentifier {
             source_ip,
             source_port,
             dest_ip,
@@ -75,13 +89,14 @@ impl FlowIdentifier {
 
     /// Try to extract the relevant flow identifiers from the sliced packet
     pub(crate) fn from_sliced_packet(
-        packet: &SlicedPacket,
-    ) -> Result<(FlowIdentifier, FragmentationInformation), ParseError> {
+        packet: &etherparse::SlicedPacket,
+    ) -> Result<(TransportFlowIdentifier, FragmentationInformation), ParseError> {
         let source_ip: IpAddr;
         let source_port: u16;
         let dest_ip: IpAddr;
         let dest_port: u16;
         let transport_protocol: IpNumber;
+        let fragmentation_information;
 
         match &packet.net {
             Some(header) => match header {
@@ -89,11 +104,17 @@ impl FlowIdentifier {
                     source_ip = IpAddr::V4(v.header().source_addr());
                     dest_ip = IpAddr::V4(v.header().destination_addr());
                     transport_protocol = v.header().protocol();
+                    fragmentation_information = if v.header().is_fragmenting_payload() {
+                        FragmentationInformation::FragmentedIpv4Packet
+                    } else {
+                        FragmentationInformation::NoFragmentation
+                    }
                 }
                 etherparse::NetSlice::Ipv6(v) => {
                     source_ip = IpAddr::V6(v.header().source_addr());
                     dest_ip = IpAddr::V6(v.header().destination_addr());
                     transport_protocol = v.header().next_header();
+                    fragmentation_information = FragmentationInformation::NoFragmentation;
                 }
             },
             None => return Err(ParseError::MissingNetworkLayer),
@@ -123,14 +144,14 @@ impl FlowIdentifier {
         }
 
         Ok((
-            FlowIdentifier {
+            TransportFlowIdentifier {
                 source_ip,
                 source_port,
                 dest_ip,
                 dest_port,
                 transport_protocol,
             },
-            FragmentationInformation(()),
+            fragmentation_information,
         ))
     }
 
@@ -162,7 +183,7 @@ impl FlowIdentifier {
     }
 }
 
-impl PartialEq for FlowIdentifier {
+impl PartialEq for TransportFlowIdentifier {
     fn eq(&self, other: &Self) -> bool {
         self.transport_protocol == other.transport_protocol
             && ((self.source_ip == other.source_ip
@@ -176,9 +197,9 @@ impl PartialEq for FlowIdentifier {
     }
 }
 
-impl Eq for FlowIdentifier {}
+impl Eq for TransportFlowIdentifier {}
 
-impl Hash for FlowIdentifier {
+impl Hash for TransportFlowIdentifier {
     fn hash<H: Hasher>(&self, state: &mut H) {
         if self.source_ip <= self.dest_ip {
             self.source_ip.hash(state);
@@ -207,14 +228,14 @@ mod tests {
 
     #[test]
     fn test_eq_transport_pair() {
-        let request = FlowIdentifier {
+        let request = TransportFlowIdentifier {
             source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
             source_port: 1234,
             dest_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
             dest_port: 80,
             transport_protocol: IpNumber::TCP,
         };
-        let reply = FlowIdentifier {
+        let reply = TransportFlowIdentifier {
             source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
             source_port: 80,
             dest_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
@@ -229,21 +250,21 @@ mod tests {
     }
     #[test]
     fn test_different_transport_pairs() {
-        let id1 = FlowIdentifier {
+        let id1 = TransportFlowIdentifier {
             source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
             source_port: 1234,
             dest_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
             dest_port: 80,
             transport_protocol: IpNumber::TCP,
         };
-        let id2 = FlowIdentifier {
+        let id2 = TransportFlowIdentifier {
             source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
             source_port: 1234,
             dest_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
             dest_port: 80,
             transport_protocol: IpNumber::UDP,
         };
-        let id3 = FlowIdentifier {
+        let id3 = TransportFlowIdentifier {
             source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
             source_port: 1234,
             dest_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),

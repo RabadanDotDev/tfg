@@ -1,9 +1,8 @@
 use crate::{
     flow_statistic::{FlowStat, FlowStatistics},
-    packet_parse::{try_parse_packet, FlowIdentifier, ParseError},
+    packet_parse::{try_parse_packet, TransportFlowIdentifier, ParseError},
 };
 use chrono::{DateTime, TimeDelta, Utc};
-use etherparse::SlicedPacket;
 use priority_queue::PriorityQueue;
 use std::{
     cmp::Reverse,
@@ -14,24 +13,23 @@ use std::{
 
 /// The commulative information of the flow of information between two hosts
 #[derive(Debug)]
-#[allow(dead_code)]
-pub struct Flow {
-    pub(crate) identifier: FlowIdentifier,
+pub struct TransportFlow {
+    pub(crate) identifier: TransportFlowIdentifier,
     pub(crate) statistics: FlowStatistics,
     label: Option<Rc<str>>,
 }
 
-impl Flow {
+impl TransportFlow {
     /// Create a flow from an initial pcap packet header and its sliced contents
     pub fn from(
-        identifier: FlowIdentifier,
+        identifier: TransportFlowIdentifier,
         packet_header: &pcap::PacketHeader,
-        sliced_packet: SlicedPacket,
-    ) -> Flow {
+        sliced_packet: etherparse::SlicedPacket,
+    ) -> TransportFlow {
         let statistics = FlowStatistics::from_packet(packet_header, &sliced_packet);
         let label = None;
 
-        Flow {
+        TransportFlow {
             identifier,
             statistics,
             label,
@@ -44,7 +42,7 @@ impl Flow {
     }
 
     /// Accomulate information to the flow with a given pcap packet header and its sliced contents
-    pub fn include(&mut self, packet_header: &pcap::PacketHeader, sliced_packet: SlicedPacket) {
+    pub fn include(&mut self, packet_header: &pcap::PacketHeader, sliced_packet: etherparse::SlicedPacket) {
         self.statistics.include(packet_header, &sliced_packet);
     }
 
@@ -53,7 +51,7 @@ impl Flow {
         writer: &mut BufWriter<T>,
         label_column: bool,
     ) -> Result<(), Error> {
-        FlowIdentifier::write_csv_header(writer)?;
+        TransportFlowIdentifier::write_csv_header(writer)?;
         write!(writer, ",")?;
         FlowStatistics::write_csv_header(writer)?;
         if label_column {
@@ -88,8 +86,8 @@ impl Flow {
 /// A group of flows
 #[derive(Debug)]
 pub struct FlowGroup {
-    flows: HashMap<FlowIdentifier, Flow>,
-    flows_queue: PriorityQueue<FlowIdentifier, Reverse<DateTime<Utc>>>,
+    transport_flows: HashMap<TransportFlowIdentifier, TransportFlow>,
+    transport_flows_queue: PriorityQueue<TransportFlowIdentifier, Reverse<DateTime<Utc>>>,
     latest_time: Option<DateTime<Utc>>,
 }
 
@@ -97,8 +95,8 @@ impl FlowGroup {
     /// Create an empty group of flows
     pub fn new() -> FlowGroup {
         FlowGroup {
-            flows: HashMap::new(),
-            flows_queue: PriorityQueue::new(),
+            transport_flows: HashMap::new(),
+            transport_flows_queue: PriorityQueue::new(),
             latest_time: None,
         }
     }
@@ -113,23 +111,23 @@ impl FlowGroup {
         let sliced_packet = try_parse_packet(link_type, packet)?;
 
         // Extract identification
-        let (flow_identifier, _fragmentation_information) =
-            FlowIdentifier::from_sliced_packet(&sliced_packet)?;
+        let (transport_flow_identifier, _fragmentation_information) =
+            TransportFlowIdentifier::from_sliced_packet(&sliced_packet)?;
 
         // Store flow
-        match self.flows.get_mut(&flow_identifier) {
+        match self.transport_flows.get_mut(&transport_flow_identifier) {
             None => {
-                let flow = Flow::from(flow_identifier, packet.header, sliced_packet);
-                self.flows_queue.push(
-                    flow_identifier,
+                let flow = TransportFlow::from(transport_flow_identifier, packet.header, sliced_packet);
+                self.transport_flows_queue.push(
+                    transport_flow_identifier,
                     Reverse(flow.statistics.flow_times.last_packet_time),
                 );
-                self.flows.insert(flow_identifier, flow);
+                self.transport_flows.insert(transport_flow_identifier, flow);
             }
             Some(flow) => {
                 flow.include(packet.header, sliced_packet);
-                self.flows_queue.change_priority(
-                    &flow_identifier,
+                self.transport_flows_queue.change_priority(
+                    &transport_flow_identifier,
                     Reverse(flow.statistics.flow_times.last_packet_time),
                 );
             }
@@ -141,16 +139,16 @@ impl FlowGroup {
     /// From the flow that has been the most time without receiving a packet,
     /// get the timestamp when the last packet was received
     pub fn get_oldest_time(&self) -> Option<DateTime<Utc>> {
-        Some(self.flows_queue.peek()?.1 .0)
+        Some(self.transport_flows_queue.peek()?.1 .0)
     }
 
     /// Try popping oldest flow if it has passed more time than `time_delta`
     /// between last packet received on it and the last packet in general
-    pub fn pop_oldest_flow_if_older_than(&mut self, time_delta: TimeDelta) -> Option<Flow> {
+    pub fn pop_oldest_flow_if_older_than(&mut self, time_delta: TimeDelta) -> Option<TransportFlow> {
         if let Some((oldest_time, latest_time)) = self.get_oldest_time().zip(self.latest_time) {
             if time_delta < latest_time - oldest_time {
-                let (flow_identifier, _) = self.flows_queue.pop().unwrap();
-                let flow = self.flows.remove(&flow_identifier).unwrap();
+                let (flow_identifier, _) = self.transport_flows_queue.pop().unwrap();
+                let flow = self.transport_flows.remove(&flow_identifier).unwrap();
                 Some(flow)
             } else {
                 None
@@ -161,9 +159,9 @@ impl FlowGroup {
     }
 
     /// Try popping oldest flow
-    pub fn pop_oldest_flow(&mut self) -> Option<Flow> {
-        if let Some((flow_identifier, _)) = self.flows_queue.pop() {
-            let flow = self.flows.remove(&flow_identifier).unwrap();
+    pub fn pop_oldest_flow(&mut self) -> Option<TransportFlow> {
+        if let Some((flow_identifier, _)) = self.transport_flows_queue.pop() {
+            let flow = self.transport_flows.remove(&flow_identifier).unwrap();
             Some(flow)
         } else {
             None
@@ -186,7 +184,7 @@ mod tests {
 
     use super::*;
     #[test]
-    fn test_correct_order_inclusion() {
+    fn test_correct_transport_flow_order_inclusion() {
         // Create flow group
         let mut flow_group = FlowGroup::new();
 
@@ -199,7 +197,7 @@ mod tests {
         // First packet
         {
             // Create
-            let flow_identifier = FlowIdentifier::new(
+            let flow_identifier = TransportFlowIdentifier::new(
                 IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
                 21,
                 IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
@@ -229,10 +227,10 @@ mod tests {
             let _ = flow_group.include(link_type, &packet_1);
 
             // Assert
-            assert_eq!(flow_group.flows.len(), 1);
-            assert_eq!(flow_group.flows_queue.len(), 1);
-            assert!(flow_group.flows.contains_key(&flow_identifier));
-            assert_eq!(flow_group.flows_queue.peek().unwrap().0, &flow_identifier);
+            assert_eq!(flow_group.transport_flows.len(), 1);
+            assert_eq!(flow_group.transport_flows_queue.len(), 1);
+            assert!(flow_group.transport_flows.contains_key(&flow_identifier));
+            assert_eq!(flow_group.transport_flows_queue.peek().unwrap().0, &flow_identifier);
             assert_eq!(flow_group.get_oldest_time().unwrap().timestamp(), 0);
             assert_eq!(flow_group.get_oldest_time().unwrap().timestamp_micros(), 0);
             assert_eq!(flow_group.latest_time.unwrap().timestamp(), 0);
@@ -247,7 +245,7 @@ mod tests {
         // Second packet
 
         // Create
-        let flow_identifier_second = FlowIdentifier::new(
+        let flow_identifier_second = TransportFlowIdentifier::new(
             IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
             1234,
             IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
@@ -278,11 +276,11 @@ mod tests {
             let _ = flow_group.include(link_type, &packet_1);
 
             // Assert
-            assert_eq!(flow_group.flows.len(), 1);
-            assert_eq!(flow_group.flows_queue.len(), 1);
-            assert!(flow_group.flows.contains_key(&flow_identifier_second));
+            assert_eq!(flow_group.transport_flows.len(), 1);
+            assert_eq!(flow_group.transport_flows_queue.len(), 1);
+            assert!(flow_group.transport_flows.contains_key(&flow_identifier_second));
             assert_eq!(
-                flow_group.flows_queue.peek().unwrap().0,
+                flow_group.transport_flows_queue.peek().unwrap().0,
                 &flow_identifier_second
             );
             assert_eq!(flow_group.get_oldest_time().unwrap().timestamp(), 0);
@@ -299,7 +297,7 @@ mod tests {
         // Third packet
         {
             // Create
-            let flow_identifier = FlowIdentifier::new(
+            let flow_identifier = TransportFlowIdentifier::new(
                 IpAddr::V4(Ipv4Addr::new(192, 168, 1, 3)),
                 21,
                 IpAddr::V4(Ipv4Addr::new(192, 168, 1, 4)),
@@ -329,11 +327,11 @@ mod tests {
             let _ = flow_group.include(link_type, &packet_1);
 
             // Assert
-            assert_eq!(flow_group.flows.len(), 2);
-            assert_eq!(flow_group.flows_queue.len(), 2);
-            assert!(flow_group.flows.contains_key(&flow_identifier));
+            assert_eq!(flow_group.transport_flows.len(), 2);
+            assert_eq!(flow_group.transport_flows_queue.len(), 2);
+            assert!(flow_group.transport_flows.contains_key(&flow_identifier));
             assert_eq!(
-                flow_group.flows_queue.peek().unwrap().0,
+                flow_group.transport_flows_queue.peek().unwrap().0,
                 &flow_identifier_second
             );
             assert_eq!(flow_group.get_oldest_time().unwrap().timestamp(), 0);

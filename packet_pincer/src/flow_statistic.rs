@@ -1,13 +1,12 @@
 use std::io::{BufWriter, Error, Write};
 
 use chrono::{DateTime, Utc};
-use etherparse::SlicedPacket;
 
 use crate::packet_parse::get_datetime_of_packet;
 
 pub trait FlowStat {
-    fn from_packet(packet_header: &pcap::PacketHeader, sliced_packet: &SlicedPacket) -> Self;
-    fn include(&mut self, packet_header: &pcap::PacketHeader, sliced_packet: &SlicedPacket);
+    fn from_packet(packet_header: &pcap::PacketHeader, sliced_packet: &etherparse::SlicedPacket) -> Self;
+    fn include(&mut self, packet_header: &pcap::PacketHeader, sliced_packet: &etherparse::SlicedPacket);
     fn write_csv_header<T: ?Sized + std::io::Write>(writer: &mut BufWriter<T>)
         -> Result<(), Error>;
     fn write_csv_value<T: ?Sized + std::io::Write>(
@@ -25,14 +24,14 @@ pub struct FlowStatistics {
 
 // TODO: create a macro to autogenerate this.
 impl FlowStat for FlowStatistics {
-    fn from_packet(packet_header: &pcap::PacketHeader, sliced_packet: &SlicedPacket) -> Self {
+    fn from_packet(packet_header: &pcap::PacketHeader, sliced_packet: &etherparse::SlicedPacket) -> Self {
         FlowStatistics {
             flow_times: FlowTimes::from_packet(packet_header, sliced_packet),
             packet_count: PacketCount::from_packet(packet_header, sliced_packet),
             byte_count: ByteCount::from_packet(packet_header, sliced_packet),
         }
     }
-    fn include(&mut self, packet_header: &pcap::PacketHeader, sliced_packet: &SlicedPacket) {
+    fn include(&mut self, packet_header: &pcap::PacketHeader, sliced_packet: &etherparse::SlicedPacket) {
         self.flow_times.include(packet_header, sliced_packet);
         self.packet_count.include(packet_header, sliced_packet);
         self.byte_count.include(packet_header, sliced_packet);
@@ -67,14 +66,14 @@ pub(crate) struct FlowTimes {
 }
 
 impl FlowStat for FlowTimes {
-    fn from_packet(packet_header: &pcap::PacketHeader, _sliced_packet: &SlicedPacket) -> Self {
+    fn from_packet(packet_header: &pcap::PacketHeader, _sliced_packet: &etherparse::SlicedPacket) -> Self {
         let time = get_datetime_of_packet(packet_header).expect("Packet headers with invalid timestamps are not supported");
         FlowTimes { 
             first_packet_time: time,
             last_packet_time: time
         }
     }
-    fn include(&mut self, packet_header: &pcap::PacketHeader, _sliced_packet: &SlicedPacket) {
+    fn include(&mut self, packet_header: &pcap::PacketHeader, _sliced_packet: &etherparse::SlicedPacket) {
         self.last_packet_time = get_datetime_of_packet(packet_header).expect("Packet headers with invalid timestamps are not supported");
     }
     fn write_csv_header<T: ?Sized + std::io::Write>(
@@ -108,12 +107,12 @@ struct PacketCount {
 }
 
 impl FlowStat for PacketCount {
-    fn from_packet(_packet_header: &pcap::PacketHeader, _sliced_packet: &SlicedPacket) -> Self {
+    fn from_packet(_packet_header: &pcap::PacketHeader, _sliced_packet: &etherparse::SlicedPacket) -> Self {
         PacketCount {
             count: 0
         }
     }
-    fn include(&mut self, _packet_header: &pcap::PacketHeader, _sliced_packet: &SlicedPacket) {
+    fn include(&mut self, _packet_header: &pcap::PacketHeader, _sliced_packet: &etherparse::SlicedPacket) {
         self.count += 1;
     }
     fn write_csv_header<T: ?Sized + std::io::Write>(
@@ -137,12 +136,12 @@ struct ByteCount {
 }
 
 impl FlowStat for ByteCount {
-    fn from_packet(_packet_header: &pcap::PacketHeader, _sliced_packet: &SlicedPacket) -> Self {
+    fn from_packet(_packet_header: &pcap::PacketHeader, _sliced_packet: &etherparse::SlicedPacket) -> Self {
         ByteCount {
             count: 0
         }
     }
-    fn include(&mut self, packet_header: &pcap::PacketHeader, _sliced_packet: &SlicedPacket) {
+    fn include(&mut self, packet_header: &pcap::PacketHeader, _sliced_packet: &etherparse::SlicedPacket) {
         self.count += u64::from(packet_header.len);
     }
     fn write_csv_header<T: ?Sized + std::io::Write>(

@@ -11,7 +11,7 @@ use std::{
 use chrono::{DateTime, TimeDelta, Utc};
 use serde::Deserialize;
 
-use crate::Flow;
+use crate::TransportFlow;
 
 #[derive(Debug, Deserialize)]
 struct GroundTruthRecord {
@@ -57,7 +57,7 @@ impl GroundTruth {
     }
 
     /// Try finding a given label that matches the flow
-    pub fn find_label(&self, flow: &Flow) -> Option<Rc<str>> {
+    pub fn find_label(&self, flow: &TransportFlow) -> Option<Rc<str>> {
         match self.flows.get(&HostPair::from_ip_pair(
             flow.identifier.source_ip,
             flow.identifier.dest_ip,
