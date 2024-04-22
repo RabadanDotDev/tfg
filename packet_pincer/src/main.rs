@@ -127,22 +127,23 @@ fn evaluate_packets(
     };
 
     // Define packet processing
-    let process_packet = &mut |_p: PacketOrigin,
-                               link_type: pcap::Linktype,
-                               packet: &pcap::Packet<'_>| {
-        match flows.include(link_type, packet) {
-            Ok(()) => execution_stats.valid_count += 1,
-            Err(_) => {
-                execution_stats.ignored_count += 1;
+    let process_packet =
+        &mut |_p: PacketOrigin, link_type: pcap::Linktype, packet: &pcap::Packet<'_>| {
+            match flows.include(link_type, packet) {
+                Ok(()) => execution_stats.valid_count += 1,
+                Err(_) => {
+                    execution_stats.ignored_count += 1;
+                }
             }
-        }
 
-        while let Some(mut flow) = flows.pop_oldest_flow_if_older_than(TimeDelta::seconds(300)) {
-            execution_stats.flow_count += 1;
-            assign_flow_label(&mut flow);
-            write_closed_flow(flow);
-        }
-    };
+            while let Some(mut flow) =
+                flows.pop_oldest_transport_flow_if_older_than(TimeDelta::seconds(300))
+            {
+                execution_stats.flow_count += 1;
+                assign_flow_label(&mut flow);
+                write_closed_flow(flow);
+            }
+        };
 
     // Evaluate packets until running out of them or being interrupted
     loop {
@@ -159,7 +160,7 @@ fn evaluate_packets(
     }
 
     // Close remaining flows
-    while let Some(mut flow) = flows.pop_oldest_flow() {
+    while let Some(mut flow) = flows.pop_oldest_transport_flow() {
         execution_stats.flow_count += 1;
         assign_flow_label(&mut flow);
         write_closed_flow(flow);

@@ -1,6 +1,9 @@
 use crate::{
     flow_statistic::{FlowStat, FlowStatistics},
-    packet_parse::{try_parse_packet, FlowIdentifier, ParseError, TransportFlowIdentifier},
+    packet_parse::{
+        self, try_parse_packet, FlowIdentifier, FragmentationInformation, NetworkFlowIdentifier,
+        ParseError, TransportFlowIdentifier,
+    },
 };
 use chrono::{DateTime, TimeDelta, Utc};
 use priority_queue::PriorityQueue;
@@ -9,6 +12,7 @@ use std::{
     collections::HashMap,
     io::{BufWriter, Error, Write},
     rc::Rc,
+    vec,
 };
 
 /// The commulative information of the flow of information between two hosts
@@ -87,11 +91,83 @@ impl TransportFlow {
     }
 }
 
+/// The fragments on a network flow yet to be reasembled
+#[derive(Debug)]
+pub struct NetworkFragmentFlow {
+    pub(crate) identifier: NetworkFlowIdentifier,
+    first_time: DateTime<Utc>,
+    last_time: DateTime<Utc>,
+    expected_size: Option<usize>,
+    fragments_data: Vec<(etherparse::IpFragOffset, Vec<u8>)>, // TODO: change this field to a better data structure
+    received_fragment_count: u32, // We track this separately because fragments with equal offset get overriden
+}
+
+impl NetworkFragmentFlow {
+    /// Create a flow from an initial pcap packet header and its sliced contents
+    pub fn from(
+        identifier: NetworkFlowIdentifier,
+        packet_header: &pcap::PacketHeader,
+        sliced_packet: etherparse::SlicedPacket,
+        fragmentation_offset: etherparse::IpFragOffset,
+        more_packets: bool,
+    ) -> NetworkFragmentFlow {
+        let time = packet_parse::get_datetime_of_packet(packet_header)
+            .expect("Packet headers with invalid timestamps are not supported");
+        let ip_payload = sliced_packet.ip_payload().unwrap().payload.to_owned();
+        let expected_size = if more_packets {
+            None
+        } else {
+            Some(usize::from(fragmentation_offset.value()) + ip_payload.len())
+        };
+
+        NetworkFragmentFlow {
+            identifier,
+            first_time: time,
+            last_time: time,
+            expected_size,
+            fragments_data: vec![(fragmentation_offset, ip_payload)],
+            received_fragment_count: 1,
+        }
+    }
+
+    /// Accomulate information to the flow with a given pcap packet header and
+    /// its sliced contents.
+    pub fn include(
+        &mut self,
+        packet_header: &pcap::PacketHeader,
+        sliced_packet: etherparse::SlicedPacket,
+        fragmentation_offset: etherparse::IpFragOffset,
+        more_packets: bool,
+    ) {
+        self.last_time = packet_parse::get_datetime_of_packet(packet_header)
+            .expect("Packet headers with invalid timestamps are not supported");
+        let ip_payload = sliced_packet.ip_payload().unwrap().payload.to_owned();
+
+        if self.expected_size.is_none() && !more_packets {
+            self.expected_size = Some(usize::from(fragmentation_offset.value()) + ip_payload.len());
+        }
+
+        match self
+            .fragments_data
+            .binary_search_by_key(&fragmentation_offset, |v| v.0)
+        {
+            Ok(v) => self.fragments_data[v].1 = ip_payload,
+            Err(v) => self
+                .fragments_data
+                .insert(v, (fragmentation_offset, ip_payload)),
+        }
+
+        self.received_fragment_count += 1;
+    }
+}
+
 /// A group of flows
 #[derive(Debug)]
 pub struct FlowGroup {
     transport_flows: HashMap<TransportFlowIdentifier, TransportFlow>,
     transport_flows_queue: PriorityQueue<TransportFlowIdentifier, Reverse<DateTime<Utc>>>,
+    network_fragment_flows: HashMap<NetworkFlowIdentifier, NetworkFragmentFlow>,
+    network_fragment_flows_queue: PriorityQueue<NetworkFlowIdentifier, DateTime<Utc>>,
     latest_time: Option<DateTime<Utc>>,
 }
 
@@ -101,6 +177,8 @@ impl FlowGroup {
         FlowGroup {
             transport_flows: HashMap::new(),
             transport_flows_queue: PriorityQueue::new(),
+            network_fragment_flows: HashMap::new(),
+            network_fragment_flows_queue: PriorityQueue::new(),
             latest_time: None,
         }
     }
@@ -115,40 +193,101 @@ impl FlowGroup {
         let sliced_packet = try_parse_packet(link_type, packet)?;
 
         // Extract identification
-        let (flow_identifier, _fragmentation_information) =
+        let (flow_identifier, fragmentation_information) =
             FlowIdentifier::from_sliced_packet(&sliced_packet)?;
 
         // Store flow
         match flow_identifier {
             FlowIdentifier::TransportFlowIdentifier(transport_flow_identifier) => {
-                match self.transport_flows.get_mut(&transport_flow_identifier) {
-                    None => {
-                        let flow = TransportFlow::from(
-                            transport_flow_identifier,
-                            packet.header,
-                            sliced_packet,
-                        );
-                        self.transport_flows_queue.push(
-                            transport_flow_identifier,
-                            Reverse(flow.statistics.flow_times.last_packet_time),
-                        );
-                        self.transport_flows.insert(transport_flow_identifier, flow);
+                self.store_transport_flow(transport_flow_identifier, packet.header, sliced_packet);
+                Ok(())
+            }
+            FlowIdentifier::NetworkFlowIdentifier(network_flow_identifier) => {
+                match fragmentation_information {
+                    FragmentationInformation::NoFragmentation => {
+                        Err(ParseError::MissingTransportLayer)
                     }
-                    Some(flow) => {
-                        flow.include(packet.header, sliced_packet);
-                        self.transport_flows_queue.change_priority(
-                            &transport_flow_identifier,
-                            Reverse(flow.statistics.flow_times.last_packet_time),
-                        );
-                    }
+                    FragmentationInformation::ReassembledIPv4Packet => unreachable!(),
+                    FragmentationInformation::FragmentedIpv4Packet {
+                        fragmentation_offset,
+                        more_packets,
+                    } => self.evaluate_ipv4_fragment(
+                        network_flow_identifier,
+                        packet.header,
+                        sliced_packet,
+                        fragmentation_offset,
+                        more_packets,
+                    ),
                 }
             }
-            FlowIdentifier::NetworkFlowIdentifier(_) => {
-                return Err(ParseError::MissingTransportLayer)
-            } // TODO try reassemble packet/store it if its fragmented
         }
+    }
 
-        Ok(())
+    fn store_transport_flow(
+        &mut self,
+        transport_flow_identifier: TransportFlowIdentifier,
+        packet_header: &pcap::PacketHeader,
+        sliced_packet: etherparse::SlicedPacket<'_>,
+    ) {
+        match self.transport_flows.get_mut(&transport_flow_identifier) {
+            None => {
+                let flow =
+                    TransportFlow::from(transport_flow_identifier, packet_header, sliced_packet);
+                self.transport_flows_queue.push(
+                    transport_flow_identifier,
+                    Reverse(flow.statistics.flow_times.last_packet_time),
+                );
+                self.transport_flows.insert(transport_flow_identifier, flow);
+            }
+            Some(flow) => {
+                flow.include(packet_header, sliced_packet);
+                self.transport_flows_queue.change_priority(
+                    &transport_flow_identifier,
+                    Reverse(flow.statistics.flow_times.last_packet_time),
+                );
+            }
+        }
+    }
+
+    fn evaluate_ipv4_fragment(
+        &mut self,
+        network_flow_identifier: NetworkFlowIdentifier,
+        packet_header: &pcap::PacketHeader,
+        sliced_packet: etherparse::SlicedPacket<'_>,
+        fragmentation_offset: etherparse::IpFragOffset,
+        more_packets: bool,
+    ) -> Result<(), ParseError> {
+        match self
+            .network_fragment_flows
+            .get_mut(&network_flow_identifier)
+        {
+            None => {
+                let flow = NetworkFragmentFlow::from(
+                    network_flow_identifier,
+                    packet_header,
+                    sliced_packet,
+                    fragmentation_offset,
+                    more_packets,
+                );
+                self.network_fragment_flows_queue
+                    .push(network_flow_identifier, flow.first_time);
+                self.network_fragment_flows
+                    .insert(network_flow_identifier, flow);
+
+                Ok(())
+            }
+            Some(flow) => {
+                flow.include(
+                    packet_header,
+                    sliced_packet,
+                    fragmentation_offset,
+                    more_packets,
+                );
+
+                // Try reasemble packet
+                todo!();
+            }
+        }
     }
 
     /// From the flow that has been the most time without receiving a packet,
@@ -157,9 +296,10 @@ impl FlowGroup {
         Some(self.transport_flows_queue.peek()?.1 .0)
     }
 
-    /// Try popping oldest flow if it has passed more time than `time_delta`
-    /// between last packet received on it and the last packet in general
-    pub fn pop_oldest_flow_if_older_than(
+    /// Try popping oldest transport flow if it has passed more time than
+    /// `time_delta` between last packet received on it and the last packet in
+    /// general
+    pub fn pop_oldest_transport_flow_if_older_than(
         &mut self,
         time_delta: TimeDelta,
     ) -> Option<TransportFlow> {
@@ -176,14 +316,26 @@ impl FlowGroup {
         }
     }
 
-    /// Try popping oldest flow
-    pub fn pop_oldest_flow(&mut self) -> Option<TransportFlow> {
+    /// Try popping oldest transport flow
+    pub fn pop_oldest_transport_flow(&mut self) -> Option<TransportFlow> {
         if let Some((flow_identifier, _)) = self.transport_flows_queue.pop() {
             let flow = self.transport_flows.remove(&flow_identifier).unwrap();
             Some(flow)
         } else {
             None
         }
+    }
+
+    /// Try popping oldest network flow fragment if it has passed more time
+    /// than `time_delta` between the first packet received on it and the last
+    /// packet complete packet
+    pub fn pop_oldest_network_flow_if_older_than(&mut self, time_delta: TimeDelta) -> Option<()> {
+        todo!()
+    }
+
+    /// Try popping oldest network flow
+    pub fn pop_oldest_network_flow(&mut self) -> Option<()> {
+        todo!()
     }
 }
 
@@ -260,7 +412,7 @@ mod tests {
 
         // Try popping
         assert!(flow_group
-            .pop_oldest_flow_if_older_than(TimeDelta::microseconds(3))
+            .pop_oldest_transport_flow_if_older_than(TimeDelta::microseconds(3))
             .is_none());
 
         // Second packet
@@ -314,7 +466,7 @@ mod tests {
 
         // Try popping
         assert!(flow_group
-            .pop_oldest_flow_if_older_than(TimeDelta::microseconds(3))
+            .pop_oldest_transport_flow_if_older_than(TimeDelta::microseconds(3))
             .is_none());
 
         // Third packet
@@ -365,7 +517,7 @@ mod tests {
 
         // Try popping
         assert!(flow_group
-            .pop_oldest_flow_if_older_than(TimeDelta::microseconds(3))
+            .pop_oldest_transport_flow_if_older_than(TimeDelta::microseconds(3))
             .is_some());
     }
 }

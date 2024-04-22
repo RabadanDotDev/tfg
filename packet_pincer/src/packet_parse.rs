@@ -16,6 +16,8 @@ pub enum ParseError {
     UnsupportedLinkType,
     /// etherparse encounered an error while parsing the packet
     ErrorOnSlicingPacket(SliceError),
+    /// etherparse encountered an error while parsing a reassembled packet
+    ErrorOnSlicingReassembledPacket(SliceError),
     /// Could not find the network packet when it was expected
     MissingNetworkLayer,
     /// Could not find the transport layer when it was expected
@@ -28,8 +30,12 @@ pub enum ParseError {
 pub enum FragmentationInformation {
     /// There is no fragmentation
     NoFragmentation,
-    /// The packet is an IPv4 packet that couldn't be reassembled yet
-    FragmentedIpv4Packet,
+    /// The packet is an IPv4 packet that couldn't be reassembled yet. The
+    /// variant contains the offset and if there are more packets to come
+    FragmentedIpv4Packet {
+        fragmentation_offset: etherparse::IpFragOffset,
+        more_packets: bool,
+    },
     /// The packet is an IPv4 packet that was reassembled from its parts
     ReassembledIPv4Packet,
 }
@@ -51,6 +57,7 @@ pub struct TransportFlowIdentifier {
 }
 
 /// An identifier for a comunication between two hosts in the network layer
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct NetworkFlowIdentifier {
     pub(crate) source_ip: IpAddr,
     pub(crate) dest_ip: IpAddr,
@@ -103,7 +110,10 @@ impl FlowIdentifier {
                                 dest_ip,
                                 identifier: v.header().identification().into(),
                             }),
-                            FragmentationInformation::FragmentedIpv4Packet,
+                            FragmentationInformation::FragmentedIpv4Packet {
+                                fragmentation_offset: v.header().fragments_offset(),
+                                more_packets: v.header().more_fragments(),
+                            },
                         ));
                     }
                 }
