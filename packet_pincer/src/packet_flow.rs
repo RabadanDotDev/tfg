@@ -183,12 +183,23 @@ impl FlowGroup {
         }
     }
 
-    /// Accomulate information to the correct flow given a packet and its respective link type
+    /// Accomulate information to the correct flow given a packet and its
+    /// respective link type. On success, returns the number of valid packets
+    /// and invalid packets. This will usually be (1, 0), but can differ in
+    /// case of fragmented packets. If packets are kept for reeasembly, it will
+    /// return (0, 0). If a reassembly happens, it will return the ones that
+    /// were used and the ones that were discarded
     pub fn include(
         &mut self,
         link_type: pcap::Linktype,
         packet: &pcap::Packet<'_>,
-    ) -> Result<(), ParseError> {
+    ) -> Result<(u32, u32), ParseError> {
+        // Record time
+        self.latest_time = Some(
+            packet_parse::get_datetime_of_packet(packet.header)
+                .expect("Packet headers with invalid timestamps are not supported"),
+        );
+
         // Slice packet
         let sliced_packet = try_parse_packet(link_type, packet)?;
 
@@ -200,7 +211,7 @@ impl FlowGroup {
         match flow_identifier {
             FlowIdentifier::TransportFlowIdentifier(transport_flow_identifier) => {
                 self.store_transport_flow(transport_flow_identifier, packet.header, sliced_packet);
-                Ok(())
+                Ok((1, 0))
             }
             FlowIdentifier::NetworkFlowIdentifier(network_flow_identifier) => {
                 match fragmentation_information {
@@ -256,7 +267,7 @@ impl FlowGroup {
         sliced_packet: etherparse::SlicedPacket<'_>,
         fragmentation_offset: etherparse::IpFragOffset,
         more_packets: bool,
-    ) -> Result<(), ParseError> {
+    ) -> Result<(u32, u32), ParseError> {
         match self
             .network_fragment_flows
             .get_mut(&network_flow_identifier)
@@ -274,7 +285,7 @@ impl FlowGroup {
                 self.network_fragment_flows
                     .insert(network_flow_identifier, flow);
 
-                Ok(())
+                Ok((0, 0))
             }
             Some(flow) => {
                 flow.include(
@@ -284,16 +295,22 @@ impl FlowGroup {
                     more_packets,
                 );
 
-                // Try reasemble packet
-                todo!();
+                // TODO: Try reasemble packet
+                Ok((0, 0))
             }
         }
     }
 
-    /// From the flow that has been the most time without receiving a packet,
-    /// get the timestamp when the last packet was received
-    pub fn get_oldest_time(&self) -> Option<DateTime<Utc>> {
+    /// From the transport flow that has been the most time without receiving a
+    /// packet, get the timestamp when the last packet was received
+    fn get_oldest_time_transport(&self) -> Option<DateTime<Utc>> {
         Some(self.transport_flows_queue.peek()?.1 .0)
+    }
+
+    /// Get the first time a fragment was received from the oldest network
+    /// fragment flow
+    fn get_oldest_time_network_fragment(&self) -> Option<DateTime<Utc>> {
+        Some(*self.network_fragment_flows_queue.peek()?.1)
     }
 
     /// Try popping oldest transport flow if it has passed more time than
@@ -303,7 +320,9 @@ impl FlowGroup {
         &mut self,
         time_delta: TimeDelta,
     ) -> Option<TransportFlow> {
-        if let Some((oldest_time, latest_time)) = self.get_oldest_time().zip(self.latest_time) {
+        if let Some((oldest_time, latest_time)) =
+            self.get_oldest_time_transport().zip(self.latest_time)
+        {
             if time_delta < latest_time - oldest_time {
                 let (flow_identifier, _) = self.transport_flows_queue.pop().unwrap();
                 let flow = self.transport_flows.remove(&flow_identifier).unwrap();
@@ -328,14 +347,40 @@ impl FlowGroup {
 
     /// Try popping oldest network flow fragment if it has passed more time
     /// than `time_delta` between the first packet received on it and the last
-    /// packet complete packet
-    pub fn pop_oldest_network_flow_if_older_than(&mut self, time_delta: TimeDelta) -> Option<()> {
-        todo!()
+    /// packet in general. In success, returns the number of fragments received
+    /// on the flow that were accomulated but not reasembled
+    pub fn pop_oldest_network_flow_if_older_than(&mut self, time_delta: TimeDelta) -> Option<u32> {
+        if let Some((oldest_time, latest_time)) = self
+            .get_oldest_time_network_fragment()
+            .zip(self.latest_time)
+        {
+            if time_delta < latest_time - oldest_time {
+                let (network_flow_identifier, _) = self.network_fragment_flows_queue.pop().unwrap();
+                let flow = self
+                    .network_fragment_flows
+                    .remove(&network_flow_identifier)
+                    .unwrap();
+                Some(flow.received_fragment_count)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
     }
 
-    /// Try popping oldest network flow
-    pub fn pop_oldest_network_flow(&mut self) -> Option<()> {
-        todo!()
+    /// Try popping oldest network flow. In success, returns the number of
+    /// fragments received on the flow that were accomulated but not reasembled
+    pub fn pop_oldest_network_flow(&mut self) -> Option<u32> {
+        if let Some((network_flow_identifier, _)) = self.network_fragment_flows_queue.pop() {
+            let flow = self
+                .network_fragment_flows
+                .remove(&network_flow_identifier)
+                .unwrap();
+            Some(flow.received_fragment_count)
+        } else {
+            None
+        }
     }
 }
 
@@ -354,6 +399,7 @@ mod tests {
 
     use super::*;
     #[test]
+    #[rustfmt::skip]
     fn test_correct_transport_flow_order_inclusion() {
         // Create flow group
         let mut flow_group = FlowGroup::new();
@@ -404,8 +450,8 @@ mod tests {
                 flow_group.transport_flows_queue.peek().unwrap().0,
                 &flow_identifier
             );
-            assert_eq!(flow_group.get_oldest_time().unwrap().timestamp(), 0);
-            assert_eq!(flow_group.get_oldest_time().unwrap().timestamp_micros(), 0);
+            assert_eq!(flow_group.get_oldest_time_transport().unwrap().timestamp(), 0);
+            assert_eq!(flow_group.get_oldest_time_transport().unwrap().timestamp_micros(), 0);
             assert_eq!(flow_group.latest_time.unwrap().timestamp(), 0);
             assert_eq!(flow_group.latest_time.unwrap().timestamp_micros(), 0);
         }
@@ -458,8 +504,8 @@ mod tests {
                 flow_group.transport_flows_queue.peek().unwrap().0,
                 &flow_identifier_second
             );
-            assert_eq!(flow_group.get_oldest_time().unwrap().timestamp(), 0);
-            assert_eq!(flow_group.get_oldest_time().unwrap().timestamp_micros(), 1);
+            assert_eq!(flow_group.get_oldest_time_transport().unwrap().timestamp(), 0);
+            assert_eq!(flow_group.get_oldest_time_transport().unwrap().timestamp_micros(), 1);
             assert_eq!(flow_group.latest_time.unwrap().timestamp(), 0);
             assert_eq!(flow_group.latest_time.unwrap().timestamp_micros(), 1);
         }
@@ -509,8 +555,8 @@ mod tests {
                 flow_group.transport_flows_queue.peek().unwrap().0,
                 &flow_identifier_second
             );
-            assert_eq!(flow_group.get_oldest_time().unwrap().timestamp(), 0);
-            assert_eq!(flow_group.get_oldest_time().unwrap().timestamp_micros(), 1);
+            assert_eq!(flow_group.get_oldest_time_transport().unwrap().timestamp(), 0);
+            assert_eq!(flow_group.get_oldest_time_transport().unwrap().timestamp_micros(), 1);
             assert_eq!(flow_group.latest_time.unwrap().timestamp(), 0);
             assert_eq!(flow_group.latest_time.unwrap().timestamp_micros(), 10);
         }

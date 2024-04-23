@@ -16,10 +16,68 @@ const MAX_LINES_FOR_CSV_FILE: u64 = 10_000_000;
 
 #[derive(Default)]
 struct ExecutionStats {
-    valid_count: u64,
-    ignored_count: u64,
     flow_count: u64,
     current_lines_written: u64,
+    total_count: u64,
+    valid_count: u64,
+    packet_error_on_slice_count: u64,
+    packet_error_on_slice_reasembled_count: u64,
+    packet_could_not_find_net_layer_count: u64,
+    packet_could_not_find_transport_layer_count: u64,
+    unsupported_link_type_count: u64,
+    unsupported_transport_type_count: u64,
+    discarded_fragments_count: u64,
+}
+
+impl ExecutionStats {
+    fn print_info_results(&self) {
+        info!("{} packets were seen", self.total_count);
+        if self.valid_count != 0 {
+            info!("{} packets were valid", self.valid_count);
+        }
+        if self.packet_error_on_slice_count != 0 {
+            info!(
+                "{} packets had issues on slicing",
+                self.packet_error_on_slice_count
+            );
+        }
+        if self.packet_error_on_slice_reasembled_count != 0 {
+            info!(
+                "{} reasembled packets had issues on slicing",
+                self.packet_error_on_slice_reasembled_count
+            );
+        }
+        if self.packet_could_not_find_net_layer_count != 0 {
+            info!(
+                "{} packets didn't contain a valid/known network layer",
+                self.packet_could_not_find_net_layer_count
+            );
+        }
+        if self.packet_could_not_find_transport_layer_count != 0 {
+            info!(
+                "{} packets didn't contain a valid/known transport layer",
+                self.packet_could_not_find_transport_layer_count
+            );
+        }
+        if self.unsupported_link_type_count != 0 {
+            info!(
+                "{} packets came from an unsupported link type",
+                self.unsupported_link_type_count
+            );
+        }
+        if self.unsupported_transport_type_count != 0 {
+            info!(
+                "{} packets came from an unsupported transport type",
+                self.unsupported_transport_type_count
+            );
+        }
+        if self.discarded_fragments_count != 0 {
+            info!(
+                "{} packets had to be discarded",
+                self.discarded_fragments_count
+            );
+        }
+    }
 }
 
 #[derive(Parser, Debug)]
@@ -129,19 +187,49 @@ fn evaluate_packets(
     // Define packet processing
     let process_packet =
         &mut |_p: PacketOrigin, link_type: pcap::Linktype, packet: &pcap::Packet<'_>| {
+            execution_stats.total_count += 1;
+
             match flows.include(link_type, packet) {
-                Ok(()) => execution_stats.valid_count += 1,
-                Err(_) => {
-                    execution_stats.ignored_count += 1;
+                Ok((valid, discarded)) => {
+                    execution_stats.valid_count += u64::from(valid);
+                    execution_stats.discarded_fragments_count += u64::from(discarded);
                 }
+                Err(parse_error) => match parse_error {
+                    packet_pincer::ParseError::ErrorOnSlicingPacket(_) => {
+                        execution_stats.packet_error_on_slice_count += 1
+                    }
+                    packet_pincer::ParseError::ErrorOnSlicingReassembledPacket(_) => {
+                        execution_stats.packet_error_on_slice_reasembled_count += 1
+                    }
+                    packet_pincer::ParseError::MissingNetworkLayer => {
+                        execution_stats.packet_could_not_find_net_layer_count += 1
+                    }
+                    packet_pincer::ParseError::MissingTransportLayer => {
+                        execution_stats.packet_could_not_find_transport_layer_count += 1
+                    }
+                    packet_pincer::ParseError::UnsupportedLinkType => {
+                        execution_stats.unsupported_link_type_count += 1
+                    }
+                    packet_pincer::ParseError::UnsupportedTransportLayer => {
+                        execution_stats.unsupported_transport_type_count += 1
+                    }
+                },
             }
 
+            // Close transport flows
             while let Some(mut flow) =
                 flows.pop_oldest_transport_flow_if_older_than(TimeDelta::seconds(300))
             {
                 execution_stats.flow_count += 1;
                 assign_flow_label(&mut flow);
                 write_closed_flow(flow);
+            }
+
+            // Close network flows
+            while let Some(fragments) =
+                flows.pop_oldest_network_flow_if_older_than(TimeDelta::seconds(10))
+            {
+                execution_stats.discarded_fragments_count += u64::from(fragments);
             }
         };
 
@@ -159,11 +247,16 @@ fn evaluate_packets(
         }
     }
 
-    // Close remaining flows
+    // Close remaining transport flows
     while let Some(mut flow) = flows.pop_oldest_transport_flow() {
         execution_stats.flow_count += 1;
         assign_flow_label(&mut flow);
         write_closed_flow(flow);
+    }
+
+    // Close remaining network flows
+    while let Some(fragments) = flows.pop_oldest_network_flow() {
+        execution_stats.discarded_fragments_count += u64::from(fragments);
     }
 }
 
@@ -195,7 +288,5 @@ fn main() {
         &mut packet_capture,
     );
 
-    info!("{} packets were valid", execution_stats.valid_count);
-    info!("{} packets were ignored", execution_stats.ignored_count);
-    info!("{} flows detected", execution_stats.flow_count);
+    execution_stats.print_info_results();
 }
