@@ -26,7 +26,8 @@ struct ExecutionStats {
     packet_could_not_find_transport_layer_count: u64,
     unsupported_link_type_count: u64,
     unsupported_transport_type_count: u64,
-    discarded_fragments_count: u64,
+    discarded_fragments_ignored_on_reassembly_count: u64,
+    discarded_fragments_no_reassembly_count: u64,
 }
 
 impl ExecutionStats {
@@ -43,7 +44,7 @@ impl ExecutionStats {
         }
         if self.packet_error_on_slice_reasembled_count != 0 {
             info!(
-                "{} reasembled packets had issues on slicing",
+                "{} reasembled packets had issues on slicing (invalid/inconsistent fields)",
                 self.packet_error_on_slice_reasembled_count
             );
         }
@@ -71,10 +72,16 @@ impl ExecutionStats {
                 self.unsupported_transport_type_count
             );
         }
-        if self.discarded_fragments_count != 0 {
+        if self.discarded_fragments_ignored_on_reassembly_count != 0 {
             info!(
-                "{} packets had to be discarded",
-                self.discarded_fragments_count
+                "{} fragments had to be discarded on reassembling packets (duplicates, possible overlaps, etc.)",
+                self.discarded_fragments_ignored_on_reassembly_count
+            );
+        }
+        if self.discarded_fragments_no_reassembly_count != 0 {
+            info!(
+                "{} fragments had to be discarded without an associated reassembly",
+                self.discarded_fragments_no_reassembly_count
             );
         }
     }
@@ -192,13 +199,14 @@ fn evaluate_packets(
             match flows.include(link_type, packet) {
                 Ok((valid, discarded)) => {
                     execution_stats.valid_count += u64::from(valid);
-                    execution_stats.discarded_fragments_count += u64::from(discarded);
+                    execution_stats.discarded_fragments_ignored_on_reassembly_count +=
+                        u64::from(discarded);
                 }
                 Err(parse_error) => match parse_error {
                     packet_pincer::ParseError::ErrorOnSlicingPacket(_) => {
                         execution_stats.packet_error_on_slice_count += 1
                     }
-                    packet_pincer::ParseError::ErrorOnSlicingReassembledPacket(_) => {
+                    packet_pincer::ParseError::ErrorOnSlicingReassembledPacket { .. } => {
                         execution_stats.packet_error_on_slice_reasembled_count += 1
                     }
                     packet_pincer::ParseError::MissingNetworkLayer => {
@@ -227,9 +235,9 @@ fn evaluate_packets(
 
             // Close network flows
             while let Some(fragments) =
-                flows.pop_oldest_network_flow_if_older_than(TimeDelta::seconds(10))
+                flows.pop_oldest_network_flow_if_older_than(TimeDelta::seconds(100000))
             {
-                execution_stats.discarded_fragments_count += u64::from(fragments);
+                execution_stats.discarded_fragments_no_reassembly_count += u64::from(fragments);
             }
         };
 
@@ -256,7 +264,7 @@ fn evaluate_packets(
 
     // Close remaining network flows
     while let Some(fragments) = flows.pop_oldest_network_flow() {
-        execution_stats.discarded_fragments_count += u64::from(fragments);
+        execution_stats.discarded_fragments_no_reassembly_count += u64::from(fragments);
     }
 }
 

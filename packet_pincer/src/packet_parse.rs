@@ -17,7 +17,12 @@ pub enum ParseError {
     /// etherparse encounered an error while parsing the packet
     ErrorOnSlicingPacket(SliceError),
     /// etherparse encountered an error while parsing a reassembled packet
-    ErrorOnSlicingReassembledPacket(SliceError),
+    ErrorOnSlicingReassembledPacket {
+        /// Slicing error
+        error: SliceError,
+        /// Number of fragmented packets that were considered
+        invalid_fragments: u32,
+    },
     /// Could not find the network packet when it was expected
     MissingNetworkLayer,
     /// Could not find the transport layer when it was expected

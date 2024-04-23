@@ -6,9 +6,10 @@ use crate::{
     },
 };
 use chrono::{DateTime, TimeDelta, Utc};
+use etherparse::PacketBuilder;
 use priority_queue::PriorityQueue;
 use std::{
-    cmp::Reverse,
+    cmp::{min, Reverse},
     collections::HashMap,
     io::{BufWriter, Error, Write},
     rc::Rc,
@@ -98,7 +99,7 @@ pub struct NetworkFragmentFlow {
     first_time: DateTime<Utc>,
     last_time: DateTime<Utc>,
     expected_size: Option<usize>,
-    fragments_data: Vec<(etherparse::IpFragOffset, Vec<u8>)>, // TODO: change this field to a better data structure
+    fragments_data: Vec<(u16, Vec<u8>)>, // TODO: change this field to a better data structure
     received_fragment_count: u32, // We track this separately because fragments with equal offset get overriden
 }
 
@@ -107,17 +108,18 @@ impl NetworkFragmentFlow {
     pub fn from(
         identifier: NetworkFlowIdentifier,
         packet_header: &pcap::PacketHeader,
-        sliced_packet: etherparse::SlicedPacket,
+        sliced_packet: &etherparse::SlicedPacket,
         fragmentation_offset: etherparse::IpFragOffset,
         more_packets: bool,
     ) -> NetworkFragmentFlow {
         let time = packet_parse::get_datetime_of_packet(packet_header)
             .expect("Packet headers with invalid timestamps are not supported");
         let ip_payload = sliced_packet.ip_payload().unwrap().payload.to_owned();
+        let offset = fragmentation_offset.value() * 8;
         let expected_size = if more_packets {
             None
         } else {
-            Some(usize::from(fragmentation_offset.value()) + ip_payload.len())
+            Some(usize::from(offset) + ip_payload.len())
         };
 
         NetworkFragmentFlow {
@@ -125,7 +127,7 @@ impl NetworkFragmentFlow {
             first_time: time,
             last_time: time,
             expected_size,
-            fragments_data: vec![(fragmentation_offset, ip_payload)],
+            fragments_data: vec![(offset, ip_payload)],
             received_fragment_count: 1,
         }
     }
@@ -135,29 +137,97 @@ impl NetworkFragmentFlow {
     pub fn include(
         &mut self,
         packet_header: &pcap::PacketHeader,
-        sliced_packet: etherparse::SlicedPacket,
+        sliced_packet: &etherparse::SlicedPacket,
         fragmentation_offset: etherparse::IpFragOffset,
         more_packets: bool,
     ) {
         self.last_time = packet_parse::get_datetime_of_packet(packet_header)
             .expect("Packet headers with invalid timestamps are not supported");
         let ip_payload = sliced_packet.ip_payload().unwrap().payload.to_owned();
+        let offset = fragmentation_offset.value() * 8;
 
-        if self.expected_size.is_none() && !more_packets {
-            self.expected_size = Some(usize::from(fragmentation_offset.value()) + ip_payload.len());
+        if !more_packets && self.expected_size.is_none() {
+            self.expected_size = Some(usize::from(offset) + ip_payload.len());
         }
 
-        match self
-            .fragments_data
-            .binary_search_by_key(&fragmentation_offset, |v| v.0)
-        {
+        match self.fragments_data.binary_search_by_key(&offset, |v| v.0) {
             Ok(v) => self.fragments_data[v].1 = ip_payload,
-            Err(v) => self
-                .fragments_data
-                .insert(v, (fragmentation_offset, ip_payload)),
+            Err(v) => self.fragments_data.insert(v, (offset, ip_payload)),
         }
 
         self.received_fragment_count += 1;
+    }
+
+    /// Check if the fragments contained can be used to generate a complete
+    /// packet
+    fn is_complete(&self) -> bool {
+        match self.expected_size {
+            None => false,
+            Some(size) => {
+                let mut next_byte: usize = 0;
+                for (offset, data) in self.fragments_data.iter() {
+                    // Check if there is a hole
+                    if next_byte < usize::from(offset.to_owned()) {
+                        return false;
+                    }
+
+                    // Update expected next byte
+                    next_byte = usize::from(offset.to_owned()) + data.len();
+                }
+
+                // Check if we reached the expected size
+                size <= next_byte
+            }
+        }
+    }
+
+    fn try_reasemble(&mut self, base_slice: &etherparse::SlicedPacket<'_>) -> Option<Vec<u8>> {
+        if !self.is_complete() {
+            return None;
+        }
+
+        // Reasemble packet
+        let mut buffer: Vec<u8> = vec![0; self.expected_size.unwrap()];
+
+        for (offset, data) in self.fragments_data.iter() {
+            // Find bounds
+            let buffer_offset = usize::from(offset.to_owned());
+            let buffer_max = min(buffer_offset + data.len(), buffer.len());
+            let data_max = min(buffer_max - buffer_offset, data.len());
+
+            // Copy data to buffer
+            buffer[buffer_offset..buffer_max].copy_from_slice(&data[..data_max]);
+        }
+
+        // Create packet
+        match base_slice.net.as_ref().unwrap() {
+            etherparse::NetSlice::Ipv4(slice) => {
+                let builder = PacketBuilder::ipv4(
+                    slice.header().source(),
+                    slice.header().destination(),
+                    slice.header().ttl(),
+                );
+                let mut packet_data = Vec::<u8>::with_capacity(builder.size(buffer.len()));
+                builder
+                    .write(&mut packet_data, slice.header().protocol(), &buffer)
+                    .unwrap();
+
+                Some(packet_data)
+            }
+            etherparse::NetSlice::Ipv6(slice) => {
+                let builder = PacketBuilder::ipv6(
+                    slice.header().source(),
+                    slice.header().destination(),
+                    slice.header().hop_limit(),
+                );
+                let mut packet_data = Vec::<u8>::with_capacity(builder.size(buffer.len()));
+                builder
+                    .write(&mut packet_data, slice.header().next_header(), &buffer)
+                    .unwrap();
+
+                Some(packet_data)
+            }
+        }
     }
 }
 
@@ -268,15 +338,12 @@ impl FlowGroup {
         fragmentation_offset: etherparse::IpFragOffset,
         more_packets: bool,
     ) -> Result<(u32, u32), ParseError> {
-        match self
-            .network_fragment_flows
-            .get_mut(&network_flow_identifier)
-        {
+        match self.network_fragment_flows.remove(&network_flow_identifier) {
             None => {
                 let flow = NetworkFragmentFlow::from(
                     network_flow_identifier,
                     packet_header,
-                    sliced_packet,
+                    &sliced_packet,
                     fragmentation_offset,
                     more_packets,
                 );
@@ -287,16 +354,38 @@ impl FlowGroup {
 
                 Ok((0, 0))
             }
-            Some(flow) => {
+            Some(mut flow) => {
                 flow.include(
                     packet_header,
-                    sliced_packet,
+                    &sliced_packet,
                     fragmentation_offset,
                     more_packets,
                 );
 
-                // TODO: Try reasemble packet
-                Ok((0, 0))
+                match flow.try_reasemble(&sliced_packet) {
+                    Some(data) => {
+                        let _ = self
+                            .network_fragment_flows_queue
+                            .remove(&network_flow_identifier);
+
+                        match etherparse::SlicedPacket::from_ip(&data) {
+                            Ok(value) => Ok((
+                                u32::try_from(flow.fragments_data.len()).unwrap(),
+                                flow.received_fragment_count,
+                            )),
+                            Err(err) => Err(ParseError::ErrorOnSlicingReassembledPacket {
+                                error: err,
+                                invalid_fragments: flow.received_fragment_count,
+                            }),
+                        }
+                    }
+                    None => {
+                        let _ = self
+                            .network_fragment_flows
+                            .insert(network_flow_identifier, flow);
+                        Ok((0, 0))
+                    }
+                }
             }
         }
     }
