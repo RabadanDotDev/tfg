@@ -30,8 +30,10 @@ impl TransportFlow {
         identifier: TransportFlowIdentifier,
         packet_header: &pcap::PacketHeader,
         sliced_packet: etherparse::SlicedPacket,
+        reasembly_information: Option<&FragmentReasemblyInformation>,
     ) -> TransportFlow {
-        let statistics = FlowStatistics::from_packet(packet_header, &sliced_packet);
+        let statistics =
+            FlowStatistics::from_packet(packet_header, &sliced_packet, reasembly_information);
         let label = None;
 
         TransportFlow {
@@ -51,8 +53,10 @@ impl TransportFlow {
         &mut self,
         packet_header: &pcap::PacketHeader,
         sliced_packet: etherparse::SlicedPacket,
+        reasembly_information: Option<&FragmentReasemblyInformation>,
     ) {
-        self.statistics.include(packet_header, &sliced_packet);
+        self.statistics
+            .include(packet_header, &sliced_packet, reasembly_information);
     }
 
     /// Write the header for separated information values of the flows to the given writer
@@ -95,18 +99,39 @@ impl TransportFlow {
 /// The fragments on a network flow yet to be reasembled
 #[derive(Debug)]
 pub struct NetworkFragmentFlow {
-    pub(crate) identifier: NetworkFlowIdentifier,
+    /// The first time a fragmented packet was received
     first_time: DateTime<Utc>,
+    /// The last time a fragmented packet was received
     last_time: DateTime<Utc>,
+    /// The expected size of the reasembled packet
     expected_size: Option<usize>,
-    fragments_data: Vec<(u16, Vec<u8>)>, // TODO: change this field to a better data structure
-    received_fragment_count: u32, // We track this separately because fragments with equal offset get overriden
+    // The pair of offsets and fragments received discarding overlaps
+    fragments_data: Vec<(u16, Vec<u8>)>,
+    /// The total count of fragments received
+    total_fragments_received_count: u32,
+    /// The count of all bytes received, including link headers
+    total_bytes_received_count: u32,
+}
+
+pub struct FragmentReasemblyInformation {
+    /// The first time a fragmented packet was received
+    pub first_time: DateTime<Utc>,
+    /// The last time a fragmented packet was received
+    pub last_time: DateTime<Utc>,
+    /// The number of packets with different offsets received
+    pub different_offset_fragment_received_count: u32,
+    /// The total number of fragments received
+    pub total_fragments_received_count: u32,
+    /// The ip layer size of the reasembled packet
+    pub reasembled_ip_packet_length: u32,
+    /// The count of all bytes received, including link headers
+    pub total_bytes_received_count: u32,
 }
 
 impl NetworkFragmentFlow {
     /// Create a flow from an initial pcap packet header and its sliced contents
     pub fn from(
-        identifier: NetworkFlowIdentifier,
+        _identifier: NetworkFlowIdentifier,
         packet_header: &pcap::PacketHeader,
         sliced_packet: &etherparse::SlicedPacket,
         fragmentation_offset: etherparse::IpFragOffset,
@@ -123,12 +148,12 @@ impl NetworkFragmentFlow {
         };
 
         NetworkFragmentFlow {
-            identifier,
             first_time: time,
             last_time: time,
             expected_size,
             fragments_data: vec![(offset, ip_payload)],
-            received_fragment_count: 1,
+            total_fragments_received_count: 1,
+            total_bytes_received_count: packet_header.len,
         }
     }
 
@@ -141,21 +166,28 @@ impl NetworkFragmentFlow {
         fragmentation_offset: etherparse::IpFragOffset,
         more_packets: bool,
     ) {
+        // Update last time
         self.last_time = packet_parse::get_datetime_of_packet(packet_header)
             .expect("Packet headers with invalid timestamps are not supported");
+
+        // Grab payload and offset valyes
         let ip_payload = sliced_packet.ip_payload().unwrap().payload.to_owned();
         let offset = fragmentation_offset.value() * 8;
 
+        // Update expected size if necessary
         if !more_packets && self.expected_size.is_none() {
             self.expected_size = Some(usize::from(offset) + ip_payload.len());
         }
 
+        // Store the payload
         match self.fragments_data.binary_search_by_key(&offset, |v| v.0) {
             Ok(v) => self.fragments_data[v].1 = ip_payload,
             Err(v) => self.fragments_data.insert(v, (offset, ip_payload)),
         }
 
-        self.received_fragment_count += 1;
+        // Update the counters
+        self.total_fragments_received_count += 1;
+        self.total_bytes_received_count += packet_header.len;
     }
 
     /// Check if the fragments contained can be used to generate a complete
@@ -181,7 +213,10 @@ impl NetworkFragmentFlow {
         }
     }
 
-    fn try_reasemble(&mut self, base_slice: &etherparse::SlicedPacket<'_>) -> Option<Vec<u8>> {
+    fn try_reasemble(
+        &mut self,
+        base_slice: &etherparse::SlicedPacket<'_>,
+    ) -> Option<(Vec<u8>, FragmentReasemblyInformation)> {
         if !self.is_complete() {
             return None;
         }
@@ -200,6 +235,7 @@ impl NetworkFragmentFlow {
         }
 
         // Create packet
+        let mut packet_data;
         match base_slice.net.as_ref().unwrap() {
             etherparse::NetSlice::Ipv4(slice) => {
                 let builder = PacketBuilder::ipv4(
@@ -207,12 +243,10 @@ impl NetworkFragmentFlow {
                     slice.header().destination(),
                     slice.header().ttl(),
                 );
-                let mut packet_data = Vec::<u8>::with_capacity(builder.size(buffer.len()));
+                packet_data = Vec::<u8>::with_capacity(builder.size(buffer.len()));
                 builder
                     .write(&mut packet_data, slice.header().protocol(), &buffer)
                     .unwrap();
-
-                Some(packet_data)
             }
             etherparse::NetSlice::Ipv6(slice) => {
                 let builder = PacketBuilder::ipv6(
@@ -220,14 +254,25 @@ impl NetworkFragmentFlow {
                     slice.header().destination(),
                     slice.header().hop_limit(),
                 );
-                let mut packet_data = Vec::<u8>::with_capacity(builder.size(buffer.len()));
+                packet_data = Vec::<u8>::with_capacity(builder.size(buffer.len()));
                 builder
                     .write(&mut packet_data, slice.header().next_header(), &buffer)
                     .unwrap();
-
-                Some(packet_data)
             }
         }
+
+        Some((
+            packet_data,
+            FragmentReasemblyInformation {
+                first_time: self.first_time,
+                last_time: self.last_time,
+                different_offset_fragment_received_count: u32::try_from(self.fragments_data.len())
+                    .unwrap(),
+                total_fragments_received_count: self.total_fragments_received_count,
+                reasembled_ip_packet_length: u32::try_from(self.expected_size.unwrap()).unwrap(),
+                total_bytes_received_count: self.total_bytes_received_count,
+            },
+        ))
     }
 }
 
@@ -280,7 +325,12 @@ impl FlowGroup {
         // Store flow
         match flow_identifier {
             FlowIdentifier::TransportFlowIdentifier(transport_flow_identifier) => {
-                self.store_transport_flow(transport_flow_identifier, packet.header, sliced_packet);
+                self.store_transport_flow(
+                    transport_flow_identifier,
+                    packet.header,
+                    sliced_packet,
+                    None,
+                );
                 Ok((1, 0))
             }
             FlowIdentifier::NetworkFlowIdentifier(network_flow_identifier) => {
@@ -288,7 +338,6 @@ impl FlowGroup {
                     FragmentationInformation::NoFragmentation => {
                         Err(ParseError::MissingTransportLayer)
                     }
-                    FragmentationInformation::ReassembledIPv4Packet => unreachable!(),
                     FragmentationInformation::FragmentedIpv4Packet {
                         fragmentation_offset,
                         more_packets,
@@ -309,11 +358,16 @@ impl FlowGroup {
         transport_flow_identifier: TransportFlowIdentifier,
         packet_header: &pcap::PacketHeader,
         sliced_packet: etherparse::SlicedPacket<'_>,
+        reasembly_information: Option<&FragmentReasemblyInformation>,
     ) {
         match self.transport_flows.get_mut(&transport_flow_identifier) {
             None => {
-                let flow =
-                    TransportFlow::from(transport_flow_identifier, packet_header, sliced_packet);
+                let flow = TransportFlow::from(
+                    transport_flow_identifier,
+                    packet_header,
+                    sliced_packet,
+                    reasembly_information,
+                );
                 self.transport_flows_queue.push(
                     transport_flow_identifier,
                     Reverse(flow.statistics.flow_times.last_packet_time),
@@ -321,7 +375,7 @@ impl FlowGroup {
                 self.transport_flows.insert(transport_flow_identifier, flow);
             }
             Some(flow) => {
-                flow.include(packet_header, sliced_packet);
+                flow.include(packet_header, sliced_packet, reasembly_information);
                 self.transport_flows_queue.change_priority(
                     &transport_flow_identifier,
                     Reverse(flow.statistics.flow_times.last_packet_time),
@@ -363,19 +417,40 @@ impl FlowGroup {
                 );
 
                 match flow.try_reasemble(&sliced_packet) {
-                    Some(data) => {
+                    Some((data, reasembly_information)) => {
                         let _ = self
                             .network_fragment_flows_queue
                             .remove(&network_flow_identifier);
 
                         match etherparse::SlicedPacket::from_ip(&data) {
-                            Ok(value) => Ok((
-                                u32::try_from(flow.fragments_data.len()).unwrap(),
-                                flow.received_fragment_count,
-                            )),
+                            Ok(sliced_packet) => {
+                                // Extract identification
+                                let (flow_identifier, _) =
+                                    FlowIdentifier::from_sliced_packet(&sliced_packet)?;
+
+                                // Store flow
+                                match flow_identifier {
+                                    FlowIdentifier::TransportFlowIdentifier(
+                                        transport_flow_identifier,
+                                    ) => {
+                                        self.store_transport_flow(
+                                            transport_flow_identifier,
+                                            packet_header,
+                                            sliced_packet,
+                                            Some(&reasembly_information),
+                                        );
+                                        let valid =
+                                            u32::try_from(flow.fragments_data.len()).unwrap();
+                                        let discarded = flow.total_fragments_received_count - valid;
+
+                                        Ok((valid, discarded))
+                                    }
+                                    FlowIdentifier::NetworkFlowIdentifier(_) => unreachable!(),
+                                }
+                            }
                             Err(err) => Err(ParseError::ErrorOnSlicingReassembledPacket {
                                 error: err,
-                                invalid_fragments: flow.received_fragment_count,
+                                invalid_fragments: flow.total_fragments_received_count,
                             }),
                         }
                     }
@@ -449,7 +524,7 @@ impl FlowGroup {
                     .network_fragment_flows
                     .remove(&network_flow_identifier)
                     .unwrap();
-                Some(flow.received_fragment_count)
+                Some(flow.total_fragments_received_count)
             } else {
                 None
             }
@@ -466,7 +541,7 @@ impl FlowGroup {
                 .network_fragment_flows
                 .remove(&network_flow_identifier)
                 .unwrap();
-            Some(flow.received_fragment_count)
+            Some(flow.total_fragments_received_count)
         } else {
             None
         }

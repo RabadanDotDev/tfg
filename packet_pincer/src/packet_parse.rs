@@ -41,8 +41,6 @@ pub enum FragmentationInformation {
         fragmentation_offset: etherparse::IpFragOffset,
         more_packets: bool,
     },
-    /// The packet is an IPv4 packet that was reassembled from its parts
-    ReassembledIPv4Packet,
 }
 
 /// An identifier for a comunication between two hosts
