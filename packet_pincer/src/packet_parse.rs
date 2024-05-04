@@ -85,7 +85,10 @@ pub fn try_parse_packet<'a>(
             Ok(value) => Ok(value),
             Err(err) => Err(ParseError::ErrorOnSlicingPacket(err)),
         },
-        Linktype::LINUX_SLL => Err(ParseError::UnsupportedLinkType), // TODO: implement sll suport
+        Linktype::LINUX_SLL => match etherparse::SlicedPacket::from_linux_sll(packet.data) {
+            Ok(value) => Ok(value),
+            Err(err) => Err(ParseError::ErrorOnSlicingPacket(err)),
+        },
         _ => Err(ParseError::UnsupportedLinkType),
     }
 }
