@@ -68,7 +68,6 @@ impl TransportFlow {
         write!(writer, ",")?;
         FlowStatistics::write_csv_header(writer)?;
         if label_column {
-            write!(writer, ",")?;
             write!(writer, "label")?;
         }
         writeln!(writer)?;
@@ -85,7 +84,6 @@ impl TransportFlow {
         write!(writer, ",")?;
         self.statistics.write_csv_value(writer)?;
         if label_column {
-            write!(writer, ",")?;
             match &self.label {
                 None => write!(writer, ""),
                 Some(v) => write!(writer, "{}", v),

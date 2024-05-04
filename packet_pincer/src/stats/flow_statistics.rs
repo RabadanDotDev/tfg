@@ -1,6 +1,59 @@
 use super::{ByteCount, FlowStat, FlowTimes, PacketCount, Protocols};
 use crate::packet_flow::FragmentReasemblyInformation;
-use std::io::{BufWriter, Error, Write};
+use std::io::Write;
+
+macro_rules! impl_flow_stat {
+    ($struct_name:ident { $($field:ident : $field_type:ty),* $(,)? }) => {
+        impl FlowStat for $struct_name {
+            fn from_packet(
+                packet_header: &pcap::PacketHeader,
+                sliced_packet: &etherparse::SlicedPacket,
+                reasembly_information: Option<&FragmentReasemblyInformation>,
+            ) -> Self {
+                $struct_name {
+                    $(
+                        $field: <$field_type>::from_packet(packet_header, sliced_packet, reasembly_information),
+                    )*
+                }
+            }
+
+            fn include(
+                &mut self,
+                packet_header: &pcap::PacketHeader,
+                sliced_packet: &etherparse::SlicedPacket,
+                reasembly_information: Option<&FragmentReasemblyInformation>,
+            ) {
+                $(
+                    self.$field.include(packet_header, sliced_packet, reasembly_information);
+                )*
+            }
+
+            fn write_csv_header<T: ?Sized + std::io::Write>(
+                writer: &mut std::io::BufWriter<T>,
+            ) -> Result<(), std::io::Error> {
+                // TODO: avoid writing the last ","
+                $(
+                    <$field_type>::write_csv_header(writer)?;
+                    write!(writer, ",")?;
+                )*
+                Ok(())
+            }
+
+            fn write_csv_value<T: ?Sized + std::io::Write>(
+                &self,
+                writer: &mut std::io::BufWriter<T>,
+            ) -> Result<(), std::io::Error> {
+                // TODO: avoid writing the last ","
+                $(
+                    self.$field.write_csv_value(writer)?;
+                    write!(writer, ",")?;
+                )*
+                Ok(())
+            }
+        }
+    };
+}
+
 
 #[derive(Debug)]
 pub struct FlowStatistics {
@@ -10,52 +63,9 @@ pub struct FlowStatistics {
     byte_count: ByteCount,
 }
 
-// TODO: create a macro to autogenerate this.
-impl FlowStat for FlowStatistics {
-    #[rustfmt::skip]
-    fn from_packet(
-        packet_header: &pcap::PacketHeader,
-        sliced_packet: &etherparse::SlicedPacket,
-        reasembly_information: Option<&FragmentReasemblyInformation>,
-    ) -> Self {
-        FlowStatistics {
-            flow_times: FlowTimes::from_packet(    packet_header, sliced_packet, reasembly_information),
-            protocols: Protocols::from_packet(     packet_header, sliced_packet, reasembly_information),
-            packet_count: PacketCount::from_packet(packet_header, sliced_packet, reasembly_information),
-            byte_count: ByteCount::from_packet(    packet_header, sliced_packet, reasembly_information),
-        }
-    }
-    #[rustfmt::skip]
-    fn include(
-        &mut self,
-        packet_header: &pcap::PacketHeader,
-        sliced_packet: &etherparse::SlicedPacket,
-        reasembly_information: Option<&FragmentReasemblyInformation>,
-    ) {
-        self.flow_times.include(  packet_header, sliced_packet, reasembly_information);
-        self.protocols.include(   packet_header, sliced_packet, reasembly_information);
-        self.packet_count.include(packet_header, sliced_packet, reasembly_information);
-        self.byte_count.include(  packet_header, sliced_packet, reasembly_information);
-    }
-    #[rustfmt::skip]
-    fn write_csv_header<T: ?Sized + std::io::Write>(
-        writer: &mut BufWriter<T>,
-    ) -> Result<(), Error> {
-        FlowTimes::write_csv_header(  writer)?; write!(writer, ",")?;
-        Protocols::write_csv_header(  writer)?; write!(writer, ",")?;
-        PacketCount::write_csv_header(writer)?; write!(writer, ",")?;
-        ByteCount::write_csv_header(  writer)?;
-        Ok(())
-    }
-    #[rustfmt::skip]
-    fn write_csv_value<T: ?Sized + std::io::Write>(
-        &self,
-        writer: &mut BufWriter<T>,
-    ) -> Result<(), Error> {
-        self.flow_times.write_csv_value(  writer)?; write!(writer, ",")?;
-        self.protocols.write_csv_value(   writer)?; write!(writer, ",")?;
-        self.packet_count.write_csv_value(writer)?; write!(writer, ",")?;
-        self.byte_count.write_csv_value(  writer)?;
-        Ok(())
-    }
-}
+impl_flow_stat!(FlowStatistics {
+    flow_times: FlowTimes,
+    protocols: Protocols,
+    packet_count: PacketCount,
+    byte_count: ByteCount,
+});
