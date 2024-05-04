@@ -1,9 +1,9 @@
 use crate::{
-    flow_statistic::{FlowStat, FlowStatistics},
     packet_parse::{
         self, try_parse_packet, FlowIdentifier, FragmentationInformation, NetworkFlowIdentifier,
         ParseError, TransportFlowIdentifier,
     },
+    stats::{FlowStat, FlowStatistics},
 };
 use chrono::{DateTime, TimeDelta, Utc};
 use etherparse::PacketBuilder;

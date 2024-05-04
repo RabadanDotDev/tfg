@@ -2,11 +2,11 @@
 
 //! Online and offline network traffic analyzer
 
-mod flow_statistic;
 mod ground_truth;
 mod packet_capture;
 mod packet_flow;
 mod packet_parse;
+mod stats;
 
 pub use crate::ground_truth::GroundTruth;
 pub use crate::packet_capture::PacketCapture;

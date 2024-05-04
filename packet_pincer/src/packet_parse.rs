@@ -199,7 +199,11 @@ impl TransportFlowIdentifier {
         write!(
             writer,
             "{},{},{},{},{}",
-            self.source_ip, self.source_port, self.dest_ip, self.dest_port, self.transport_protocol.0
+            self.source_ip,
+            self.source_port,
+            self.dest_ip,
+            self.dest_port,
+            self.transport_protocol.0
         )?;
         Ok(())
     }
