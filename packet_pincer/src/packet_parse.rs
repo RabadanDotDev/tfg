@@ -187,7 +187,7 @@ impl TransportFlowIdentifier {
     ) -> Result<(), Error> {
         write!(
             writer,
-            "source_ip,source_port,dest_ip,dest_port,is_tcp,is_udp"
+            "source_ip,source_port,dest_ip,dest_port,transport_protocol"
         )?;
         Ok(())
     }
@@ -198,14 +198,9 @@ impl TransportFlowIdentifier {
     ) -> Result<(), Error> {
         write!(
             writer,
-            "{},{},{},{},",
-            self.source_ip, self.source_port, self.dest_ip, self.dest_port
+            "{},{},{},{},{}",
+            self.source_ip, self.source_port, self.dest_ip, self.dest_port, self.transport_protocol.0
         )?;
-        match self.transport_protocol {
-            IpNumber::TCP => write!(writer, "{},{}", 1, 0)?,
-            IpNumber::UDP => write!(writer, "{},{}", 0, 1)?,
-            _ => write!(writer, "{},{}", 0, 0)?,
-        }
         Ok(())
     }
 }
