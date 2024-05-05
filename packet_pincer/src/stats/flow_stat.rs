@@ -1,9 +1,12 @@
 use crate::{packet_flow::FragmentReasemblyInformation, packet_parse::TransportFlowIdentifier};
 use std::io::{BufWriter, Error};
 
+use super::FlowTimes;
+
 pub trait FlowStat {
     fn from_packet(
         flow_identifier: &TransportFlowIdentifier,
+        flow_times: &FlowTimes,
         packet_header: &pcap::PacketHeader,
         sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
@@ -11,6 +14,7 @@ pub trait FlowStat {
     fn include(
         &mut self,
         flow_identifier: &TransportFlowIdentifier,
+        flow_times: &FlowTimes,
         packet_header: &pcap::PacketHeader,
         sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
@@ -20,5 +24,6 @@ pub trait FlowStat {
     fn write_csv_value<T: ?Sized + std::io::Write>(
         &self,
         writer: &mut BufWriter<T>,
+        flow_times: &FlowTimes,
     ) -> Result<(), Error>;
 }

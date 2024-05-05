@@ -187,7 +187,7 @@ impl TransportFlowIdentifier {
     ) -> Result<(), Error> {
         write!(
             writer,
-            "source_ip,source_port,dest_ip,dest_port,transport_protocol"
+            "source_ip,source_port,dest_ip,dest_port,transport_protocol,"
         )?;
         Ok(())
     }
@@ -198,7 +198,7 @@ impl TransportFlowIdentifier {
     ) -> Result<(), Error> {
         write!(
             writer,
-            "{},{},{},{},{}",
+            "{},{},{},{},{},",
             self.source_ip,
             self.source_port,
             self.dest_ip,

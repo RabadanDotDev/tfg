@@ -1,4 +1,4 @@
-use super::FlowStat;
+use super::{FlowStat, FlowTimes};
 use crate::{packet_flow::FragmentReasemblyInformation, packet_parse::TransportFlowIdentifier};
 use std::io::{BufWriter, Error, Write};
 
@@ -10,6 +10,7 @@ pub struct ByteCount {
 impl FlowStat for ByteCount {
     fn from_packet(
         _identifier: &TransportFlowIdentifier,
+        _flow_times: &FlowTimes,
         packet_header: &pcap::PacketHeader,
         _sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
@@ -24,6 +25,7 @@ impl FlowStat for ByteCount {
     fn include(
         &mut self,
         _identifier: &TransportFlowIdentifier,
+        _flow_times: &FlowTimes,
         packet_header: &pcap::PacketHeader,
         _sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
@@ -44,6 +46,7 @@ impl FlowStat for ByteCount {
     fn write_csv_value<T: ?Sized + std::io::Write>(
         &self,
         writer: &mut BufWriter<T>,
+        _flow_times: &FlowTimes,
     ) -> Result<(), Error> {
         write!(writer, "{}", self.count)?;
         Ok(())

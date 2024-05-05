@@ -3,7 +3,7 @@ use crate::{
         self, try_parse_packet, FlowIdentifier, FragmentationInformation, NetworkFlowIdentifier,
         ParseError, TransportFlowIdentifier,
     },
-    stats::{FlowStat, FlowStatistics},
+    stats::{FlowStat, FlowStatistics, FlowTimes},
 };
 use chrono::{DateTime, TimeDelta, Utc};
 use etherparse::PacketBuilder;
@@ -20,6 +20,7 @@ use std::{
 #[derive(Debug)]
 pub struct TransportFlow {
     pub(crate) identifier: TransportFlowIdentifier,
+    pub(crate) flow_times: FlowTimes,
     pub(crate) statistics: FlowStatistics,
     label: Option<Rc<str>>,
 }
@@ -32,12 +33,13 @@ impl TransportFlow {
         sliced_packet: etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
     ) -> TransportFlow {
-        let statistics =
-            FlowStatistics::from_packet(&identifier, packet_header, &sliced_packet, reasembly_information);
+        let flow_times = FlowTimes::from_packet(&identifier, packet_header, &sliced_packet, reasembly_information);
+        let statistics = FlowStatistics::from_packet(&identifier, &flow_times, packet_header, &sliced_packet, reasembly_information);
         let label = None;
 
         TransportFlow {
             identifier,
+            flow_times,
             statistics,
             label,
         }
@@ -55,8 +57,8 @@ impl TransportFlow {
         sliced_packet: etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
     ) {
-        self.statistics
-            .include(&self.identifier, packet_header, &sliced_packet, reasembly_information);
+        self.flow_times.include(&self.identifier, packet_header, &sliced_packet, reasembly_information);
+        self.statistics.include(&self.identifier, &self.flow_times, packet_header, &sliced_packet, reasembly_information);
     }
 
     /// Write the header for separated information values of the flows to the given writer
@@ -65,7 +67,7 @@ impl TransportFlow {
         label_column: bool,
     ) -> Result<(), Error> {
         TransportFlowIdentifier::write_csv_header(writer)?;
-        write!(writer, ",")?;
+        FlowTimes::write_csv_header(writer)?;
         FlowStatistics::write_csv_header(writer)?;
         if label_column {
             write!(writer, "label")?;
@@ -81,8 +83,8 @@ impl TransportFlow {
         label_column: bool,
     ) -> Result<(), Error> {
         self.identifier.write_csv_value(writer)?;
-        write!(writer, ",")?;
-        self.statistics.write_csv_value(writer)?;
+        self.flow_times.write_csv_value(writer)?;
+        self.statistics.write_csv_value( writer, &self.flow_times)?;
         if label_column {
             match &self.label {
                 None => write!(writer, ""),
@@ -368,7 +370,7 @@ impl FlowGroup {
                 );
                 self.transport_flows_queue.push(
                     transport_flow_identifier,
-                    Reverse(flow.statistics.flow_times.last_packet_time),
+                    Reverse(flow.flow_times.last_packet_time),
                 );
                 self.transport_flows.insert(transport_flow_identifier, flow);
             }
@@ -376,7 +378,7 @@ impl FlowGroup {
                 flow.include(packet_header, sliced_packet, reasembly_information);
                 self.transport_flows_queue.change_priority(
                     &transport_flow_identifier,
-                    Reverse(flow.statistics.flow_times.last_packet_time),
+                    Reverse(flow.flow_times.last_packet_time),
                 );
             }
         }

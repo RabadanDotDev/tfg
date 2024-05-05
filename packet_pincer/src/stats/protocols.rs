@@ -1,4 +1,4 @@
-use super::FlowStat;
+use super::{FlowStat, FlowTimes};
 use crate::{packet_flow::FragmentReasemblyInformation, packet_parse::TransportFlowIdentifier};
 use std::io::{BufWriter, Error, Write};
 
@@ -43,6 +43,7 @@ fn evaluate(sliced_packet: &etherparse::SlicedPacket) -> PacketEval {
 impl FlowStat for Protocols {
     fn from_packet(
         _identifier: &TransportFlowIdentifier,
+        _flow_times: &FlowTimes,
         _packet_header: &pcap::PacketHeader,
         sliced_packet: &etherparse::SlicedPacket,
         _reasembly_information: Option<&FragmentReasemblyInformation>,
@@ -57,6 +58,7 @@ impl FlowStat for Protocols {
     fn include(
         &mut self,
         _identifier: &TransportFlowIdentifier,
+        _flow_times: &FlowTimes,
         _packet_header: &pcap::PacketHeader,
         sliced_packet: &etherparse::SlicedPacket,
         _reasembly_information: Option<&FragmentReasemblyInformation>,
@@ -69,19 +71,17 @@ impl FlowStat for Protocols {
     fn write_csv_header<T: ?Sized + std::io::Write>(
         writer: &mut BufWriter<T>,
     ) -> Result<(), Error> {
-        write!(writer, "has_tcp,has_udp")?;
+        write!(writer, "has_tcp,")?;
+        write!(writer, "has_udp,")?;
         Ok(())
     }
     fn write_csv_value<T: ?Sized + std::io::Write>(
         &self,
         writer: &mut BufWriter<T>,
+        _flow_times: &FlowTimes,
     ) -> Result<(), Error> {
-        write!(
-            writer,
-            "{},{}",
-            if self.has_tcp { 1 } else { 0 },
-            if self.has_udp { 1 } else { 0 }
-        )?;
+        write!(writer, "{},",  if self.has_tcp { 1 } else { 0 })?;
+        write!(writer, "{},",  if self.has_udp { 1 } else { 0 })?;
         Ok(())
     }
 }

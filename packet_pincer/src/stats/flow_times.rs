@@ -4,16 +4,14 @@ use chrono::{DateTime, Utc};
 
 use crate::{packet_flow::FragmentReasemblyInformation, packet_parse::{get_datetime_of_packet, TransportFlowIdentifier}};
 
-use super::FlowStat;
-
 #[derive(Debug)]
 pub struct FlowTimes {
     pub(crate) first_packet_time: DateTime<Utc>,
     pub(crate) last_packet_time: DateTime<Utc>,
 }
 
-impl FlowStat for FlowTimes {
-    fn from_packet(
+impl FlowTimes {
+    pub fn from_packet(
         _identifier: &TransportFlowIdentifier,
         packet_header: &pcap::PacketHeader,
         _sliced_packet: &etherparse::SlicedPacket,
@@ -35,7 +33,7 @@ impl FlowStat for FlowTimes {
             last_packet_time,
         }
     }
-    fn include(
+    pub fn include(
         &mut self,
         _identifier: &TransportFlowIdentifier,
         packet_header: &pcap::PacketHeader,
@@ -52,28 +50,33 @@ impl FlowStat for FlowTimes {
             None => pcap_packet_time,
         };
     }
-    fn write_csv_header<T: ?Sized + std::io::Write>(
+    pub fn write_csv_header<T: ?Sized + std::io::Write>(
         writer: &mut BufWriter<T>,
     ) -> Result<(), Error> {
-        write!(writer, "first_packet_time")?;
-        write!(writer, ",")?;
-        write!(writer, "last_packet_time")?;
-        write!(writer, ",")?;
-        write!(writer, "duration")?;
+        write!(writer, "first_packet_time,")?;
+        write!(writer, "last_packet_time,")?;
+        write!(writer, "duration,")?;
         Ok(())
     }
-    fn write_csv_value<T: ?Sized + std::io::Write>(
+    pub fn write_csv_value<T: ?Sized + std::io::Write>(
         &self,
         writer: &mut BufWriter<T>,
     ) -> Result<(), Error> {
-        write!(writer, "{}", self.first_packet_time.timestamp_micros())?;
-        write!(writer, ",")?;
-        write!(writer, "{}", self.last_packet_time.timestamp_micros())?;
-        write!(writer, ",")?;
+        write!(writer, "{},", self.first_packet_time.timestamp_micros())?;
+        write!(writer, "{},", self.last_packet_time.timestamp_micros())?;
         let duration = (self.last_packet_time - self.first_packet_time)
             .num_microseconds()
             .ok_or(Error::new(std::io::ErrorKind::Other, "Overflow"))?;
-        write!(writer, "{}", duration)?;
+        write!(writer, "{},", duration)?;
         Ok(())
+    }
+    pub fn duration_microseconds(&self) -> Result<i64, Error> {
+        (self.last_packet_time - self.first_packet_time)
+        .num_microseconds()
+        .ok_or(Error::new(std::io::ErrorKind::Other, "Overflow"))
+    }
+    pub fn duration_seconds(&self) -> i64 {
+        (self.last_packet_time - self.first_packet_time)
+        .num_seconds()
     }
 }
