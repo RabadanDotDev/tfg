@@ -1,14 +1,11 @@
 use std::{
     io::{BufWriter, Error, Write},
     net::IpAddr,
-    process::id,
 };
-
-use chrono::Duration;
 
 use crate::{packet_flow::FragmentReasemblyInformation, packet_parse::TransportFlowIdentifier};
 
-use super::{flow_times, FlowStat, FlowTimes};
+use super::{FlowStat, FlowTimes};
 
 #[derive(Debug)]
 pub struct PacketCount {
@@ -26,7 +23,7 @@ fn extract_count(reasembly_information: Option<&FragmentReasemblyInformation>) -
 impl FlowStat for PacketCount {
     fn from_packet(
         _identifier: &TransportFlowIdentifier,
-        flow_times: &FlowTimes,
+        _flow_times: &FlowTimes,
         _packet_header: &pcap::PacketHeader,
         _sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
@@ -39,7 +36,7 @@ impl FlowStat for PacketCount {
     fn include(
         &mut self,
         identifier: &TransportFlowIdentifier,
-        flow_times: &FlowTimes,
+        _flow_times: &FlowTimes,
         _packet_header: &pcap::PacketHeader,
         sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
@@ -63,12 +60,12 @@ impl FlowStat for PacketCount {
     fn write_csv_header<T: ?Sized + std::io::Write>(
         writer: &mut BufWriter<T>,
     ) -> Result<(), Error> {
-        write!(writer, "bidirectional_packets_count,")?;
-        write!(writer, "forward_packets_count,")?;
-        write!(writer, "backward_packets_count,")?;
-        write!(writer, "bidirectional_packets_second,")?;
-        write!(writer, "forward_packets_second,")?;
-        write!(writer, "backward_packets_second,")?;
+        write!(writer, "bidirectional_packet_count,")?;
+        write!(writer, "forward_packet_count,")?;
+        write!(writer, "backward_packet_count,")?;
+        write!(writer, "bidirectional_packet_second,")?;
+        write!(writer, "forward_packet_second,")?;
+        write!(writer, "backward_packet_second,")?;
         Ok(())
     }
     fn write_csv_value<T: ?Sized + std::io::Write>(

@@ -55,7 +55,6 @@ macro_rules! impl_flow_stat {
     };
 }
 
-
 #[derive(Debug)]
 pub struct FlowStatistics {
     protocols: Protocols,
