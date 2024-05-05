@@ -1,6 +1,6 @@
 use std::io::{BufWriter, Error, Write};
 
-use crate::packet_flow::FragmentReasemblyInformation;
+use crate::{packet_flow::FragmentReasemblyInformation, packet_parse::TransportFlowIdentifier};
 
 use super::FlowStat;
 
@@ -11,6 +11,7 @@ pub struct PacketCount {
 
 impl FlowStat for PacketCount {
     fn from_packet(
+        _identifier: &TransportFlowIdentifier,
         _packet_header: &pcap::PacketHeader,
         _sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
@@ -25,6 +26,7 @@ impl FlowStat for PacketCount {
     }
     fn include(
         &mut self,
+        _identifier: &TransportFlowIdentifier,
         _packet_header: &pcap::PacketHeader,
         _sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,

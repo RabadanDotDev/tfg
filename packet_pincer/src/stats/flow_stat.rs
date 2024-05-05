@@ -1,14 +1,16 @@
-use crate::packet_flow::FragmentReasemblyInformation;
+use crate::{packet_flow::FragmentReasemblyInformation, packet_parse::TransportFlowIdentifier};
 use std::io::{BufWriter, Error};
 
 pub trait FlowStat {
     fn from_packet(
+        flow_identifier: &TransportFlowIdentifier,
         packet_header: &pcap::PacketHeader,
         sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
     ) -> Self;
     fn include(
         &mut self,
+        flow_identifier: &TransportFlowIdentifier,
         packet_header: &pcap::PacketHeader,
         sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,

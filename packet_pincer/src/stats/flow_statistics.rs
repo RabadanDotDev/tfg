@@ -1,30 +1,33 @@
 use super::{ByteCount, FlowStat, FlowTimes, PacketCount, Protocols};
 use crate::packet_flow::FragmentReasemblyInformation;
+use crate::packet_parse::TransportFlowIdentifier;
 use std::io::Write;
 
 macro_rules! impl_flow_stat {
     ($struct_name:ident { $($field:ident : $field_type:ty),* $(,)? }) => {
         impl FlowStat for $struct_name {
             fn from_packet(
+                identifier: &TransportFlowIdentifier,
                 packet_header: &pcap::PacketHeader,
                 sliced_packet: &etherparse::SlicedPacket,
                 reasembly_information: Option<&FragmentReasemblyInformation>,
             ) -> Self {
                 $struct_name {
                     $(
-                        $field: <$field_type>::from_packet(packet_header, sliced_packet, reasembly_information),
+                        $field: <$field_type>::from_packet(identifier, packet_header, sliced_packet, reasembly_information),
                     )*
                 }
             }
 
             fn include(
                 &mut self,
+                identifier: &TransportFlowIdentifier,
                 packet_header: &pcap::PacketHeader,
                 sliced_packet: &etherparse::SlicedPacket,
                 reasembly_information: Option<&FragmentReasemblyInformation>,
             ) {
                 $(
-                    self.$field.include(packet_header, sliced_packet, reasembly_information);
+                    self.$field.include(identifier, packet_header, sliced_packet, reasembly_information);
                 )*
             }
 

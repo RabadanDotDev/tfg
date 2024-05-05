@@ -2,7 +2,7 @@ use std::io::{BufWriter, Error, Write};
 
 use chrono::{DateTime, Utc};
 
-use crate::{packet_flow::FragmentReasemblyInformation, packet_parse::get_datetime_of_packet};
+use crate::{packet_flow::FragmentReasemblyInformation, packet_parse::{get_datetime_of_packet, TransportFlowIdentifier}};
 
 use super::FlowStat;
 
@@ -14,6 +14,7 @@ pub struct FlowTimes {
 
 impl FlowStat for FlowTimes {
     fn from_packet(
+        _identifier: &TransportFlowIdentifier,
         packet_header: &pcap::PacketHeader,
         _sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
@@ -36,6 +37,7 @@ impl FlowStat for FlowTimes {
     }
     fn include(
         &mut self,
+        _identifier: &TransportFlowIdentifier,
         packet_header: &pcap::PacketHeader,
         _sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,

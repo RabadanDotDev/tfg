@@ -1,5 +1,5 @@
 use super::FlowStat;
-use crate::packet_flow::FragmentReasemblyInformation;
+use crate::{packet_flow::FragmentReasemblyInformation, packet_parse::TransportFlowIdentifier};
 use std::io::{BufWriter, Error, Write};
 
 #[derive(Debug)]
@@ -42,6 +42,7 @@ fn evaluate(sliced_packet: &etherparse::SlicedPacket) -> PacketEval {
 
 impl FlowStat for Protocols {
     fn from_packet(
+        _identifier: &TransportFlowIdentifier,
         _packet_header: &pcap::PacketHeader,
         sliced_packet: &etherparse::SlicedPacket,
         _reasembly_information: Option<&FragmentReasemblyInformation>,
@@ -55,6 +56,7 @@ impl FlowStat for Protocols {
     }
     fn include(
         &mut self,
+        _identifier: &TransportFlowIdentifier,
         _packet_header: &pcap::PacketHeader,
         sliced_packet: &etherparse::SlicedPacket,
         _reasembly_information: Option<&FragmentReasemblyInformation>,

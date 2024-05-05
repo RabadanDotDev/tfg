@@ -33,7 +33,7 @@ impl TransportFlow {
         reasembly_information: Option<&FragmentReasemblyInformation>,
     ) -> TransportFlow {
         let statistics =
-            FlowStatistics::from_packet(packet_header, &sliced_packet, reasembly_information);
+            FlowStatistics::from_packet(&identifier, packet_header, &sliced_packet, reasembly_information);
         let label = None;
 
         TransportFlow {
@@ -56,7 +56,7 @@ impl TransportFlow {
         reasembly_information: Option<&FragmentReasemblyInformation>,
     ) {
         self.statistics
-            .include(packet_header, &sliced_packet, reasembly_information);
+            .include(&self.identifier, packet_header, &sliced_packet, reasembly_information);
     }
 
     /// Write the header for separated information values of the flows to the given writer

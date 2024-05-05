@@ -1,5 +1,5 @@
 use super::FlowStat;
-use crate::packet_flow::FragmentReasemblyInformation;
+use crate::{packet_flow::FragmentReasemblyInformation, packet_parse::TransportFlowIdentifier};
 use std::io::{BufWriter, Error, Write};
 
 #[derive(Debug)]
@@ -9,6 +9,7 @@ pub struct ByteCount {
 
 impl FlowStat for ByteCount {
     fn from_packet(
+        _identifier: &TransportFlowIdentifier,
         packet_header: &pcap::PacketHeader,
         _sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
@@ -22,6 +23,7 @@ impl FlowStat for ByteCount {
     }
     fn include(
         &mut self,
+        _identifier: &TransportFlowIdentifier,
         packet_header: &pcap::PacketHeader,
         _sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
