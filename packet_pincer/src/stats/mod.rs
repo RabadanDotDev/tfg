@@ -16,6 +16,8 @@ pub use packet_count::*;
 mod protocols;
 pub use protocols::*;
 
-mod running_stat;
+mod tcp_flags;
+pub use tcp_flags::*;
 
+mod running_stat;
 mod interarrival;
