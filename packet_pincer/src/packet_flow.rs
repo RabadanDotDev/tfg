@@ -214,8 +214,11 @@ impl NetworkFragmentFlow {
         let offset = fragmentation_offset.value() * 8;
 
         // Update expected size if necessary
-        if !more_packets && self.expected_size.is_none() {
-            self.expected_size = Some(usize::from(offset) + ip_payload.len());
+        if !more_packets {
+            self.expected_size = match &self.expected_size {
+                None => Some(usize::from(offset) + ip_payload.len()),
+                Some(size) => Some(std::cmp::max(*size, usize::from(offset) + ip_payload.len())),
+            }
         }
 
         // Store the payload
@@ -266,8 +269,8 @@ impl NetworkFragmentFlow {
         for (offset, data) in self.fragments_data.iter() {
             // Find bounds
             let buffer_offset = usize::from(offset.to_owned());
-            let buffer_max = min(buffer_offset + data.len(), buffer.len());
-            let data_max = min(buffer_max - buffer_offset, data.len());
+            let buffer_max = min(buffer_offset + data.len(), buffer.len()); //slice index starts at 2960 but ends at 2476
+            let data_max = buffer_max - buffer_offset;
 
             // Copy data to buffer
             buffer[buffer_offset..buffer_max].copy_from_slice(&data[..data_max]);
