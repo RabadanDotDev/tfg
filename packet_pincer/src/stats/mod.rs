@@ -22,5 +22,8 @@ pub use tcp_flags::*;
 mod transport;
 pub use transport::*;
 
+mod activity;
+pub use activity::*;
+
 mod interarrival;
 mod running_stat;
