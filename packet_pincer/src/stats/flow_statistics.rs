@@ -1,5 +1,5 @@
 use super::interarrival::Interarrival;
-use super::{ByteCount, FlowStat, FlowTimes, PacketCount, Protocols, TcpFlags};
+use super::{ByteCount, FlowStat, FlowTimes, PacketCount, Protocols, TcpFlags, Transport};
 use crate::packet_flow::FragmentReasemblyInformation;
 use crate::packet_parse::TransportFlowIdentifier;
 
@@ -63,6 +63,7 @@ pub struct FlowStatistics {
     byte_count: ByteCount,
     interrarival: Interarrival,
     tcp_flags: TcpFlags,
+    transport: Transport,
 }
 
 impl_flow_stat!(FlowStatistics {
@@ -71,4 +72,5 @@ impl_flow_stat!(FlowStatistics {
     byte_count: ByteCount,
     interrarival: Interarrival,
     tcp_flags: TcpFlags,
+    transport: Transport,
 });

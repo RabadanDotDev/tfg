@@ -19,5 +19,8 @@ pub use protocols::*;
 mod tcp_flags;
 pub use tcp_flags::*;
 
-mod running_stat;
+mod transport;
+pub use transport::*;
+
 mod interarrival;
+mod running_stat;
