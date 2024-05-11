@@ -12,7 +12,7 @@ pub struct ByteCount {
     backward: RunningStat,
 }
 
-fn extract_count(
+pub fn extract_byte_count(
     packet_header: &pcap::PacketHeader,
     reasembly_information: Option<&FragmentReasemblyInformation>,
 ) -> u64 {
@@ -30,7 +30,7 @@ impl FlowStat for ByteCount {
         _sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
     ) -> Self {
-        let count = extract_count(packet_header, reasembly_information);
+        let count = extract_byte_count(packet_header, reasembly_information);
 
         let mut bidirectional = RunningStat::new();
         let mut forward = RunningStat::new();
@@ -53,7 +53,7 @@ impl FlowStat for ByteCount {
         sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
     ) {
-        let count = extract_count(packet_header, reasembly_information);
+        let count = extract_byte_count(packet_header, reasembly_information);
 
         let src_ip = match &sliced_packet.net {
             Some(header) => match header {

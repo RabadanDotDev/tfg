@@ -1,5 +1,7 @@
 use super::interarrival::Interarrival;
-use super::{ByteCount, FlowStat, FlowTimes, PacketCount, Protocols, TcpFlags, Transport};
+use super::{
+    ByteCount, FlowStat, FlowTimes, PacketCount, Protocols, TcpFlags, Transport,
+};
 use crate::packet_flow::FragmentReasemblyInformation;
 use crate::packet_parse::TransportFlowIdentifier;
 

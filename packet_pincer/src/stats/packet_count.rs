@@ -13,7 +13,7 @@ pub struct PacketCount {
     backward_count: u32,
 }
 
-fn extract_count(reasembly_information: Option<&FragmentReasemblyInformation>) -> u32 {
+pub fn extract_packet_count(reasembly_information: Option<&FragmentReasemblyInformation>) -> u32 {
     match reasembly_information {
         Some(reasembly_information) => reasembly_information.total_fragments_received_count,
         None => 1,
@@ -29,7 +29,7 @@ impl FlowStat for PacketCount {
         reasembly_information: Option<&FragmentReasemblyInformation>,
     ) -> Self {
         PacketCount {
-            forward_count: extract_count(reasembly_information),
+            forward_count: extract_packet_count(reasembly_information),
             backward_count: 0,
         }
     }
@@ -41,7 +41,7 @@ impl FlowStat for PacketCount {
         sliced_packet: &etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
     ) {
-        let count = extract_count(reasembly_information);
+        let count = extract_packet_count(reasembly_information);
 
         let src_ip = match &sliced_packet.net {
             Some(header) => match header {
