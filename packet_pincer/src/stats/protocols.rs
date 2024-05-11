@@ -80,8 +80,8 @@ impl FlowStat for Protocols {
         writer: &mut BufWriter<T>,
         _flow_times: &FlowTimes,
     ) -> Result<(), Error> {
-        write!(writer, "{},",  if self.has_tcp { 1 } else { 0 })?;
-        write!(writer, "{},",  if self.has_udp { 1 } else { 0 })?;
+        write!(writer, "{},", if self.has_tcp { 1 } else { 0 })?;
+        write!(writer, "{},", if self.has_udp { 1 } else { 0 })?;
         Ok(())
     }
 }

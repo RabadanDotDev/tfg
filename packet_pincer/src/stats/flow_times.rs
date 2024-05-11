@@ -2,7 +2,10 @@ use std::io::{BufWriter, Error, Write};
 
 use chrono::{DateTime, Utc};
 
-use crate::{packet_flow::FragmentReasemblyInformation, packet_parse::{get_datetime_of_packet, TransportFlowIdentifier}};
+use crate::{
+    packet_flow::FragmentReasemblyInformation,
+    packet_parse::{get_datetime_of_packet, TransportFlowIdentifier},
+};
 
 #[derive(Debug)]
 pub struct FlowTimes {
@@ -72,7 +75,6 @@ impl FlowTimes {
         Ok(())
     }
     pub fn duration_seconds(&self) -> i64 {
-        (self.last_packet_time - self.first_packet_time)
-        .num_seconds()
+        (self.last_packet_time - self.first_packet_time).num_seconds()
     }
 }

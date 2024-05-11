@@ -85,9 +85,13 @@ impl FlowStat for PacketCount {
             }
             duration => {
                 let duration = duration as f64;
-                write!(writer, "{},", f64::from(self.backward_count + self.forward_count)/duration)?;
-                write!(writer, "{},", f64::from(self.forward_count)/duration)?;
-                write!(writer, "{},", f64::from(self.backward_count)/duration)?;
+                write!(
+                    writer,
+                    "{},",
+                    f64::from(self.backward_count + self.forward_count) / duration
+                )?;
+                write!(writer, "{},", f64::from(self.forward_count) / duration)?;
+                write!(writer, "{},", f64::from(self.backward_count) / duration)?;
             }
         };
 

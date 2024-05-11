@@ -1,12 +1,11 @@
-
-/// Running stat implementation based on Knuth TAOCP vol 2, 3rd edition, page 
+/// Running stat implementation based on Knuth TAOCP vol 2, 3rd edition, page
 /// 232. Where we have the recurrences for 2 <= k <= n:
-/// 
+///
 /// - M_{1} = x_{1}, M_{k} = M_{k-1} + ( x_{k} - M_{k-1} ) / k
 /// - S_{1} = 0,     S_{k} = S_{k-1} + ( x_{k} - M_{k-1} ) * ( x_{k} - M_{k} )
-/// 
+///
 /// Where M_{k} is the mean and the variance is equal to S_{k} / (k - 1) at the
-/// step k 
+/// step k
 #[derive(Debug)]
 pub struct RunningStat {
     count: u64,
@@ -51,7 +50,7 @@ impl RunningStat {
         self.mean = next_mean;
         self.sq_diff = next_sq_diff;
     }
-    
+
     #[allow(dead_code)]
     pub fn current_count(&self) -> u64 {
         self.count
@@ -88,12 +87,11 @@ impl RunningStat {
             self.sq_diff / (self.count as f64 - 1.0)
         }
     }
-    
+
     pub fn current_standard_deviation(&self) -> f64 {
         f64::sqrt(self.current_variance())
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -136,8 +134,8 @@ mod tests {
         assert_eq!(v.current_sum(), 60);
         assert_eq!(v.current_mean(), 15.0);
         assert_eq!(v.sq_diff, 50.0);
-        assert_eq!(v.current_variance(), 50.0/3.0);
-        assert_eq!(v.current_standard_deviation(), f64::sqrt(50.0/3.0));
+        assert_eq!(v.current_variance(), 50.0 / 3.0);
+        assert_eq!(v.current_standard_deviation(), f64::sqrt(50.0 / 3.0));
 
         v.include(20);
 
@@ -145,7 +143,7 @@ mod tests {
         assert_eq!(v.current_sum(), 80);
         assert_eq!(v.current_mean(), 16.0);
         assert_eq!(v.sq_diff, 70.0);
-        assert_eq!(v.current_variance(), 70.0/4.0);
-        assert_eq!(v.current_standard_deviation(), f64::sqrt(70.0/4.0));
+        assert_eq!(v.current_variance(), 70.0 / 4.0);
+        assert_eq!(v.current_standard_deviation(), f64::sqrt(70.0 / 4.0));
     }
 }

@@ -33,8 +33,19 @@ impl TransportFlow {
         sliced_packet: etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
     ) -> TransportFlow {
-        let flow_times = FlowTimes::from_packet(&identifier, packet_header, &sliced_packet, reasembly_information);
-        let statistics = FlowStatistics::from_packet(&identifier, &flow_times, packet_header, &sliced_packet, reasembly_information);
+        let flow_times = FlowTimes::from_packet(
+            &identifier,
+            packet_header,
+            &sliced_packet,
+            reasembly_information,
+        );
+        let statistics = FlowStatistics::from_packet(
+            &identifier,
+            &flow_times,
+            packet_header,
+            &sliced_packet,
+            reasembly_information,
+        );
         let label = None;
 
         TransportFlow {
@@ -62,12 +73,27 @@ impl TransportFlow {
             .expect("Packet headers with invalid timestamps are not supported");
 
         if packet_time < self.flow_times.last_packet_time {
-            log::warn!("Ignoring packet that went back in time on flow inclusion (last: {}, recived: {})", self.flow_times.last_packet_time, packet_time);
+            log::warn!(
+                "Ignoring packet that went back in time on flow inclusion (last: {}, recived: {})",
+                self.flow_times.last_packet_time,
+                packet_time
+            );
             return;
         }
 
-        self.flow_times.include(&self.identifier, packet_header, &sliced_packet, reasembly_information);
-        self.statistics.include(&self.identifier, &self.flow_times, packet_header, &sliced_packet, reasembly_information);
+        self.flow_times.include(
+            &self.identifier,
+            packet_header,
+            &sliced_packet,
+            reasembly_information,
+        );
+        self.statistics.include(
+            &self.identifier,
+            &self.flow_times,
+            packet_header,
+            &sliced_packet,
+            reasembly_information,
+        );
     }
 
     /// Write the header for separated information values of the flows to the given writer
@@ -93,7 +119,7 @@ impl TransportFlow {
     ) -> Result<(), Error> {
         self.identifier.write_csv_value(writer)?;
         self.flow_times.write_csv_value(writer)?;
-        self.statistics.write_csv_value( writer, &self.flow_times)?;
+        self.statistics.write_csv_value(writer, &self.flow_times)?;
         if label_column {
             match &self.label {
                 None => write!(writer, ""),

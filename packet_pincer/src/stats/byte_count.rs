@@ -1,6 +1,9 @@
 use super::{running_stat::RunningStat, FlowStat, FlowTimes};
 use crate::{packet_flow::FragmentReasemblyInformation, packet_parse::TransportFlowIdentifier};
-use std::{io::{BufWriter, Error, Write}, net::IpAddr};
+use std::{
+    io::{BufWriter, Error, Write},
+    net::IpAddr,
+};
 
 #[derive(Debug)]
 pub struct ByteCount {
@@ -59,7 +62,6 @@ impl FlowStat for ByteCount {
             },
             None => panic!("Unexpected sliced packet without net layer"),
         };
-
 
         self.bidirectional.include(count);
 
@@ -129,13 +131,29 @@ impl FlowStat for ByteCount {
             }
             duration => {
                 let duration = duration as f64;
-                write!(writer, "{},", (self.bidirectional.current_sum() as f64)/duration)?;
-                write!(writer, "{},", (self.forward.current_sum() as f64)/duration)?;
-                write!(writer, "{},", (self.backward.current_sum() as f64)/duration)?;
+                write!(
+                    writer,
+                    "{},",
+                    (self.bidirectional.current_sum() as f64) / duration
+                )?;
+                write!(
+                    writer,
+                    "{},",
+                    (self.forward.current_sum() as f64) / duration
+                )?;
+                write!(
+                    writer,
+                    "{},",
+                    (self.backward.current_sum() as f64) / duration
+                )?;
             }
         };
 
-        write!(writer, "{},", (self.backward.current_sum() as f64)/(self.forward.current_sum() as f64))?;
+        write!(
+            writer,
+            "{},",
+            (self.backward.current_sum() as f64) / (self.forward.current_sum() as f64)
+        )?;
 
         Ok(())
     }
