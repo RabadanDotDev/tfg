@@ -1,3 +1,4 @@
+use super::interarrival::Interarrival;
 use super::{ByteCount, FlowStat, FlowTimes, PacketCount, Protocols};
 use crate::packet_flow::FragmentReasemblyInformation;
 use crate::packet_parse::TransportFlowIdentifier;
@@ -60,10 +61,12 @@ pub struct FlowStatistics {
     protocols: Protocols,
     packet_count: PacketCount,
     byte_count: ByteCount,
+    interrarival: Interarrival,
 }
 
 impl_flow_stat!(FlowStatistics {
     protocols: Protocols,
     packet_count: PacketCount,
     byte_count: ByteCount,
+    interrarival: Interarrival,
 });

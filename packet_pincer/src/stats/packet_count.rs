@@ -15,7 +15,7 @@ pub struct PacketCount {
 
 fn extract_count(reasembly_information: Option<&FragmentReasemblyInformation>) -> u32 {
     match reasembly_information {
-        Some(reasembly_information) => reasembly_information.total_fragments_received_count.into(),
+        Some(reasembly_information) => reasembly_information.total_fragments_received_count,
         None => 1,
     }
 }

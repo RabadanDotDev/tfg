@@ -51,7 +51,8 @@ impl RunningStat {
         self.mean = next_mean;
         self.sq_diff = next_sq_diff;
     }
-
+    
+    #[allow(dead_code)]
     pub fn current_count(&self) -> u64 {
         self.count
     }
@@ -87,7 +88,7 @@ impl RunningStat {
             self.sq_diff / (self.count as f64 - 1.0)
         }
     }
-
+    
     pub fn current_standard_deviation(&self) -> f64 {
         f64::sqrt(self.current_variance())
     }

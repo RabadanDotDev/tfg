@@ -57,6 +57,15 @@ impl TransportFlow {
         sliced_packet: etherparse::SlicedPacket,
         reasembly_information: Option<&FragmentReasemblyInformation>,
     ) {
+        // Get time
+        let packet_time = packet_parse::get_datetime_of_packet(packet_header)
+            .expect("Packet headers with invalid timestamps are not supported");
+
+        if packet_time < self.flow_times.last_packet_time {
+            log::warn!("Ignoring packet that went back in time on flow inclusion (last: {}, recived: {})", self.flow_times.last_packet_time, packet_time);
+            return;
+        }
+
         self.flow_times.include(&self.identifier, packet_header, &sliced_packet, reasembly_information);
         self.statistics.include(&self.identifier, &self.flow_times, packet_header, &sliced_packet, reasembly_information);
     }
@@ -113,6 +122,7 @@ pub struct NetworkFragmentFlow {
     total_bytes_received_count: u32,
 }
 
+#[derive(Debug)]
 pub struct FragmentReasemblyInformation {
     /// The first time a fragmented packet was received
     pub first_time: DateTime<Utc>,
@@ -166,9 +176,12 @@ impl NetworkFragmentFlow {
         fragmentation_offset: etherparse::IpFragOffset,
         more_packets: bool,
     ) {
-        // Update last time
-        self.last_time = packet_parse::get_datetime_of_packet(packet_header)
+        // Get time
+        let packet_time = packet_parse::get_datetime_of_packet(packet_header)
             .expect("Packet headers with invalid timestamps are not supported");
+
+        // Update last time
+        self.last_time = packet_time;
 
         // Grab payload and offset valyes
         let ip_payload = sliced_packet.ip_payload().unwrap().payload.to_owned();
