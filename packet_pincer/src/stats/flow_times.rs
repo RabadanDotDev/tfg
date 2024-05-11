@@ -1,6 +1,6 @@
 use std::io::{BufWriter, Error, Write};
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, TimeDelta, Utc};
 
 use crate::{
     packet_flow::FragmentReasemblyInformation,
@@ -59,22 +59,29 @@ impl FlowTimes {
     ) -> Result<(), Error> {
         write!(writer, "first_packet_time,")?;
         write!(writer, "last_packet_time,")?;
-        write!(writer, "duration,")?;
+        write!(writer, "duration_seconds,")?;
         Ok(())
     }
     pub fn write_csv_value<T: ?Sized + std::io::Write>(
         &self,
         writer: &mut BufWriter<T>,
     ) -> Result<(), Error> {
+        let duration = self.last_packet_time - self.first_packet_time;
         write!(writer, "{},", self.first_packet_time.timestamp_micros())?;
         write!(writer, "{},", self.last_packet_time.timestamp_micros())?;
-        let duration = (self.last_packet_time - self.first_packet_time)
-            .num_microseconds()
-            .ok_or(Error::new(std::io::ErrorKind::Other, "Overflow"))?;
-        write!(writer, "{},", duration)?;
+        write!(
+            writer,
+            "{}.{:09},",
+            duration.num_seconds(),
+            duration.subsec_nanos()
+        )?;
         Ok(())
     }
-    pub fn duration_seconds(&self) -> i64 {
-        (self.last_packet_time - self.first_packet_time).num_seconds()
+    pub fn duration(&self) -> TimeDelta {
+        self.last_packet_time - self.first_packet_time
+    }
+    pub fn duration_seconds_f64(&self) -> f64 {
+        let duration = self.duration();
+        duration.subsec_nanos() as f64 + (duration.num_seconds() as f64) * 1_000_000_000.0
     }
 }

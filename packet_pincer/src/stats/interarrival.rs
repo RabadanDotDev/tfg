@@ -60,9 +60,9 @@ impl FlowStat for Interarrival {
         // Update bidirectional
         let bidirectional_increment: u64 = (time - self.bidirectional_last_time)
             .num_microseconds()
-            .expect("IAT increments should fit in a i64")
+            .expect("IAT increments microseconds should fit in a i64")
             .try_into()
-            .expect("IAT increments should convert to u64");
+            .expect("IAT increments microseconds should convert to u64");
 
         self.bidirectional_iat.include(bidirectional_increment);
         self.bidirectional_last_time = time;
@@ -109,33 +109,65 @@ impl FlowStat for Interarrival {
     ) -> Result<(), Error> {
         write!(
             writer,
-            "{},",
-            self.bidirectional_iat.current_max().unwrap_or(0)
+            "{:.9},",
+            (self.bidirectional_iat.current_max().unwrap_or(0) as f64) / 1_000_000.0
         )?;
         write!(
             writer,
-            "{},",
-            self.bidirectional_iat.current_min().unwrap_or(0)
+            "{:.9},",
+            (self.bidirectional_iat.current_min().unwrap_or(0) as f64) / 1_000_000.0
         )?;
-        write!(writer, "{},", self.bidirectional_iat.current_mean())?;
         write!(
             writer,
-            "{},",
-            self.bidirectional_iat.current_standard_deviation()
+            "{:.9},",
+            self.bidirectional_iat.current_mean() / 1_000_000.0
+        )?;
+        write!(
+            writer,
+            "{:.9},",
+            self.bidirectional_iat.current_standard_deviation() / 1_000_000.0
         )?;
 
-        write!(writer, "{},", self.forward_iat.current_max().unwrap_or(0))?;
-        write!(writer, "{},", self.forward_iat.current_min().unwrap_or(0))?;
-        write!(writer, "{},", self.forward_iat.current_mean())?;
-        write!(writer, "{},", self.forward_iat.current_standard_deviation())?;
-
-        write!(writer, "{},", self.backward_iat.current_max().unwrap_or(0))?;
-        write!(writer, "{},", self.backward_iat.current_min().unwrap_or(0))?;
-        write!(writer, "{},", self.backward_iat.current_mean())?;
         write!(
             writer,
-            "{},",
-            self.backward_iat.current_standard_deviation()
+            "{:.9},",
+            (self.forward_iat.current_max().unwrap_or(0) as f64) / 1_000_000.0
+        )?;
+        write!(
+            writer,
+            "{:.9},",
+            (self.forward_iat.current_min().unwrap_or(0) as f64) / 1_000_000.0
+        )?;
+        write!(
+            writer,
+            "{:.9},",
+            self.forward_iat.current_mean() / 1_000_000.0
+        )?;
+        write!(
+            writer,
+            "{:.9},",
+            self.forward_iat.current_standard_deviation() / 1_000_000.0
+        )?;
+
+        write!(
+            writer,
+            "{:.9},",
+            (self.backward_iat.current_max().unwrap_or(0) as f64) / 1_000_000.0
+        )?;
+        write!(
+            writer,
+            "{:.9},",
+            (self.backward_iat.current_min().unwrap_or(0) as f64) / 1_000_000.0
+        )?;
+        write!(
+            writer,
+            "{:.9},",
+            self.backward_iat.current_mean() / 1_000_000.0
+        )?;
+        write!(
+            writer,
+            "{:.9},",
+            self.backward_iat.current_standard_deviation() / 1_000_000.0
         )?;
 
         Ok(())

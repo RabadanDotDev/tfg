@@ -77,23 +77,20 @@ impl FlowStat for PacketCount {
         write!(writer, "{},", self.forward_count)?;
         write!(writer, "{},", self.backward_count)?;
 
-        match flow_times.duration_seconds() {
-            0 => {
-                write!(writer, "{},", 0)?;
-                write!(writer, "{},", 0)?;
-                write!(writer, "{},", 0)?;
-            }
-            duration => {
-                let duration = duration as f64;
-                write!(
-                    writer,
-                    "{},",
-                    f64::from(self.backward_count + self.forward_count) / duration
-                )?;
-                write!(writer, "{},", f64::from(self.forward_count) / duration)?;
-                write!(writer, "{},", f64::from(self.backward_count) / duration)?;
-            }
-        };
+        if flow_times.duration().is_zero() {
+            write!(writer, "{},", 0)?;
+            write!(writer, "{},", 0)?;
+            write!(writer, "{},", 0)?;
+        } else {
+            let duration = flow_times.duration_seconds_f64();
+            write!(
+                writer,
+                "{:.9},",
+                f64::from(self.backward_count + self.forward_count) / duration
+            )?;
+            write!(writer, "{:.9},", f64::from(self.forward_count) / duration)?;
+            write!(writer, "{:.9},", f64::from(self.backward_count) / duration)?;
+        }
 
         Ok(())
     }

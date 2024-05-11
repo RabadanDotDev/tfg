@@ -78,19 +78,19 @@ impl FlowStat for ByteCount {
         write!(writer, "bidirectional_packet_bytes_max,")?;
         write!(writer, "bidirectional_packet_bytes_min,")?;
         write!(writer, "bidirectional_packet_bytes_mean,")?;
-        write!(writer, "bidirectional_packet_bytes_variance,")?;
+        write!(writer, "bidirectional_packet_bytes_std,")?;
 
         write!(writer, "forward_packet_bytes_sum,")?;
         write!(writer, "forward_packet_bytes_max,")?;
         write!(writer, "forward_packet_bytes_min,")?;
         write!(writer, "forward_packet_bytes_mean,")?;
-        write!(writer, "forward_packet_bytes_variance,")?;
+        write!(writer, "forward_packet_bytes_std,")?;
 
         write!(writer, "backward_packet_bytes_sum,")?;
         write!(writer, "backward_packet_bytes_max,")?;
         write!(writer, "backward_packet_bytes_min,")?;
         write!(writer, "backward_packet_bytes_mean,")?;
-        write!(writer, "backward_packet_bytes_variance,")?;
+        write!(writer, "backward_packet_bytes_std,")?;
 
         write!(writer, "bidirectional_bytes_s,")?;
         write!(writer, "backward_bytes_s,")?;
@@ -108,50 +108,51 @@ impl FlowStat for ByteCount {
         write!(writer, "{},", self.bidirectional.current_sum())?;
         write!(writer, "{},", self.bidirectional.current_max().unwrap_or(0))?;
         write!(writer, "{},", self.bidirectional.current_min().unwrap_or(0))?;
-        write!(writer, "{},", self.bidirectional.current_mean())?;
-        write!(writer, "{},", self.bidirectional.current_variance())?;
+        write!(writer, "{:.9},", self.bidirectional.current_mean())?;
+        write!(
+            writer,
+            "{:.9},",
+            self.bidirectional.current_standard_deviation()
+        )?;
 
         write!(writer, "{},", self.forward.current_sum())?;
         write!(writer, "{},", self.forward.current_max().unwrap_or(0))?;
         write!(writer, "{},", self.forward.current_min().unwrap_or(0))?;
-        write!(writer, "{},", self.forward.current_mean())?;
-        write!(writer, "{},", self.forward.current_variance())?;
+        write!(writer, "{:.9},", self.forward.current_mean())?;
+        write!(writer, "{:.9},", self.forward.current_standard_deviation())?;
 
         write!(writer, "{},", self.backward.current_sum())?;
         write!(writer, "{},", self.backward.current_max().unwrap_or(0))?;
         write!(writer, "{},", self.backward.current_min().unwrap_or(0))?;
-        write!(writer, "{},", self.backward.current_mean())?;
-        write!(writer, "{},", self.backward.current_variance())?;
+        write!(writer, "{:.9},", self.backward.current_mean())?;
+        write!(writer, "{:.9},", self.backward.current_standard_deviation())?;
 
-        match flow_times.duration_seconds() {
-            0 => {
-                write!(writer, "{},", 0)?;
-                write!(writer, "{},", 0)?;
-                write!(writer, "{},", 0)?;
-            }
-            duration => {
-                let duration = duration as f64;
-                write!(
-                    writer,
-                    "{},",
-                    (self.bidirectional.current_sum() as f64) / duration
-                )?;
-                write!(
-                    writer,
-                    "{},",
-                    (self.forward.current_sum() as f64) / duration
-                )?;
-                write!(
-                    writer,
-                    "{},",
-                    (self.backward.current_sum() as f64) / duration
-                )?;
-            }
-        };
+        if flow_times.duration().is_zero() {
+            write!(writer, "{},", 0)?;
+            write!(writer, "{},", 0)?;
+            write!(writer, "{},", 0)?;
+        } else {
+            let duration = flow_times.duration_seconds_f64();
+            write!(
+                writer,
+                "{:.9},",
+                (self.bidirectional.current_sum() as f64) / duration
+            )?;
+            write!(
+                writer,
+                "{:.9},",
+                (self.forward.current_sum() as f64) / duration
+            )?;
+            write!(
+                writer,
+                "{:.9},",
+                (self.backward.current_sum() as f64) / duration
+            )?;
+        }
 
         write!(
             writer,
-            "{},",
+            "{:.9},",
             (self.backward.current_sum() as f64) / (self.forward.current_sum() as f64)
         )?;
 

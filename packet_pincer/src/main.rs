@@ -235,7 +235,7 @@ fn evaluate_packets(
 
             // Close network flows
             while let Some(fragments) =
-                flows.pop_oldest_network_flow_if_older_than(TimeDelta::seconds(100000))
+                flows.pop_oldest_network_flow_if_older_than(TimeDelta::seconds(60))
             {
                 execution_stats.discarded_fragments_no_reassembly_count += u64::from(fragments);
             }
