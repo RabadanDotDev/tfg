@@ -73,7 +73,7 @@ impl TransportFlow {
             .expect("Packet headers with invalid timestamps are not supported");
 
         if packet_time < self.flow_times.last_packet_time {
-            log::warn!(
+            log::debug!(
                 "Ignoring packet that went back in time on flow inclusion (last: {}, recived: {})",
                 self.flow_times.last_packet_time,
                 packet_time
