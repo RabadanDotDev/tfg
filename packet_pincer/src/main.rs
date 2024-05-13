@@ -6,7 +6,7 @@ use packet_pincer::{FlowGroup, GroundTruth, PacketCapture, PacketOrigin, Transpo
 
 use std::{
     fs::File,
-    io::BufWriter,
+    io::{BufWriter, Write},
     path::PathBuf,
     process::exit,
     sync::mpsc::{channel, Receiver},
@@ -92,7 +92,11 @@ impl ExecutionStats {
 struct Settings {
     /// Base directory path to write csv output files
     #[arg(short, long)]
-    pub output_base_csv: Option<PathBuf>,
+    pub csv_output_base: Option<PathBuf>,
+
+    /// Output tags on the stdout. Ignored if output_base_csv is set
+    #[arg(short, long)]
+    pub stdout_output: bool,
 
     /// File in a csv format indicating the tags that should be tried to be
     /// assigned to the flows. It should contain the colums source_ip, dest_ip,
@@ -138,10 +142,12 @@ fn create_packet_capture_from_settings(command: &Commands) -> PacketCapture {
     }
 }
 
-fn create_csv_output(mut path: PathBuf, label_column: bool) -> Option<BufWriter<File>> {
+fn create_csv_output(mut path: PathBuf, label_column: bool) -> Option<BufWriter<Box<dyn Write>>> {
     let timestamp = chrono::offset::Utc::now().timestamp_millis();
     path.set_extension(format!("{}.csv", timestamp));
-    let mut w = BufWriter::new(File::create(path).expect("Unable to create file"));
+    let file = File::create(path).expect("Unable to create file");
+    let writer: Box<dyn Write> = Box::new(file);
+    let mut w = BufWriter::new(writer);
     let _ = TransportFlow::write_csv_header(&mut w, label_column);
     Some(w)
 }
@@ -156,7 +162,8 @@ fn create_termination_channel() -> Receiver<()> {
 
 fn evaluate_packets(
     termination_channel: Receiver<()>,
-    csv_output: Option<PathBuf>,
+    csv_output_base: Option<PathBuf>,
+    stdout_output: bool,
     ground_truth: Option<GroundTruth>,
     execution_stats: &mut ExecutionStats,
     flows: &mut FlowGroup,
@@ -173,17 +180,20 @@ fn evaluate_packets(
     };
 
     // Init csv writer
-    let mut csv_writer = csv_output
-        .as_ref()
-        .and_then(|path| create_csv_output(path.clone(), ground_truth.is_some()));
+    let mut csv_writer: Option<BufWriter<Box<dyn Write>>> = match (&csv_output_base, stdout_output) {
+        (Some(path), _) => create_csv_output(path.clone(), ground_truth.is_some()),
+        (None, true) => Some(BufWriter::new( Box::new(std::io::stdout()))), 
+        (None, false) => None
+    };
+    
 
     // Define writing a closed flow to file
     let mut write_closed_flow = |flow: TransportFlow| {
         if let Some(ref mut w) = csv_writer {
             _ = flow.write_csv_value(w, ground_truth.is_some());
             execution_stats.current_lines_written += 1;
-            if MAX_LINES_FOR_CSV_FILE <= execution_stats.current_lines_written {
-                csv_writer = csv_output
+            if MAX_LINES_FOR_CSV_FILE <= execution_stats.current_lines_written && csv_output_base.as_ref().is_some() {
+                csv_writer = csv_output_base
                     .as_ref()
                     .and_then(|path| create_csv_output(path.clone(), ground_truth.is_some()));
                 execution_stats.current_lines_written = 0;
@@ -289,7 +299,8 @@ fn main() {
 
     evaluate_packets(
         termination_channel,
-        settings.output_base_csv,
+        settings.csv_output_base,
+        settings.stdout_output,
         ground_truth,
         &mut execution_stats,
         &mut flows,
