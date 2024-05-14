@@ -88,7 +88,59 @@ Para decidir como interpretar el campo de longitud o tipo, se ha de determinar s
 
 \subsection{Linux Cooked Capture v1 (SLL)}
 
-por hacer
+'Linux Cooked Capture v1' es un pseudo-protocolo utilizado por libpcap para capturar de la interfaz 'any' (todas las interfaces de red al mismo tiempo) y en dispositivos donde las cabeceras de la capa de enlace no están disponibles \cite{sllwireshark}. Una indicación del formato de los paquetes lo podemos encontrar en la web de tcpdump \cite{slltcpdump} y es como podemos observar en la Figura \ref{fig:linux_cooked_capture_struct}.
+
+\begin{figure}[H]
+    \begin{center}
+        \begin{bytefield}[bitwidth=1em]{32}
+            \begin{rightwordgroup}{2 B}
+                \wordbox{1}{Tipo de paquete}
+            \end{rightwordgroup} \\
+            \begin{leftwordgroup}{2 B}
+                \wordbox{1}{Tipo 'ARPHRD\_'}
+            \end{leftwordgroup} \\
+            \begin{rightwordgroup}{2 B}
+                \wordbox{1}{Longitud de capa de enlace}
+            \end{rightwordgroup} \\
+            \begin{leftwordgroup}{8 B}
+                \wordbox{3}{Dirección de capa de enlace}
+            \end{leftwordgroup} \\
+            \begin{rightwordgroup}{2 B}
+                \wordbox{1}{Protocolo datos}
+            \end{rightwordgroup} \\
+            \wordbox[lrt]{1}{Datos} \\
+                \skippedwords \\
+            \wordbox[lrb]{1}{} \\
+        \end{bytefield}
+    \end{center}
+    \caption{Formato paquete linux sll}
+    \label{fig:linux_cooked_capture_struct}
+\end{figure}
+
+El tipo de paquete proviene de \texttt{if\_packet.h} \cite{linuxifpacket}. En el momento de la redacción, existen 8 definiciones indexadas desde 0 de las cuales solo las 5 primeras aparecen en la web de tcpdump:
+
+\begin{itemize}
+    \item \textbf{PACKET\_HOST} (0): El paquete ha sido enviado específicamente al dispositivo capturador.
+    \item \textbf{PACKET\_BROADCAST} (1): El paquete ha sido enviado en difusión amplia.
+    \item \textbf{PACKET\_MULTICAST} (2): El paquete ha sido enviado a un grupo en el que pertenecia el dispositivo capturador.
+    \item \textbf{PACKET\_OTHERHOST} (3): El paquete ha sido enviado hacia otro dispositivo diferente al capturador.
+    \item \textbf{PACKET\_OUTGOING} (4): El paquete ha sido enviado por parte del capturador.
+    \item \textbf{PACKET\_LOOPBACK} (5): El paquete ha sido enviado hacia sí mismo
+    \item \textbf{PACKET\_USER} (6): El paquete se ha enviado a 'user space' o entorno de ejecución no privilegiado (especifico de Linux)
+    \item \textbf{PACKET\_KERNEL} (7):  El paquete se ha enviado a 'kernel space' o entorno de ejecución privilegiado (especifico de Linux)
+\end{itemize}
+
+El tipo de 'ARPHRD\_' proviene de \texttt{if\_arp.h} \cite{linuxifarp}. Este indica, el tipo de paquete capturado en la siguiente capa, similar a lo indicado en los registros de paquetes. Las posibilidades indicadas en la web de tcpdump son las siguientes:
+
+\begin{enumerate}
+    \item \textbf{ARPHRD\_ETHER} (1): El campo del protocolo de datos corresponde al valor definido en \texttt{if\_ether.h} \cite{linuxifether}. Los valores iguales y mayores a 1536 corresponden a los números registrados \cite{etherprotocolnumbers}. Adicionalmente, hay definidos valores no estándar que pueden ser generados, pero se encuentran por debajo de 1500 para hacer uso del espacio en el que no habrá colisiones con tipos reales.
+    \item \textbf{ARPHRD\_FRAD} (770): El campo del protocolo de datos es ignorado y el campo de datos contiene una trama 'Frame Relay LAPF', con una cabecera asociada. 
+    \item \textbf{ARPHRD\_IPGRE} (778): El campo del protocolo de datos contiene un tipo del protocolo 'Generic Routing Encapsulation' y los datos asociados corresponden a este.
+    \item \textbf{ARPHRD\_IEEE80211\_RADIOTAP} (803): El campo del protocolo de datos es ignorado y el campo de datos empieza con una cabecera 'radiotap' seguido por una cabecera IEEE 802.11.
+    \item \textbf{ARPHRD\_NETLINK} (824): El campo del protocolo de datos contiene un tipo del protocolo 'Netlink' y los datos asociados corresponden a este.
+\end{enumerate}
+
+Los campos de la longitud de la dirección de capa de enlace y la dirección como tal corresponden a la del emisor original del paquete. En caso de que la longitud sea más pequeña que el espacio disponible, se añaden ceros de relleno. En caso de que sea más grande, la dirección es truncada a los primeros 8 octetos.
 
 \subsection{IP versión 4}
 
