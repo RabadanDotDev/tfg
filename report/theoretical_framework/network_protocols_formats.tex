@@ -266,7 +266,7 @@ UDP es un protocolo minimalista para permitir enviar mensajes entre permitir env
                 \bitbox{32}{Dirección destino} \\ 
                 \bitbox{8}{Zero} 
                 \bitbox{8}{Proto} 
-                \bitbox{16}{Longitud UDP} \\
+                \bitbox{16}{Longitud} \\
             \end{bytefield}
         \end{center}
         \caption{Pseudocabecera checksum}
@@ -276,4 +276,57 @@ UDP es un protocolo minimalista para permitir enviar mensajes entre permitir env
 
 \subsection{TCP}
 
-por hacer
+\begin{figure}[h]
+    \begin{center}
+        \begin{bytefield}[bitwidth=1.1em]{32}
+            \bitheader{0-31} \\
+            \bitbox{16}{Puerto de origen}
+            \bitbox{16}{Puerto de destino} \\
+            \bitbox{32}{Número de secuencia} \\
+            \bitbox{32}{Numéro de reconocimiento} \\
+            \bitbox{4}{Offset}
+            \bitbox{4}{Reserv.}
+            \bitbox{1}{\rotatebox{90}{\tiny CWR}}
+            \bitbox{1}{\rotatebox{90}{\tiny ECE}}
+            \bitbox{1}{\rotatebox{90}{\tiny URG}}
+            \bitbox{1}{\rotatebox{90}{\tiny ACK}}
+            \bitbox{1}{\rotatebox{90}{\tiny PSH}}
+            \bitbox{1}{\rotatebox{90}{\tiny RST}}
+            \bitbox{1}{\rotatebox{90}{\tiny SYN}}
+            \bitbox{1}{\rotatebox{90}{\tiny FIN}}
+            \bitbox{16}{Tamaño de ventana} \\
+            \bitbox{16}{Checksum}
+            \bitbox{16}{Puntero URG} \\
+            \begin{rightwordgroup}{0-40 B}
+                \wordbox[lrt]{1}{Opciones} \\
+                    \skippedwords \\
+                \wordbox[lrb]{1}{}
+            \end{rightwordgroup} \\
+            \wordbox[lrt]{1}{Datos} \\
+                \skippedwords \\
+            \wordbox[lrb]{1}{} \\
+        \end{bytefield}
+    \end{center}
+    \caption{Formato paquete TCP}
+    \label{fig:tcp_paquet}
+\end{figure}
+
+TCP es un protocolo orientado a la conexión, el cual ofrece la capacidad de enviar un flujo bidireccional de bytes de forma fiable y ordenada. Adicionalmente, permite hacer un control de la congestión para evitar saturar la red, detectar errores y retransmitir paquetes perdidos \cite{rfc9293}. Las unidades del protocolo son llamadas segmentos y en la Figura \ref{fig:tcp_paquet} podemos ver su estructura. Los campos en este consisten en:
+
+\begin{enumerate}
+    \item \textbf{Puerto de origen}: El número indicando el puerto de origen
+    \item \textbf{Puerto de destino}:  El número indicando el puerto de destino
+    \item \textbf{Número de secuencia}: Si SYN está a 0, el número de secuencia del primer byte del campo de datos. Si SYN está a 1, el número de secuencia inicial, siendo el primer byte el siguiente número. La recomendación es inicializar este número de forma aleatoria.
+    \item \textbf{Número de reconocimiento} y \textbf{ACK}: Si ACK está a 1, el número de secuencia del siguiente byte que el emisor del segmento espera.  La recomendación es inicializar este número de forma aleatoria.
+    \item \textbf{Offset}: El número de grupos de 32 bits en la cabecera TCP. La definición del protocolo garantiza que la longitud de la cabecera es un múltiplo de 32 bits.
+    \item \textbf{CWR}: Indicador que el tamaño de ventana de congestión se encuentra reducida.
+    \item \textbf{ECE}: Copia del bit ECN de la cabecera IP
+    \item \textbf{URG} y \textbf{Puntero URG}: Si URG está a 1, el puntero URG indica un offset respecto al número de secuencia donde hay datos considerados urgentes.
+    \item \textbf{PSH}: Si está a 1, se indica que se han de pasar los datos a la capa de aplicación por parte del receptor lo antes posible.
+    \item \textbf{RST}: Si está a 1, se indica que la conexión se ha reseteado y, dependiendo del estado de la conexión, se ha de actuar de una manera u otra. Se utiliza cuando se recibe un segmento que no corresponde a la conexión enviada.
+    \item \textbf{SYN}: Sincronización de número de secuencia. Es utilizado para iniciar una conexión.
+    \item \textbf{FIN}: El emisor no enviará más datos. 
+    \item \textbf{Tamaño de ventana}: El número de bytes a partir del número de reconocimiento que el emisor puede aceptar. Este número va variando según el algoritmo de control de la congestión.
+    \item \textbf{Checksum}: Código de verificación para detectar errores en el paquete. Utiliza una pseudocabecera similar al caso de UDP representada en la Figura \ref{fig:udp_packet_pseudoheader}
+    \item \textbf{Opciones}: Campo opcional de opciones. No es frecuentemente utilizado
+\end{enumerate}
