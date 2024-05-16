@@ -194,13 +194,51 @@ La versión 4 del protocolo IP es la más utilizada en la actualidad \cite{ipv4u
     \item \textbf{Protocolo}: El identificador del protocolo de la siguiente capa. Por ejemplo, TCP es 6 y UDP es 17 \cite{ipprotocolnumbers}.
     \item \textbf{Checksum}: Código de verificación para detectar errores en la cabecera del datagrama.
     \item \textbf{Dirección origen}: Dirección del host que ha enviado el datagrama.
-    \item \textbf{Dirección destino}: Dirección del host que ha recibido el datagrama.
+    \item \textbf{Dirección destino}: Dirección de destino del datagrama. Puede ser un nodo específico, un grupo o una dirección de difusión.
     \item \textbf{Opciones}: Campo opcional para añadir cabeceras adicionales de opciones.
 \end{enumerate}
 
 \subsubsection{IP versión 6}
 
-por hacer
+La versión 6 del protocolo IP es una versión diseñada para ser un sucesor a IPv4. Está focalizado en incrementar el espacio de direcciones y sus posibilidades, simplificar la cabecera, mejorar el soporte para extensiones y añadir capacidades como el etiquetado de flujos, autenticación y privacidad \cite{rfc8200}. Aparte de las direcciones de difusión, grupo y de host, se añade una de 'anycast', la cual permite enviar un paquete a cualquier nodo dentro de un grupo, pero no a todos. Podemos ver en la Figura \ref{fig:ipv6_packet} los diferentes campos que se definieron:
+
+\begin{enumerate}
+    \item \textbf{Versión}: La versión del protocolo. Ha de contener siempre el valor 6.
+    \item \textbf{Categoría de tráfico}: Este campo es el equivalente a los campos DSCP + ECN combinados de IPv4.
+    \item \textbf{Etiqueta de flujo}: Etiqueta para identificar un flujo de datos entre dos nodos. Permite correlacionar diferentes datagramas enviados entre hosts.
+    \item \textbf{Longitud de los datos}: El tamaño total del campo de datos, incluyendo cabeceras de extensión. No se incluye la cabecera de IPv6 en el recuento.
+    \item \textbf{Siguiente cabecera}: El contenido del campo de datos definido por los números IP registrados \cite{ipprotocolnumbers}. Normalmente, indica el protocolo de la capa de transporte, pero hay números definidos para extensiones de la cabecera.
+    \item \textbf{Límite de saltos}: Número de saltos entre routers que el datagrama puede realizar antes de ser descartado. Es el equivalente al TTL de IPv4
+    \item \textbf{Dirección origen}: Dirección del host que ha enviado el datagrama.
+    \item \textbf{Dirección destino}: Dirección de destino del datagrama.
+\end{enumerate}
+
+Cabe notar que no hay un 'checksum' como en IPv4, ya que las capas de enlace y las capas de transporte ya contienen detección de errores. En el momento de la redacción, alrededor del 45\% de usuarios de Google se conectan a este a través de IPv6 \cite{ipv4ipv6usage}, el cual parece estar creciendo de forma lineal.
+
+\begin{figure}[h]
+    \begin{center}
+        \begin{bytefield}[bitwidth=1.1em]{32}
+            \bitheader{0-31} \\
+            \bitbox{4}{Versión}
+            \bitbox{8}{Categoría de tráfico}
+            \bitbox{20}{Etiqueta de flujo} \\
+            \bitbox{16}{Longitud de los datos} 
+            \bitbox{8}{Siguiente cabecera}
+            \bitbox{8}{Límite de saltos} \\
+            \begin{rightwordgroup}{128 bits}
+                \wordbox{4}{Dirección origen}
+            \end{rightwordgroup} \\
+            \begin{rightwordgroup}{128 bits}
+                \wordbox{4}{Dirección destino}
+            \end{rightwordgroup} \\
+            \wordbox[lrt]{1}{Datos} \\
+                \skippedwords \\
+            \wordbox[lrb]{1}{} \\
+        \end{bytefield}
+    \end{center}
+    \caption{Formato paquete IPv6}
+    \label{fig:ipv6_packet}
+\end{figure}
 
 \subsection{UDP}
 
