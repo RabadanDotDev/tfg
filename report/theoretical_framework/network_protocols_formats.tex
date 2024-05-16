@@ -133,7 +133,7 @@ El tipo de paquete proviene de \texttt{if\_packet.h} \cite{linuxifpacket}. En el
 El tipo de 'ARPHRD\_' proviene de \texttt{if\_arp.h} \cite{linuxifarp}. Este indica, el tipo de paquete capturado en la siguiente capa, similar a lo indicado en los registros de paquetes. Las posibilidades indicadas en la web de tcpdump son las siguientes:
 
 \begin{enumerate}
-    \item \textbf{ARPHRD\_ETHER} (1): El campo del protocolo de datos corresponde al valor definido en \texttt{if\_ether.h} \cite{linuxifether}. Los valores iguales y mayores a 1536 corresponden a los números registrados \cite{etherprotocolnumbers}. Adicionalmente, hay definidos valores no estándar que pueden ser generados, pero se encuentran por debajo de 1500 para hacer uso del espacio en el que no habrá colisiones con tipos reales.
+    \item \textbf{ARPHRD\_ETHER} (1): El campo del protocolo de datos corresponde al valor definido en \texttt{if\_ether.h} \cite{linuxifether}. Los valores iguales y mayores a 1536 corresponden a los números registrados \cite{etherprotocolnumbers}. Por ejemplo, 0x0800 es para IPv4 y 0x86DD para IPv6. Adicionalmente, hay definidos valores no estándar que pueden ser generados, pero se encuentran por debajo de 1500 para hacer uso del espacio en el que no habrá colisiones con tipos reales.
     \item \textbf{ARPHRD\_FRAD} (770): El campo del protocolo de datos es ignorado y el campo de datos contiene una trama 'Frame Relay LAPF', con una cabecera asociada. 
     \item \textbf{ARPHRD\_IPGRE} (778): El campo del protocolo de datos contiene un tipo del protocolo 'Generic Routing Encapsulation' y los datos asociados corresponden a este.
     \item \textbf{ARPHRD\_IEEE80211\_RADIOTAP} (803): El campo del protocolo de datos es ignorado y el campo de datos empieza con una cabecera 'radiotap' seguido por una cabecera IEEE 802.11.
@@ -142,11 +142,63 @@ El tipo de 'ARPHRD\_' proviene de \texttt{if\_arp.h} \cite{linuxifarp}. Este ind
 
 Los campos de la longitud de la dirección de capa de enlace y la dirección como tal corresponden a la del emisor original del paquete. En caso de que la longitud sea más pequeña que el espacio disponible, se añaden ceros de relleno. En caso de que sea más grande, la dirección es truncada a los primeros 8 octetos.
 
-\subsection{IP versión 4}
+\subsection{IP}
 
-por hacer
+El protocolo de Internet (IP) es una tecnología de conmutación de paquetes basada en 'datagramas' \cite{iptechslides}. No está orientado a la conexión (los datagramas son enviados sin establecer una conexión) y se hace una entrega de mejor esfuerzo (no se dan garantías de que los datos lleguen o como a su destino). Está ubicado en la capa de red, donde los puntos de destino se les llama 'hosts' y los datagramas se transmiten a través de intermediarios (routers), los cuales entre ellos se comunican con otro protocolo de una capa inferior. Existen actualmente dos versiones del protocolo, principalmente la versión 4 y la versión 6.
 
-\subsection{IP versión 6}
+\subsubsection{IP versión 4}
+
+\begin{figure}[h]
+    \begin{center}
+        \begin{bytefield}[bitwidth=1.1em]{32}
+            \bitheader{0-31} \\
+            \bitbox{4}{Versión}
+            \bitbox{4}{IHL}
+            \bitbox{6}{DSCP}
+            \bitbox{2}{ECN}
+            \bitbox{16}{Longitud total} \\
+            \bitbox{16}{Identificador} 
+            \bitbox{3}{Flgs}
+            \bitbox{13}{Offset del fragmento} \\
+            \bitbox{8}{TTL}
+            \bitbox{8}{Protocolo}
+            \bitbox{16}{Checksum} \\
+            \bitbox{32}{Dirección origen} \\
+            \bitbox{32}{Dirección destino} \\
+            \begin{rightwordgroup}{0-40 B}
+                \wordbox[lrt]{1}{Opciones} \\
+                    \skippedwords \\
+                \wordbox[lrb]{1}{}
+            \end{rightwordgroup} \\
+            \wordbox[lrt]{1}{Datos} \\
+                \skippedwords \\
+            \wordbox[lrb]{1}{} \\
+        \end{bytefield}
+    \end{center}
+    \caption{Formato paquete IPv4}
+    \label{fig:ipv4_packet}
+\end{figure}
+
+La versión 4 del protocolo IP es la más utilizada en la actualidad \cite{ipv4usage}. En la Figura \ref{fig:ipv4_packet} podemos observar la estructura de la cabecera \cite{rfc791}. En este, tenemos una variedad de campos:
+
+\begin{enumerate}
+    \item \textbf{Versión}: La versión del protocolo. Ha de contener siempre el valor 4.
+    \item \textbf{IHL}: La longitud total de la cabecera es expresada como el número de grupos de 32 bits que hay en la cabecera. El valor mínimo es 5, indicando que solo hay 20 Bytes sin opciones adicionales. El valor máximo que puede representar con 4 bits es 15, indicando que hay un total de 60 Bytes.
+    \item \textbf{DSCP}: Código de servicio diferenciado. En la especificación original RFC791 \cite{rfc791}, se indica que este campo permite indicar preferencias de como tratar el paquete (menor latencia, mayor fiabilidad). Sin embargo, en RFC 2474 \cite{rfc2474}, se modificó para que indicase un identificador de servicios diferenciados.
+    \item \textbf{ECN}: Indicador para notificar a los hosts la existencia de congestión definido en RFC 3168 \cite{rfc3168}
+    \item \textbf{Longitud total}: Longitud total del datagrama, incluyendo la cabecera IP. El tamaño mínimo es 20 Bytes (el tamaño de la cabecera) y el máximo, el valor máximo representable con 16 bits (65635). En caso de que la longitud sea mayor que la que admita la capa inferior, se fragmentará el datagrama.
+    \item \textbf{Identificador}: Identificador del paquete. Es utilizado para reconstruir datagramas fragmentados.
+    \item \textbf{Flgs}: Indicadores para controlar la fragmentación de paquetes. El primero se encuentra sin uso y está reservado, el segundo es un indicador de que el paquete no ha de ser fragmentado (DF) y el tercero indica que hay más fragmentos después del actual (MF).
+    \item \textbf{Offset del fragmento}: Indica el número de grupos de 8 bytes de offset después del inicio de los datos del fragmento. Por ejemplo, si fragmentamos por la mitad un campo de datos de 16 Bytes en dos datagramas, el primero tendrá un 0 y el segundo un 1 en este campo.
+    \item \textbf{TTL}: El número de saltos máximo permitido que el paquete puede atravesar, aunque originalmente indicaba segundos. Esto es utilizado para evitar que haya paquetes en un bucle en caso de que haya tablas de enrutamiento mal configuradas.
+    \item \textbf{Protocolo}: El identificador del protocolo de la siguiente capa. Por ejemplo, TCP es 6 y UDP es 17 \cite{ipprotocolnumbers}.
+    \item \textbf{Checksum}: Código de verificación para detectar errores en la cabecera del datagrama.
+    \item \textbf{Dirección origen}: Dirección del host que ha enviado el datagrama.
+    \item \textbf{Dirección destino}: Dirección del host que ha recibido el datagrama.
+    \item \textbf{Opciones}: Campo opcional para añadir cabeceras adicionales de opciones.
+\end{enumerate}
+
+\subsubsection{IP versión 6}
 
 por hacer
 
