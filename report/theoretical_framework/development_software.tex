@@ -6,7 +6,11 @@ En esta sección resumiremos los diferentes elementos software que serán utiliz
 
 \subsubsection{Rust}
 
-por hacer
+Rust es un lenguaje de programación compilado de propósito general y multiparadigma \cite{blandy2017programming} \cite{klabnik2018rust}. Este trata de garantizar que todas las referencias a memoria sean válidas e impedir condiciones de carrera sin tener necesidad de un 'recolector de basura' como Java o Python. Esto lo hace a través de, en el momento de compilación, comprobar que los usos de memoria sean correctos. 
+
+Debido a que garantizar con exactitud si un programa hace uso de la memoria de forma correcta es un reto, el compilador toma una posición más conservadora. En caso de que el programador tenga más información y sepa que un uso de memoria que el compilador rechaza es correcto, existen métodos para hacer que el compilador lo acepte. Ejemplos son el uso de \texttt{unwrap()} para acceder a valores opcionales, el cual, si no contiene el valor esperado, interrumpe el programa en vez de corromper la memoria, o bloques \texttt{unsafe}, donde el programador ha de manualmente comprobar que no se está accediendo a memoria inválida.
+
+Se ha escogido este lenguaje para el desarrollo de la herramienta debido a la capacidad de escribir código de bajo nivel, su alto rendimiento, su énfasis en el código correcto, la calidad de las herramientas asociadas y el gran número de librerías disponibles. 
 
 \subsubsection{Bash}
 
@@ -15,7 +19,6 @@ por hacer
 \subsubsection{Python}
 
 por hacer
-
 
 \subsection{Programas}
 
