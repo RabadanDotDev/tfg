@@ -242,7 +242,37 @@ Cabe notar que no hay un 'checksum' como en IPv4, ya que las capas de enlace y l
 
 \subsection{UDP}
 
-por hacer
+UDP es un protocolo minimalista para permitir enviar mensajes entre permitir enviar mensajes entre programas sobre IP \cite{rfc768}. Ofrece características adicionales sobre IP reducidas: diferenciación de puertos y detección de errores en los datos. Como podemos ver en la Figura \ref{fig:udp_packet} tenemos un puerto de origen y uno de destino, la longitud del mensaje incluyendo la cabecera y un campo de checksum. Este se calcula con el mensaje como tal y se le añade una pseudocabecera como en la Figura \ref{fig:udp_packet_pseudoheader}
+
+\begin{figure}[h]
+    \minipage{0.5\textwidth}
+        \begin{center}
+            \begin{bytefield}[bitwidth=0.5em]{32}
+                \bitheader{0,8,16} \\
+                \bitbox{16}{Puerto de origen} 
+                \bitbox{16}{Puerto de destino} \\ 
+                \bitbox{16}{Longitud} 
+                \bitbox{16}{Checksum} \\
+            \end{bytefield}
+        \end{center}
+        \caption{Formato paquete UDP}
+        \label{fig:udp_packet}
+    \endminipage\hfill
+    \minipage{0.5\textwidth}
+        \begin{center}
+            \begin{bytefield}[bitwidth=0.5em]{32}
+                \bitheader{0,8,16} \\
+                \bitbox{32}{Dirección origen} \\
+                \bitbox{32}{Dirección destino} \\ 
+                \bitbox{8}{Zero} 
+                \bitbox{8}{Proto} 
+                \bitbox{16}{Longitud UDP} \\
+            \end{bytefield}
+        \end{center}
+        \caption{Pseudocabecera checksum}
+        \label{fig:udp_packet_pseudoheader}
+    \endminipage\hfill
+\end{figure}
 
 \subsection{TCP}
 
