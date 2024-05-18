@@ -1,6 +1,6 @@
 \section{Software para el desarrollo}
 
-En esta sección resumiremos los diferentes elementos software que serán utilizados para el desarrollo del trabajo. Concretamente, se indicarán los lenguajes de programación utilizados y los programas, además de la razón de su uso.
+En esta sección resumiremos los diferentes elementos software que serán utilizados para el desarrollo del trabajo y no sean mencionados en otros puntos. Concretamente, se indicarán los lenguajes de programación utilizados y los programas excepto Tshark, además de la razón de su uso.
 
 \subsection{Lenguajes de programación}
 
@@ -36,7 +36,9 @@ Se utilizará este programa para realizar el control de versiones de todo el pro
 
 \subsubsection{Docker}
 
-por hacer
+Docker es la de facto plataforma para gestionar contenedores, la cual facilita el desarrollo y el despliegue de aplicaciones de forma fácil y consistente \cite{dockerruntime}. El concepto de contenedores no es específico de Docker, sino algo más general. Según su web, un contenedor es una unidad estándar de software que empaqueta código y todas sus dependencias para que una aplicación determinada se inicie rápidamente y fiablemente en diferentes entornos \cite{dockerwhatsacontainer}. De esta manera, el entorno donde se ejecuta la aplicación es consistente y se eliminan los problemas derivados de tener instaladas librerías incompatibles. Adicionalmente, las aplicaciones se encuentran aisladas, ofreciendo una capa adicional de seguridad.
+
+Debido a que es posible que se utilicen diferentes máquinas durante el desarrollo del trabajo, y para asegurar que el entorno es reproducible, se hará uso del sistema de contenedores ofrecido por Docker. Se utilizará este, ya que es uno de los más populares y de la experiencia utilizando este en proyectos anteriores.
 
 \subsubsection{Visual Studio Code}
 
