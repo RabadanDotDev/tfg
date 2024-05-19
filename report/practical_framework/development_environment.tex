@@ -1,3 +1,20 @@
-\section{Entorno de desarollo}
+\section{Entorno de desarrollo}
 
-Por hacer
+El entorno de desarrollo utilizado para el desarrollo del trabajo consiste en diversas partes. Tenemos el editor, una configuración de este para desarrollar bajo un contenedor y parámetros adicionales para instalar todas las dependencias necesarias.
+
+Primero de todo, se ha hecho uso de Visual Studio Code como editor general para las diferentes partes del proyecto, como se ha indicado en el marco teórico. Adicionalmente, se ha utilizado una extensión llamada 'dev containers', la cual permite integrar el editor con un contenedor de docker \cite{devcontainers}. Esto nos permite adicionalmente conectarnos remotamente desde otros dispositivos y acceder al último estado del proyecto. Para configurarlo, se ha definido un archivo \texttt{devcontainer.json}, el cual nos permite indicar qué capas y configuración queremos que se genere en nuestro entorno. Esta configuración consiste en:
+
+\begin{enumerate}
+    \item Indicar la distribución Debian como imagen base
+    \item La característica 'latex', la cual nos añade la extensión 'LaTeX Workshop' en el editor, además del compilador LaTeX para compilar la memoria. Adicionalmente, permite indicar la lista de librerías que se han de instalar.
+    \item La característica 'Python', la cual nos instala tanto el interpretador Python como extensiones para tener autocompletado y capacidad de depurar el código.
+    \item La característica 'apt-packages', la cual nos permite indicar paquetes a instalar de forma declarativa. Hemos indicado 'tshark' y 'libpcap-dev', ya que son los que se han utilizado para realizar el análisis de las trazas de red y capturar paquetes, respectivamente.
+    \item La característica 'rust', la cual nos instala el compilador y el gestor de paquetes del lenguaje Rust además de extensiones para tener autocompletado, depuración, instalación de paquetes automática, entre otros.
+    \item Un script para instalar dependencias adicionales. Estas consisten en tipos de letras utilizadas en la memoria y un entorno virtual de Python con los paquetes relevantes. 
+    \item Dos directrices para incluir carpetas del host dentro del contenedor. Estos consisten en la carpeta de los datasets descargados (montada en /Datasets) y las credenciales SSH para firmar y subir cambios realizados en el sistema de control de versiones.
+\end{enumerate}
+
+Dentro del contenedor, los archivos se han estructurado de forma que tenemos una carpeta para el código fuente de la herramienta, una carpeta para la memoria y otra para todos los scripts de análisis y extracción de datos. Adicionalmente, hay carpetas y archivos de configuración para el editor, contenedor, dependencias Python y control de versiones.
+
+Finalmente, todos los archivos relevantes están bajo el control de versiones git. Para prevenir la posibilidad de perder los datos si el dispositivo en el que se encuentran guardados dejará de funcionar, se ha configurado un repositorio en GitHub para mantener una copia. Este se encuentra en \url{https://github.com/RabadanDotDev/tfg} y será hecho público una vez se haya realizado el depósito del trabajo.
+
