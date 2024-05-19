@@ -4,11 +4,11 @@
 
 	"features": {
 		"ghcr.io/prulloac/devcontainer-features/latex:1.2.0": {
-			"packages": "listings,appendix,bytefield,fontspec,xcolor,babel-spanish,babel-catalan,xkeyval,imakeidx,tocloft,etoolbox,glossaries,glossaries-spanish,hyphen-spanish,titlesec,blindtext,caption,float"
+			"packages": "pgf-umlcd,listings,appendix,bytefield,fontspec,xcolor,babel-spanish,babel-catalan,xkeyval,imakeidx,tocloft,etoolbox,glossaries,glossaries-spanish,hyphen-spanish,titlesec,blindtext,caption,float"
 		},
 		"ghcr.io/devcontainers/features/python:1": {},
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-			"packages": "tshark,libpcap-dev"
+			"packages": "tshark,libpcap-dev,plantuml,graphviz"
 		},
 		"ghcr.io/devcontainers/features/rust:1": {}
 	},

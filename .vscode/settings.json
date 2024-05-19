@@ -5,6 +5,7 @@
         {
             "name": "latexmk (lualatex)",
             "tools": [
+                "plantuml",
                 "lualatexmk",
                 "bibtex",
             ]
@@ -12,6 +13,7 @@
         {
             "name": "lualatexmk -> bibtex -> lualatexmk * 2",
             "tools": [
+                "plantuml",
                 "lualatexmk",
                 "bibtex",
                 "lualatexmk",
@@ -19,5 +21,37 @@
             ]
         },
     ],
-    "python.terminal.activateEnvInCurrentTerminal": true
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "latex-workshop.latex.tools": [
+        {
+            "name": "lualatexmk",
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-lualatex",
+                "-outdir=%OUTDIR%",
+                "%DOC%"
+            ],
+            "env": {}
+        },
+        {
+            "name": "bibtex",
+            "command": "bibtex",
+            "args": [
+                "%DOCFILE%"
+            ],
+            "env": {}
+        },
+        {
+            "name": "plantuml",
+            "command": "plantuml",
+            "args": [
+                "/workspaces/tfg/report/plant_uml_diagrams/*.plantuml",
+                "-tlatex:nopreamble"
+            ],
+            "env": {}
+        },
+    ]
 }
