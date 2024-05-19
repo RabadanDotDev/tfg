@@ -35,7 +35,7 @@ Adicionalmente, se han generado ataques DDoS basados en reflejos (usar un sistem
 
 \subsubsection{Contenidos csvs}
 
-El conjunto de datos procesados utilizando CICFlowMeter y etiquetado está compuesto por una lista de archivos por cada uno de los dos días en los que se generaron datos, el 3 de noviembre de 2018 y el 1 de diciembre de 2018. Las características ofrecidas son las mismas que las mencionadas en la herramienta CICFlowMeter. En todas las filas existen valores con excepción de algunas en la columna "Flow Bytes/s". Los scripts utilizados para la extracción y representación de los datos son \texttt{extract\_info\_cicddos\_2019.py} y \texttt{plot\_info\_cicddos\_2019.py} disponibles en TODO DEFINIR.
+El conjunto de datos procesados utilizando CICFlowMeter y etiquetado está compuesto por una lista de archivos por cada uno de los dos días en los que se generaron datos, el 3 de noviembre de 2018 y el 1 de diciembre de 2018. Las características ofrecidas son las mismas que las mencionadas en la herramienta CICFlowMeter. En todas las filas existen valores con excepción de algunas en la columna "Flow Bytes/s". Los scripts utilizados para la extracción y representación de los datos son \texttt{extract\_info\_cicddos\_2019\_csvs.py} y \texttt{plot\_info\_cicddos\_2019\_csvs.py} disponibles en el anexo 1.
 
 Si miramos las líneas temporales que muestran cada archivo con las etiquetas ataques contenidas en las figuras \ref{fig:cicddos_2019_csv_03-11_timeline} y \ref{fig:cicddos_2019_csv_01-12_timeline}, podemos  que hay un solapamiento entre WebDDoS y UDP-Lag. Además, podemos ver cómo hay bastantes ataques que no están contenidos solo en su archivo respectivo, sino que se vierten parcialmente en los adyacentes. Esto es más claro en las figuras \ref{fig:cicddos_2019_csv_03-11_file_results} y \ref{fig:cicddos_2019_csv_01-12_file_results}. Por ejemplo, en \texttt{UDPLag.csv} del primer día, podemos ver que hay ataques Syn, UDP y UDPLag. Para el primer día, las categorías adicionales provienen de otros archivos. Para el segundo, la categoría adicional en UDPLag.csv no tiene ningún archivo específico y su magnitud es de las más bajas. Cabe notar que el tráfico benigno se encuentra infrarepresentado, cosa que es posible que no se corresponda con un entorno real, donde el tráfico sea normalmente benigno y los ataques sean relativamente raros e inesperados.
 
@@ -68,18 +68,9 @@ Si miramos las líneas temporales que muestran cada archivo con las etiquetas at
     \endminipage\hfill
 \end{figure}
 
-
-%\begin{figure}[!htb]
-%    \minipage{1\textwidth}
-%      \includegraphics[width=\linewidth]{media/cicddos_2019_csv_day_results.png}
-%      \captionsetup{justification=centering}
-%      \caption{Número de flujos por archivo de las trazas de noviembre 3}\label{fig:cicddos_2019_csv_day_results}
-%    \endminipage
-%\end{figure}
-
 \subsubsection{Contenidos pcaps}
 
-El dataset CIC-DDos2019 ofrece un conjunto de trazas de red de los dos días en los que se generaron datos. Para el primer día (3 de noviembre), hay 145 archivos de unos 190.7 MiB cada uno y un último de 66.5 MiB. Para el segundo día (1 de diciembre), se ofrecen 818 archivos de 190.7 MiB cada uno y uno adicional de 3.7 MiB. En ambos casos, si intentamos abrir el último paquete con Wireshark o generamos cualquier análisis a través de tshark, se nos notifica que el paquete se encuentra 'cortado'. Esto es quizá causado porque, en el momento de generar las trazas, se cortó el proceso de captura precipitadamente. Los scripts utilizados para la extracción de datos es \texttt{extract\_info\_cicddos\_2019\_pcaps\_tshark.sh} y el utilizado para la representacion de estos es \texttt{evaluate\_info\_cicddos\_2019\_pcaps\_tshark.py} disponibles en TODO DEFINIR.
+El dataset CIC-DDos2019 ofrece un conjunto de trazas de red de los dos días en los que se generaron datos. Para el primer día (3 de noviembre), hay 145 archivos de unos 190.7 MiB cada uno y un último de 66.5 MiB. Para el segundo día (1 de diciembre), se ofrecen 818 archivos de 190.7 MiB cada uno y uno adicional de 3.7 MiB. En ambos casos, si intentamos abrir el último paquete con Wireshark o generamos cualquier análisis a través de tshark, se nos notifica que el paquete se encuentra 'cortado'. Esto es quizá causado porque, en el momento de generar las trazas, se cortó el proceso de captura precipitadamente. Los scripts utilizados para la extracción de datos es \texttt{extract\_info\_cicddos\_2019\_pcaps\_tshark.sh} y el utilizado para la representacion de estos es \texttt{evaluate\_info\_cicddos\_2019\_pcaps\_tshark.py} disponibles en el anexo 1.
 
 En los pcap, aparecen más direcciones IP en la red del testbed (192.\-168.\-50.\-0/24) de las mencionadas en la información ofrecida en la web del dataset. Concretamente, tenemos que en el primer día aparecen adicionalmente 192.\-168.\-50.\-4, 192.\-168.\-50.\-9 192.\-168.\-50.\-253 y 192.\-168.\-50.\-254. En el segundo día, tenemos que aparecen 192.\-168.\-50.\-253 y 192.\-168.\-50.\-254 además del posible router con IP 192.\-168.\-50.\-1. Adicionalmente, en ambos casos aparece la IP de broadcast (192.\-168.\-50.\-255). Respecto al número de direcciones IP únicas, podemos ver que en el primer día aparecen 1321 y en el segundo 640, teniendo en total 1723 únicas en el transcurso de los dos días. 
 

@@ -23,6 +23,7 @@
 \usepackage{float}
 \usepackage{bytefield}
 \usepackage{listings}
+\usepackage{bibentry}
 \lstset{
   basicstyle=\ttfamily\footnotesize,
   columns=fullflexible,
@@ -70,9 +71,6 @@
 
 \renewcommand{\baselinestretch}{1.5} 
 
-\bibliographystyle{plain}
-\addto\captionsspanish{\renewcommand{\bibname}{BIBLIOGRAFÍA}}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Table of contents style                                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,97 +114,83 @@
 \renewcommand{\cftsubsubsecaftersnum}{. \space}%
 \renewcommand{\cftsubsubsecleader}{\hfill}%
 
-% List of figures title
-\setlength{\cftbeforeloftitleskip}{0ex}%
-\setlength{\cftafterloftitleskip}{0ex}%
-\renewcommand{\cftloftitlefont}{\hfill\textbf}%
-\renewcommand{\cftafterloftitle}{\hfill}%
-\addto\captionsspanish{\renewcommand{\listfigurename}{ÍNDICE DE FIGURAS}}
-
-% List of figures point
-\renewcommand{\cftfigleader}{\hfill}%
-\setlength{\cftfignumwidth}{5em}
-\renewcommand{\cftfigpresnum}{Figura~}
-\renewcommand{\cftfigaftersnum}{.}
-
-% List of tables title
-\setlength{\cftbeforelottitleskip}{0ex}%
-\setlength{\cftafterlottitleskip}{0ex}%
-\renewcommand{\cftlottitlefont}{\hfill\textbf}%
-\renewcommand{\cftafterlottitle}{\hfill}%
-\addto\captionsspanish{\renewcommand{\listtablename}{ÍNDICE DE TABLAS}}
-
-% List of tables point
-\renewcommand{\cfttableader}{\hfill}%
-\setlength{\cfttabnumwidth}{5em}
-\renewcommand{\cfttabpresnum}{Tabla~}
-\renewcommand{\cfttabaftersnum}{.}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Glossary                                                                    %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Import
-\usepackage[acronym,automake,section=subsubsection]{glossaries}
-
-% Generation
-\makeglossaries
-
-% Contents
-\newglossaryentry{matrix}% the label
-{name={matrix},% the term
- description={a rectangular table of elements},% brief description
- plural={matrices}% the plural
-}
-
-\newglossaryentry{userdatagramprotocol}% the label
-{name={User Datagram Protocol},% the term
- description={Protocolo de red de la capa de transportes orientado a mensajes.},% brief description
-}
-
-\newacronym{ml}{ML}{Machine learning}
-\newacronym{udp}{UDP}{User Datagram Protocol}
-
-% Style
-
-\addto\captionsspanish{\renewcommand{\glossaryname}{TÉRMINOS}}
-\addto\captionsspanish{\renewcommand{\acronymname}{ACRÓNIMOS}}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Document                                                                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 
-% Front pages
+% Make default compilation not complain about missing bib
+\nocite{*}
+\bibliographystyle{unsrt}
+\nobibliography{refsapp1}
+
 \selectlanguage{spanish}
-\include{front_pages/front_pages}
 
-% Abatracts
-\selectlanguage{spanish}
-\include{abstract/abstract_es}
-\selectlanguage{catalan}
-\include{abstract/abstract_ca}
-\selectlanguage{english}
-\include{abstract/abstract_en}
+% Front page
+\begin{titlepage}
+    \begin{center}
+        \includegraphics{media/epsevg_logo.jpeg}
 
-% Indices
-\selectlanguage{spanish}
-\include{index_pages/index_pages}
+        \vspace{1.5cm}
+        {\Huge\textbf{TRABAJO FINAL DE GRADO}}
 
-% Contents
-\include{introduction/introduction}
-\include{theoretical_framework/theoretical_framework}
+        \vfill
+        {\Large\textbf{ANEXO 1: CODIGO FUENTE SCRIPTS}}
 
-\color{black} %TODO remove this when revised
+        \vfill
+        \textbf{TÍTULO} \\  	Desarrollo de una herramienta de análisis de tráfico de red y su uso en algoritmos de ML para la detección de ataques.
+        \\[\baselineskip]
+        \textbf{AUTOR:} \\ Rabadan Arroyo, Raul 
+        \\[\baselineskip]
+        \textbf{FECHA DE PRESENTACIÓN:} \\ Junio, 2024
+        \vfill
 
-\include{conclusions/conclusions}
-\include{acknowledgements/acknowledgements}
+    \end{center}
+\end{titlepage}
 
-% Bibliography
-\input{bibliography/bibliography}
+% Index
+\tableofcontents
+\newpage
 
-% Appendix
-\input{appendix/appendix\_tfg\_add\_titles.tex}
+\chapter{Análisis inicial CIC-DDos2019}
+\section{extract\_info\_cicddos\_2019\_csvs.py}
+\lstinputlisting[language=Python]{../scripts/extract_info_cicddos_2019_csvs.py}
+
+\section{plot\_info\_cicddos\_2019\_csvs.py}
+\lstinputlisting[language=Python]{../scripts/plot_info_cicddos_2019_csvs.py}
+
+\section{extract\_info\_cicddos\_2019\_pcap\_tshark.sh}
+\lstinputlisting[language=Bash]{../scripts/extract_info_cicddos_2019_pcaps_tshark.sh}
+
+\section{evaluate\_info\_cicddos\_2019\_pcaps\_tshark.py}
+\lstinputlisting[language=Python]{../scripts/evaluate_info_cicddos_2019_pcaps_tshark.py}
+
+\chapter{Análisis inicial BoT-IoT}
+\section{extract\_info\_botiot\_csvs\_full\_dataset.py}
+\lstinputlisting[language=Python]{../scripts/extract_info_botiot_csvs_fulldataset.py}
+
+\section{plot\_info\_botiot\_csvs.py}
+\lstinputlisting[language=Python]{../scripts/plot_info_botiot_csvs.py}
+
+\section{extract\_info\_botiot\_pcap\_tshark.sh}
+\lstinputlisting[language=Bash]{../scripts/extract_info_botiot_pcaps_tshark.sh}
+
+\section{evaluate\_info\_botiot\_pcaps\_tshark.py}
+\lstinputlisting[language=Python]{../scripts/evaluate_info_botiot_pcaps_tshark.py}
+
+\chapter{Análisis inicial TON-IoT}
+\section{extract\_info\_toniot\_csvs.py}
+\lstinputlisting[language=Python]{../scripts/extract_info_toniot_csvs.py}
+
+\section{plot\_info\_toniot\_csvs.py}
+\lstinputlisting[language=Python]{../scripts/plot_info_botiot_csvs.py}
+
+\section{extract\_info\_toniot\_pcap\_tshark.sh}
+\lstinputlisting[language=Bash]{../scripts/extract_info_toniot_pcaps_tshark.sh}
+
+\section{evaluate\_info\_toniot\_pcaps\_tshark.py}
+\lstinputlisting[language=Python]{../scripts/evaluate_info_toniot_pcaps_tshark.py}
+
 
 \end{document}
