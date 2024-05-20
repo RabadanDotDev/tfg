@@ -51,8 +51,9 @@
 ## Result files
 **.pdf
 
-# Generated tex files from plantuml
-report/plant_uml_diagrams/*.latex
+# Generated png and tex files from plantuml
+report/plant_uml_diagrams/*.tex
+report/plant_uml_diagrams/*.png
 
 # venv
 venv/

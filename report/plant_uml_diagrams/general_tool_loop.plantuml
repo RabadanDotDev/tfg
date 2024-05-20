@@ -1,0 +1,40 @@
+@startuml
+
+start
+while (packet available?)
+  if (fragmented IPv4 packet?) then (yes)
+
+    if (related network flow exists?) then (no)
+      :update network flow;
+    else (no)
+      :create network flow;
+    endif
+    
+    :try reassemble IPv4 packet;
+  else (no)
+  endif
+
+  if (valid and supported packet?) then (yes)
+    if (related network flow exists?) then (yes)
+      :update transport flow;
+    else (no)
+      :create transport flow;
+    endif
+  else (no)
+  endif
+
+  while (old network flows available?)
+    :close oldest network flow;
+  endwhile
+
+  while (old transport flows available?)
+    :close oldest transport flow;
+  endwhile
+endwhile
+
+while (transport flow available?)
+  :close last transport flow;
+endwhile
+
+stop
+@enduml

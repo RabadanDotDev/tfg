@@ -8,7 +8,7 @@
 		},
 		"ghcr.io/devcontainers/features/python:1": {},
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-			"packages": "tshark,libpcap-dev,plantuml,graphviz"
+			"packages": "openjdk-17-jre,tshark,libpcap-dev,graphviz"
 		},
 		"ghcr.io/devcontainers/features/rust:1": {}
 	},
@@ -21,6 +21,7 @@
 
 	"mounts": [
 		"source=${localEnv:HOME}/Datasets,target=/Datasets,type=bind,consistency=cached",
-		"source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,readonly,type=bind"
+		"source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,readonly,type=bind",
+		"source=${localEnv:HOME}${localEnv:USERPROFILE}/.gitconfig,target=/home/vscode/.gitconfig,readonly,type=bind"
 	]
 }

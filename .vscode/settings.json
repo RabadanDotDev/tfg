@@ -46,8 +46,11 @@
         },
         {
             "name": "plantuml",
-            "command": "plantuml",
+            "command": "/usr/bin/java",
             "args": [
+                "-Djava.awt.headless=true",
+                "-jar",
+                "/opt/plantuml.jar",
                 "/workspaces/tfg/report/plant_uml_diagrams/*.plantuml",
                 "-tlatex:nopreamble"
             ],
