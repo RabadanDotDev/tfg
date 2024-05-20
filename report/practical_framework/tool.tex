@@ -48,7 +48,16 @@ Para el caso de la lectura de paquetes en tiempo real, podemos hacer uso relativ
 
 \subsubsection{Lectura de trazas de paquetes}
 
-Por hacer
+El caso de la lectura de trazas es más complicado. Debido a que se quiere admitir el poder leer de uno o varios archivos, es necesario hacer una mayor gestión adicional a la que nos proporciona la librería. Para esto, se han definido tres estructuras internas:
+\begin{enumerate}
+  \item \textbf{OwnedPacket}: Un paquete el cual 'posee' la memoria a la que hace referencia. A diferencia del que nos proporciona la librería pcap, no hace referencia a una sección de memoria que puede formar o no parte de otra mayor, permitiéndonos garantizar que las referencias a memoria son válidas.
+  \item \textbf{FileCapture}: Una envoltura de una 'Capture' de la librería pcap con su ruta de origen y el siguiente paquete que se debe tratar extraído. Esto se hace para poder ordenar las diferentes 'FileCapture' según el tiempo de captura del paquete.
+  \item \textbf{FileCaptureCollection}: Un conjunto de 'FileCapture'. Está estructurado en dos campos: un 'HashMap' de la librería estándar y en una cola de prioridad \cite{priority-queue}. El primero es utilizado para poder acceder en tiempo constante a cualquier 'FileCapture' a partir de su ruta y el segundo para tener una lista ordenada de más a menos antiguo del siguiente paquete a analizar. Esto es necesario debido a que hay algunos conjuntos de datos contienen archivos que se solapan en el tiempo.
+\end{enumerate}
+
+(explicar el proceso de creación)
+
+(explicar el proceso de obtención del siguiente paquete)
 
 \subsection{Extensión de libreria de código abierto para la decodificación de paquetes}
 
