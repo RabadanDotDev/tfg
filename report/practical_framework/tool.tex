@@ -30,11 +30,23 @@ Respecto a las señales, se hace uso de la librería ctrlc \cite{controlc}. Esta
 
 El código que se encarga de tratar estos puntos, se puede encontrar en \texttt{main.rs} en el anexo 2 o en el repositorio de GitHub.
 
-\subsection{Lectura de paquetes en tiempo real}
+\subsection{Lectura de paquetes}
 
-Por hacer
+\subsubsection{Librerias}
 
-\subsection{Lectura de trazas de paquetes}
+Para realizar la lectura de paquetes, tanto en tiempo real como a partir de archivos, se ha escogido hacer uso de la librería de rust 'pcap' \cite{rustpcap}, la cual a su vez hace uso internamente de otra llamada 'libpcap' la cual es desarrollada por el grupo tcpdump \cite{libpcap}. Dependiendo de si queremos leer paquetes desde un archivo o desde una interfaz de red, tendremos que utilizar una función de la API pública u otra para generar una instancia 'Capture'. 
+
+\subsubsection{Detalles de implementación comunes}
+
+A pesar de que la librería ofrece casi todas las funcionalidades que se requieren, no ofrece soporte para leer desde una lista de archivos, sino que hemos de leer de cada uno individualmente. Debido a esto, se ha creado la envoltura 'PacketCapture' disponible en \texttt{packet\_capture.rs} en el anexo 2 o en el repositorio de GitHub. En esta, se permite crear una instancia a partir de una ruta, que puede ser un archivo, un directorio o una interfaz de red. Adicionalmente, permite al usuario del módulo hacer una petición para procesar el siguiente paquete. Esto se hace a través de pasar una clausura que acepta un 'PacketOrigin' (ruta del archivo o nombre, interfaz), un 'LinkType' (el tipo de la capa de enlace \cite{linktypetcpdump}) y una referencia al paquete a tratar. La función de procesamiento extrae el siguiente paquete y llama a la clausura, devolviendo un valor afirmativo si se ha podido extraer un paquete o un valor negativo en caso de contrario.
+
+Se hace uso de una clausura en vez de devolver una referencia al paquete debido a que el compilador no lo permitía. Después de investigar, esto era causado por el hecho que la librería pcap, dentro de la instancia 'Capture', tenía una referencia a un trozo de memoria. Al seguir manteniendo una referencia a la captura después de ejecutar la función, esto causaba que el compilador no pudiese garantizar que esta referencia fuese válida. En cambio, al pasar una clausura se puede asegurar a que se haga un uso correcto de la memoria al poder indicarlo en el prototipo de la función proporcionada por el usuario del módulo.
+
+\subsubsection{Lectura de paquetes en tiempo real}
+
+Para el caso de la lectura de paquetes en tiempo real, podemos hacer uso relativamente directo de la librería. En el momento de crear 'PacketCapture' creamos la instancia 'Capture' basada en una interficie de red. Cuando queremos procesar el siguiente paquete, pasamos la petición directamente a 'Capture' y a continuación ejecutamos la clausura. Si no hay errores, devolvemos un valor verdadero, indicando que hay potencialmente más paquetes válidos. En caso contrario, indicamos un valor negativo, indicando que probablemente no se puedan capturar más paquetes.
+
+\subsubsection{Lectura de trazas de paquetes}
 
 Por hacer
 
