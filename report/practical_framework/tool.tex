@@ -55,9 +55,9 @@ El caso de la lectura de trazas es más complicado. Debido a que se quiere admit
   \item \textbf{FileCaptureCollection}: Un conjunto de 'FileCapture'. Está estructurado en dos campos: un 'HashMap' de la librería estándar y en una cola de prioridad \cite{priority-queue}. El primero es utilizado para poder acceder en tiempo constante a cualquier 'FileCapture' a partir de su ruta y el segundo para tener una lista ordenada de más a menos antiguo del siguiente paquete a analizar. Esto es necesario debido a que hay algunos conjuntos de datos contienen archivos que se solapan en el tiempo.
 \end{enumerate}
 
-(explicar el proceso de creación)
+Para generar la instancia a partir de la ruta, navegamos por todos los archivos y directorios de esta haciendo uso de walkdir \cite{walkdir}. Por cada archivo, intentamos abrirlo como captura pcap y, en caso de no ser posible, lo saltamos. Una vez abierto, extraemos el primer paquete de la captura y creamos un 'FileCapture' con las tres partes necesarias. Finalmente, creamos el 'HashMap' con todas las capturas abiertas y la cola de prioridad para poder acceder a las capturas de forma ordenada.
 
-(explicar el proceso de obtención del siguiente paquete)
+Para procesar el siguiente paquete, primero se obtiene la ruta de la captura con el siguiente paquete más antiguo. A continuación, se encuentra la instancia 'FileCapture' y llamamos a la clausura con esta. Una vez hecho esto, se trata de extraer el siguiente paquete de la traza de red. En caso de error, eliminamos la captura tanto de la cola como del 'HashMap'. En caso contrario, actualizamos el valor del siguiente paquete en 'FileCapture' y su posición en la cola.
 
 \subsection{Extensión de libreria de código abierto para la decodificación de paquetes}
 
