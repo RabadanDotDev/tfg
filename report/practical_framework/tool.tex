@@ -69,11 +69,17 @@ Para realizar esto, primero se creó un 'issue' en el repositorio original el 24
 
 Se hace uso de la librería \texttt{etherparse} en la mayor parte de \texttt{packet\_pincer}. El primer uso de este durante el flujo del programa es en la función \texttt{try\_parse\_packet} disponible en \texttt{packet\_parse.rs} en el anexo 2 o en el repositorio. En esta, a partir del tipo de capa de enlace indicado por \texttt{pcap} y la librería etherparse, obtenemos una instancia de \texttt{SlicedPacket}. En caso de datos Ethernet, utilizamos la función \texttt{etherparse::SlicedPacket::from\_ethernet} y en caso de tener datos en SLL, hacemos uso de {etherparse::SlicedPacket::from\_linux\_sll} añadida durante el desarrollo del proyecto. Después de la Decodificación inicial, se acceden a los diferentes campos disponibles durante la ejecución de la aplicación.
 
-\subsection{Defragmentación IPv4}
+\subsection{Desfragmentación IPv4} \label{ipv4defrag}
 
-Por hacer
+Los datasets utilizados contienen tramos donde hay una gran cantidad de paquetes IPv4 fragmentados. Es posible que estén relacionados con ataques y que, si ofrecemos soporte para la desfragmentación en la herramienta, las estadísticas generadas puedan ser más útiles para la detección de ataques. Para realizar esto, se ha definido una estructura llamada \texttt{NetworkFragmentFlow}, la cual acumula fragmentos IPv4 con información adicional para su posterior reensamblado. Adicionalmente, en el momento de hacer un reensamblado, aparte del paquete reconstruido, se emitirá una estructura \texttt{FragmentReasemblyInformation} con la información adicional acumulada. Los diferentes flujos activos serán agrupados en una instancia \texttt{FlowGrup}, donde adicionalmente tendremos flujos de transporte como veremos en \ref{flowseparation}.
 
-\subsection{Separación de flujos}
+
+
+(Explicar el flow group con sus funciones)
+
+(Explicar el network fragment flow con sus funciones)
+
+\subsection{Separación de flujos} \label{flowseparation}
 
 Por hacer
 
