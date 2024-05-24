@@ -1,8 +1,8 @@
-\section{Formatos y protocolos de red}
+\section{Formatos y protocolos de red} \label{netformats}
 
 En esta sección definiremos los diferentes protocolos y formatos de red que serán tenidos en cuenta. Concretamente, veremos el formato 'libpcap' en el que las trazas de red son guardadas, las capas de enlace de Ethernet y Linux Cooked Capture v1 (SLL), las capas de red IPv4 e IPv6 y las capas de transporte UDP y TCP.
 
-\subsection{libpcap}
+\subsection{libpcap} \label{libpcapformat}
 
 \subsubsection{Descripción}
 
@@ -60,7 +60,7 @@ El orden de los campos en la cabecera del fichero es como podemos ver en la Figu
     \label{fig:libpcap_file_packet_record}
 \end{figure}
 
-\subsection{Tramas ethernet}
+\subsection{Tramas ethernet} \label{etherformat}
 Ethernet es un conjunto de protocolos de transmisión de la información ubicados en la capa física y de enlace \cite{7428776}. La unidad mínima en la capa de enlace se llama 'trama' y tiene la estructura indicada en la Figura \ref{fig:ethernet_frame}. Tiene un par de direcciones MAC de origen y de destino de 6 octetos, un etiquetado de VLAN opcional de 4 octetos, un campo usado como longitud o tipo, una longitud variable de datos y un código de detección de errores al final de 4 octetos. 
 
 \begin{figure}[H]
@@ -86,7 +86,7 @@ Ethernet es un conjunto de protocolos de transmisión de la información ubicado
 
 Para decidir como interpretar el campo de longitud o tipo, se ha de determinar si el valor es igual o menor a 1500 (0x05DC) o igual o mayor a 1536 (0x0600). En el primer caso, el valor del campo indica la longitud y en el segundo caso se indica el tipo. Para obtener la información de longitud para el segundo caso, se puede hacer a partir de los delimitadores de la capa inferior. El significado de cada número de cada tipo se encuentra en un registro publicado por diversas fuentes como IANA \cite{etherprotocolnumbers}.
 
-\subsection{Linux Cooked Capture v1 (SLL)}
+\subsection{Linux Cooked Capture v1 (SLL)} \label{sllformat}
 
 'Linux Cooked Capture v1' es un pseudo-protocolo utilizado por libpcap para capturar de la interfaz 'any' (todas las interfaces de red al mismo tiempo) y en dispositivos donde las cabeceras de la capa de enlace no están disponibles \cite{sllwireshark}. Una indicación del formato de los paquetes lo podemos encontrar en la web de tcpdump \cite{slltcpdump} y es como podemos observar en la Figura \ref{fig:linux_cooked_capture_struct}.
 
@@ -142,11 +142,11 @@ El tipo de 'ARPHRD\_' proviene de \texttt{if\_arp.h} \cite{linuxifarp}. Este ind
 
 Los campos de la longitud de la dirección de capa de enlace y la dirección como tal corresponden a la del emisor original del paquete. En caso de que la longitud sea más pequeña que el espacio disponible, se añaden ceros de relleno. En caso de que sea más grande, la dirección es truncada a los primeros 8 octetos.
 
-\subsection{IP}
+\subsection{IP} \label{ipformat}
 
 El protocolo de Internet (IP) es una tecnología de conmutación de paquetes basada en 'datagramas' \cite{iptechslides}. No está orientado a la conexión (los datagramas son enviados sin establecer una conexión) y se hace una entrega de mejor esfuerzo (no se dan garantías de que los datos lleguen o como a su destino). Está ubicado en la capa de red, donde los puntos de destino se les llama 'hosts' y los datagramas se transmiten a través de intermediarios (routers), los cuales entre ellos se comunican con otro protocolo de una capa inferior. Existen actualmente dos versiones del protocolo, principalmente la versión 4 y la versión 6.
 
-\subsubsection{IP versión 4}
+\subsubsection{IP versión 4} \label{ipv4format}
 
 \begin{figure}[h]
     \begin{center}
@@ -198,7 +198,7 @@ La versión 4 del protocolo IP es la más utilizada en la actualidad \cite{ipv4u
     \item \textbf{Opciones}: Campo opcional para añadir cabeceras adicionales de opciones.
 \end{enumerate}
 
-\subsubsection{IP versión 6}
+\subsubsection{IP versión 6} \label{ipv6format}
 
 La versión 6 del protocolo IP es una versión diseñada para ser un sucesor a IPv4. Está focalizado en incrementar el espacio de direcciones y sus posibilidades, simplificar la cabecera, mejorar el soporte para extensiones y añadir capacidades como el etiquetado de flujos, autenticación y privacidad \cite{rfc8200}. Aparte de las direcciones de difusión, grupo y de host, se añade una de 'anycast', la cual permite enviar un paquete a cualquier nodo dentro de un grupo, pero no a todos. Podemos ver en la Figura \ref{fig:ipv6_packet} los diferentes campos que se definieron:
 
@@ -240,7 +240,7 @@ Cabe notar que no hay un 'checksum' como en IPv4, ya que las capas de enlace y l
     \label{fig:ipv6_packet}
 \end{figure}
 
-\subsection{UDP}
+\subsection{UDP} \label{udpformat}
 
 UDP es un protocolo minimalista para permitir enviar mensajes entre permitir enviar mensajes entre programas sobre IP \cite{rfc768}. Ofrece características adicionales sobre IP reducidas: diferenciación de puertos y detección de errores en los datos. Como podemos ver en la Figura \ref{fig:udp_packet} tenemos un puerto de origen y uno de destino, la longitud del mensaje incluyendo la cabecera y un campo de checksum. Este se calcula con el mensaje como tal y se le añade una pseudocabecera como en la Figura \ref{fig:udp_packet_pseudoheader}
 
@@ -274,7 +274,7 @@ UDP es un protocolo minimalista para permitir enviar mensajes entre permitir env
     \endminipage\hfill
 \end{figure}
 
-\subsection{TCP}
+\subsection{TCP} \label{tcpformat}
 
 \begin{figure}[h]
     \begin{center}

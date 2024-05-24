@@ -59,9 +59,15 @@ Para generar la instancia a partir de la ruta, navegamos por todos los archivos 
 
 Para procesar el siguiente paquete, primero se obtiene la ruta de la captura con el siguiente paquete más antiguo. A continuación, se encuentra la instancia 'FileCapture' y llamamos a la clausura con esta. Una vez hecho esto, se trata de extraer el siguiente paquete de la traza de red. En caso de error, eliminamos la captura tanto de la cola como del 'HashMap'. En caso contrario, actualizamos el valor del siguiente paquete en 'FileCapture' y su posición en la cola.
 
-\subsection{Extensión de libreria de código abierto para la decodificación de paquetes}
+\subsection{Decodificación de paquetes y extensión de librería de código abierto}
 
-Por hacer
+Los datos ofrecidos por la librería \texttt{pcap} consisten en información de cuando se capturó el paquete, cuál era la capa de enlace y los datos en crudo capturados. Es decir, nos interpreta exclusivamente la parte del formato 'libpcap' vista en \ref{libpcapformat}. Para interpretar el resto de capas indicadas en \ref{netformats}, haremos uso de la librería \texttt{etherparse} \cite{etherparse}.
+
+Después de un primer análisis, se observó que la librería soportaba interpretar tramas de Ethernet \ref{etherformat}, paquetes IP \ref{ipformat}, datagramas UDP \ref{udpformat} y segmentos TCP \ref{tcpformat}. Sin embargo, no ofrecía soporte para SLL \ref{sllformat}, el cual necesitábamos para el dataset TON-IoT. Debido a que la librería tenía soporte para la mayoría de puntos necesarios, además de ofrecer una interfaz sencilla, se decidió hacer una extensión de esta para añadirle soporte de SLL. 
+
+Para realizar esto, primero se creó un 'issue' en el repositorio original el 24 de abril de 2024 para indicar al desarrollador de la librería sobre la intención de hacer esta adición \cite{slladdsllissue}. No se recibió respuesta, pero se inició el trabajo para añadir el soporte. Durante los siguientes 5 días, se añadieron 4,145 líneas de código y se eliminaron 141. En estas, se incluye el formato SLL, el proceso para extraer los valores relevantes desde datos en crudo desde el formato SLL, tests y toda la documentación asociada. Se trató de mantener el estilo de la librería para asegurar que el desarrollador original aceptaría los cambios. Una vez finalizado, el 29 de abril se creó un 'pull request' para juntar los cambios \cite{slladdsllpr}. En esta instancia, el desarrollador contestó agradeciendo el trabajo realizado. Después de que lo revisara y arreglase algunos detalles de integración, el 2 de mayo juntó los cambios a la rama principal.
+
+Se hace uso de la librería \texttt{etherparse} en la mayor parte de \texttt{packet\_pincer}. El primer uso de este durante el flujo del programa es en la función \texttt{try\_parse\_packet} disponible en \texttt{packet\_parse.rs} en el anexo 2 o en el repositorio. En esta, a partir del tipo de capa de enlace indicado por \texttt{pcap} y la librería etherparse, obtenemos una instancia de \texttt{SlicedPacket}. En caso de datos Ethernet, utilizamos la función \texttt{etherparse::SlicedPacket::from\_ethernet} y en caso de tener datos en SLL, hacemos uso de {etherparse::SlicedPacket::from\_linux\_sll} añadida durante el desarrollo del proyecto. Después de la Decodificación inicial, se acceden a los diferentes campos disponibles durante la ejecución de la aplicación.
 
 \subsection{Defragmentación IPv4}
 
