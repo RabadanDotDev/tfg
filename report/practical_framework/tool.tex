@@ -61,9 +61,9 @@ Para procesar el siguiente paquete, primero se obtiene la ruta de la captura con
 
 \subsubsection{Obtención de paquetes}
 
-El uso de la envoltura \texttt{PacketCapture} se realiza desde \texttt{main.rs} disponible en el anexo 2 y en el repositorio. Una vez creada a partir de los argumentos proporcionados, se define una clausura para proporcionarlas a la función de procesamiento. Respecto a la petición de procesamiento del siguiente paquete, se hace uso de un bucle infinito que llama a la función respectiva en \texttt{PacketCapture}. Esto se realiza hasta que la función devuelve un valor falso o se reciba una señal de terminación.
+El uso de la envoltura \texttt{PacketCapture} se realiza desde \texttt{main.rs} disponible en el anexo 2 y en el repositorio. Una vez creada a partir de los argumentos proporcionados, se define una clausura para proporcionarlas a la función de procesamiento. A continuación se hace uso de un bucle infinito que llama a la función \texttt{try\_process\_next} en \texttt{PacketCapture}, pasando la clausura como argumento. Esto se realiza hasta que la función devuelve un valor falso o se reciba una señal de terminación. Dentro de la clausura, se acumula información en una instancia de \texttt{FlowGroup} (donde se decodifica el paquete y se acumula la información relevante del paquete), se actualizan las estadísticas de ejecución y se emiten estadísticas de flujos finalizados.
 
-\subsection{Decodificación de paquetes y extensión de librería de código abierto}
+\subsection{Decodificación de paquetes y extensión de librería de código abierto} \label{packetdecode}
 
 \subsubsection{Análisis librería}
 
