@@ -51,8 +51,10 @@
                 "-Djava.awt.headless=true",
                 "-jar",
                 "/opt/plantuml.jar",
+                "-charset",
+                "UTF-8",
                 "/workspaces/tfg/report/plant_uml_diagrams/*.plantuml",
-                "-tlatex:nopreamble"
+                "-tpng"
             ],
             "env": {}
         },

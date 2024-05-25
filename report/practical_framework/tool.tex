@@ -2,7 +2,7 @@
 
 En esta sección veremos el funcionamiento de cada parte de la herramienta, la cual se ha llamado 'packet pincer' por el momento. Veremos qué y cuáles argumentos de consola acepta, como realiza la lectura de paquetes tanto en tiempo real como por trazas. A continuación se explicarán los diferentes pasos que llevan a cabo en el momento al analizar un paquete y como se realiza la generación de estadísticas. Finalmente, veremos como se realiza el etiquetado automático de los flujos y se escriben emiten los resultados.
 
-El flujo principal de la aplicación se puede observar en la Figura \ref{fig:packetpincerexecution}. Como podemos ver, se van extrayendo paquetes mientras se encuentren disponibles. Cuando se obtiene uno, en caso de ser un paquete IPv4 fragmentado, se intenta reconstruir o se guarda en caso de no poder. A continuación, se comprueba si la herramienta soporta analizar el paquete indicado y, en caso afirmativo, acumula la información en el flujo de transporte respectivo. Finalmente, se 'cierran' los flujos antiguos, es decir, se emite la información relevante y a continuación se descarta el resto de información acumulada.
+Un esquema del flujo principal de la aplicación se puede observar en la Figura \ref{fig:packetpincerexecution}. Como podemos ver, se van extrayendo paquetes mientras se encuentren disponibles. Cuando se obtiene uno, en caso de ser un paquete IPv4 fragmentado, se intenta reconstruir o se guarda en caso de no poder. A continuación, se comprueba si la herramienta soporta analizar el paquete indicado y, en caso afirmativo, acumula la información en el flujo de transporte respectivo. Finalmente, se 'cierran' los flujos antiguos, es decir, se emite la información relevante y a continuación se descarta el resto de información acumulada.
 
 \begin{figure}[H]
   \begin{center}
@@ -59,21 +59,29 @@ Para generar la instancia a partir de la ruta, navegamos por todos los archivos 
 
 Para procesar el siguiente paquete, primero se obtiene la ruta de la captura con el siguiente paquete más antiguo. A continuación, se encuentra la instancia 'FileCapture' y llamamos a la clausura con esta. Una vez hecho esto, se trata de extraer el siguiente paquete de la traza de red. En caso de error, eliminamos la captura tanto de la cola como del 'HashMap'. En caso contrario, actualizamos el valor del siguiente paquete en 'FileCapture' y su posición en la cola.
 
+\subsubsection{Obtención de paquetes}
+
+El uso de la envoltura \texttt{PacketCapture} se realiza desde \texttt{main.rs} disponible en el anexo 2 y en el repositorio. Una vez creada a partir de los argumentos proporcionados, se define una clausura para proporcionarlas a la función de procesamiento. Respecto a la petición de procesamiento del siguiente paquete, se hace uso de un bucle infinito que llama a la función respectiva en \texttt{PacketCapture}. Esto se realiza hasta que la función devuelve un valor falso o se reciba una señal de terminación.
+
 \subsection{Decodificación de paquetes y extensión de librería de código abierto}
 
-Los datos ofrecidos por la librería \texttt{pcap} consisten en información de cuando se capturó el paquete, cuál era la capa de enlace y los datos en crudo capturados. Es decir, nos interpreta exclusivamente la parte del formato 'libpcap' vista en \ref{libpcapformat}. Para interpretar el resto de capas indicadas en \ref{netformats}, haremos uso de la librería \texttt{etherparse} \cite{etherparse}.
+\subsubsection{Análisis librería}
+
+Los datos ofrecidos por la librería \texttt{pcap} consisten en información de cuándo se capturó el paquete, cuál era la capa de enlace y los datos en crudo capturados. Es decir, nos interpreta exclusivamente la parte del formato 'libpcap' vista en \ref{libpcapformat}. Para interpretar el resto de capas indicadas en \ref{netformats}, haremos uso de la librería \texttt{etherparse} \cite{etherparse}.
 
 Después de un primer análisis, se observó que la librería soportaba interpretar tramas de Ethernet \ref{etherformat}, paquetes IP \ref{ipformat}, datagramas UDP \ref{udpformat} y segmentos TCP \ref{tcpformat}. Sin embargo, no ofrecía soporte para SLL \ref{sllformat}, el cual necesitábamos para el dataset TON-IoT. Debido a que la librería tenía soporte para la mayoría de puntos necesarios, además de ofrecer una interfaz sencilla, se decidió hacer una extensión de esta para añadirle soporte de SLL. 
 
+\subsubsection{Extensión librería}
+
 Para realizar esto, primero se creó un 'issue' en el repositorio original el 24 de abril de 2024 para indicar al desarrollador de la librería sobre la intención de hacer esta adición \cite{slladdsllissue}. No se recibió respuesta, pero se inició el trabajo para añadir el soporte. Durante los siguientes 5 días, se añadieron 4,145 líneas de código y se eliminaron 141. En estas, se incluye el formato SLL, el proceso para extraer los valores relevantes desde datos en crudo desde el formato SLL, tests y toda la documentación asociada. Se trató de mantener el estilo de la librería para asegurar que el desarrollador original aceptaría los cambios. Una vez finalizado, el 29 de abril se creó un 'pull request' para juntar los cambios \cite{slladdsllpr}. En esta instancia, el desarrollador contestó agradeciendo el trabajo realizado. Después de que lo revisara y arreglase algunos detalles de integración, el 2 de mayo juntó los cambios a la rama principal.
 
-Se hace uso de la librería \texttt{etherparse} en la mayor parte de \texttt{packet\_pincer}. El primer uso de este durante el flujo del programa es en la función \texttt{try\_parse\_packet} disponible en \texttt{packet\_parse.rs} en el anexo 2 o en el repositorio. En esta, a partir del tipo de capa de enlace indicado por \texttt{pcap} y la librería etherparse, obtenemos una instancia de \texttt{SlicedPacket}. En caso de datos Ethernet, utilizamos la función \texttt{etherparse::SlicedPacket::from\_ethernet} y en caso de tener datos en SLL, hacemos uso de {etherparse::SlicedPacket::from\_linux\_sll} añadida durante el desarrollo del proyecto. Después de la Decodificación inicial, se acceden a los diferentes campos disponibles durante la ejecución de la aplicación.
+\subsubsection{Uso de la libreria}
+
+El primer uso durante el flujo del programa es en la función \texttt{try\_parse\_packet} disponible en \texttt{packet\_parse.rs} en el anexo 2 o en el repositorio. La función se llama después de realizar la extracción de un paquete desde \texttt{PacketCapture} o después de hacer una reconstrucción como veremos en \ref{ipv4defrag}. Dentro de la función, a partir del tipo de capa de enlace indicado por \texttt{pcap} y la librería etherparse, obtenemos una instancia de \texttt{SlicedPacket} de la cual podemos obtener los campos de diferentes capas del paquete original. En caso de datos Ethernet, utilizamos la función \texttt{etherparse::SlicedPacket::from\_ethernet} y en caso de tener datos en SLL, hacemos uso de {etherparse::SlicedPacket::from\_linux\_sll} añadida durante el desarrollo del proyecto. A continuación se realizan los pasos de desfragmentación (\ref{ipv4defrag}) y/o separación de flujos (\ref{flowseparation}) según aplique.
 
 \subsection{Desfragmentación IPv4} \label{ipv4defrag}
 
 Los datasets utilizados contienen tramos donde hay una gran cantidad de paquetes IPv4 fragmentados. Es posible que estén relacionados con ataques y que, si ofrecemos soporte para la desfragmentación en la herramienta, las estadísticas generadas puedan ser más útiles para la detección de ataques. Para realizar esto, se ha definido una estructura llamada \texttt{NetworkFragmentFlow}, la cual acumula fragmentos IPv4 con información adicional para su posterior reensamblado. Adicionalmente, en el momento de hacer un reensamblado, aparte del paquete reconstruido, se emitirá una estructura \texttt{FragmentReasemblyInformation} con la información adicional acumulada. Los diferentes flujos activos serán agrupados en una instancia \texttt{FlowGrup}, donde adicionalmente tendremos flujos de transporte como veremos en \ref{flowseparation}.
-
-
 
 (Explicar el flow group con sus funciones)
 
@@ -85,7 +93,9 @@ Por hacer
 
 \subsection{Generación de estadísticas}
 
-Por hacer
+(estadisticas ejecucion)
+
+(estadisticas paquetes)
 
 \subsection{Escritura y etiquetado de flujos}
 
