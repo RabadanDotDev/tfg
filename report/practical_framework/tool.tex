@@ -179,7 +179,57 @@ Con esto, en el momento de cerrar el flujo y emitir las estadísticas, se genera
   \item \texttt{bidirectional\_bytes\_s}: cadencia media de datos en bytes por segundo en ambas direcciones
   \item \texttt{forward\_bytes\_s}: cadencia media de datos en bytes por segundo desde el iniciador de la transmisión
   \item \texttt{backward\_bytes\_s}: cadencia media de datos en bytes por segundo hacia el iniciador de la transmisión
-  \item \texttt{down\_up\_bytes\_ratio}: ratio entre los bytes capturados entre las dos direcciones
+  \item \texttt{down\_up\_bytes\_ratio}: balance entre los bytes capturados entre las dos direcciones
+  %%
+  \item \texttt{bidirectional\_inter\_arrival\_time\_max}: tiempo de llegada entre paquetes máximo en ambas direcciones
+  \item \texttt{bidirectional\_inter\_arrival\_time\_min}: tiempo de llegada entre paquetes mínimo en ambas direcciones
+  \item \texttt{bidirectional\_inter\_arrival\_time\_mean}: tiempo de llegada media de los paquetes en ambas direcciones
+  \item \texttt{bidirectional\_inter\_arrival\_time\_std}: desviación estándar del tiempo de llegada de los paquetes en ambas direcciones
+  \item \texttt{forward\_inter\_arrival\_time\_max}: tiempo de llegada entre paquetes máximo del iniciador de la transmisión
+  \item \texttt{forward\_inter\_arrival\_time\_min}: tiempo de llegada entre paquetes mínimo del iniciador de la transmisión
+  \item \texttt{forward\_inter\_arrival\_time\_mean}: tiempo de llegada media de los paquetes del iniciador de la transmisión
+  \item \texttt{forward\_inter\_arrival\_time\_std}: desviación estándar del tiempo de llegada de los paquetes del iniciador de la transmisión
+  \item \texttt{backward\_inter\_arrival\_time\_max}: tiempo de llegada entre paquetes máximo hacia el iniciador de la transmisión
+  \item \texttt{backward\_inter\_arrival\_time\_min}: tiempo de llegada entre paquetes mínimo hacia el iniciador de la transmisión
+  \item \texttt{backward\_inter\_arrival\_time\_mean}: tiempo de llegada media de los paquetes hacia el iniciador de la transmisión 
+  \item \texttt{backward\_inter\_arrival\_time\_std}: desviación estándar del tiempo de llegada de los paquetes hacia el iniciador de la transmisión
+  %%
+  \item \texttt{bidirectional\_tcp\_cwr\_flags\_count}: número de paquetes en ambas direcciones con el campo 'cwr' de en la cabecera TCP activo
+  \item \texttt{bidirectional\_tcp\_ece\_flags\_count}: número de paquetes en ambas direcciones con el campo 'ece' de en la cabecera TCP activo
+  \item \texttt{bidirectional\_tcp\_urg\_flags\_count}: número de paquetes en ambas direcciones con el campo 'urg' de en la cabecera TCP activo
+  \item \texttt{bidirectional\_tcp\_ack\_flags\_count}: número de paquetes en ambas direcciones con el campo 'ack' de en la cabecera TCP activo
+  \item \texttt{bidirectional\_tcp\_psh\_flags\_count}: número de paquetes en ambas direcciones con el campo 'psh' de en la cabecera TCP activo
+  \item \texttt{bidirectional\_tcp\_rst\_flags\_count}: número de paquetes en ambas direcciones con el campo 'rst' de en la cabecera TCP activo
+  \item \texttt{bidirectional\_tcp\_syn\_flags\_count}: número de paquetes en ambas direcciones con el campo 'syn' de en la cabecera TCP activo
+  \item \texttt{bidirectional\_tcp\_fin\_flags\_count}: número de paquetes en ambas direcciones con el campo 'fin' de en la cabecera TCP activo
+  \item \texttt{forward\_tcp\_psh\_flags\_count}: número de paquetes desde el iniciador de la transmisión con el campo 'psh' de en la cabecera TCP activo
+  \item \texttt{forward\_tcp\_urg\_flags\_count}: número de paquetes desde el iniciador de la transmisión con el campo 'urg' de en la cabecera TCP activo
+  \item \texttt{backward\_tcp\_psh\_flags\_count}: número de paquetes hacia el iniciador de la transmisión con el campo 'psh' de en la cabecera TCP activo
+  \item \texttt{backward\_tcp\_urg\_flags\_count}: número de paquetes hacia el iniciador de la transmisión con el campo 'urg' de en la cabecera TCP activo
+  %%
+  \item \texttt{forward\_transport\_header\_bytes\_sum}: la suma total del número de bytes en las cabeceras de transporte de los paquetes del iniciador de la transmisión
+  \item \texttt{forward\_transport\_payload\_bytes\_mean}: la media del número de bytes de datos de la capa de transporte de los paquetes del iniciador de la transmisión
+  \item \texttt{forward\_transport\_payload\_bytes\_min}: el mínimo del número de bytes de datos de la capa de transporte de los paquetes del iniciador de la transmisión
+  \item \texttt{forward\_transport\_packets\_with\_payload\_count}: el número de paquetes del iniciador de la conexión con el campo de datos de la capa de transporte no vacío
+  \item \texttt{forward\_tcp\_initial\_window\_bytes}: la ventana TCP inicial, o número de bytes aceptados, por parte del iniciador de la transmisión, si aplica
+  \item \texttt{backward\_transport\_header\_bytes\_sum}: la suma total del número de bytes en las cabeceras de transporte de los paquetes hacia el iniciador de la transmisión
+  \item \texttt{backward\_transport\_payload\_bytes\_mean}: la media número de bytes de datos de la capa de transporte de los paquetes hacia el iniciador de la transmisión
+  \item \texttt{backward\_tcp\_initial\_window\_bytes}: la ventana TCP inicial, o número de bytes aceptados, por parte del receptor inicial de la transmisión, si aplica
+  %%
+  \item \texttt{idle\_seconds\_min}: el tiempo mínimo el cual el flujo estuvo inactivo antes de volver a estar activo
+  \item \texttt{idle\_seconds\_max}: el tiempo máximo el cual el flujo estuvo inactivo antes de volver a estar activo
+  \item \texttt{idle\_seconds\_mean}: el tiempo medio el cual el flujo estuvo inactivo antes de volver a estar activo
+  \item \texttt{idle\_seconds\_std}: la desviación estándar del tiempo en el cual el flujo estuvo inactivo antes de volver a estar activo
+  \item \texttt{active\_seconds\_min}: el tiempo mínimo el cual el flujo estuvo activo antes de pasar a estar activo
+  \item \texttt{active\_seconds\_max}: el tiempo máximo el cual el flujo estuvo activo antes de pasar a estar activo
+  \item \texttt{active\_seconds\_mean}: el tiempo medio el cual el flujo estuvo activo antes de pasar a estar activo 
+  \item \texttt{active\_seconds\_std}: la desviación estándar del tiempo en el cual el flujo estuvo activo antes de pasar a estar activo
+  \item \texttt{active\_group\_forward\_packet\_average}: el número de paquetes medio en los grupos activos del flujo del iniciador de la transmisión
+  \item \texttt{active\_group\_backward\_packet\_average}: el número de paquetes medio en los grupos activos del flujo hacia el iniciador de la transmisión
+  \item \texttt{active\_group\_forward\_byte\_average}: el número de bytes transmitidos medio en los grupos activos del flujo del iniciador de la transmisión
+  \item \texttt{active\_group\_backward\_byte\_average}: el número de bytes transmitidos medios en los grupos activos del flujo hacia el iniciador de la transmisión
+  \item \texttt{active\_group\_forward\_byte\_second\_average}: la cadencia media de datos en los grupos activos del flujo del iniciador de la transmisión
+  \item \texttt{active\_group\_backward\_byte\_second\_average}: la cadencia media de datos en los grupos activos del flujo hacia el iniciador de la transmisión
 \end{enumerate}
 
 \subsection{Escritura y etiquetado de flujos} \label{flowwrite}
