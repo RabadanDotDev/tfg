@@ -105,7 +105,7 @@ En el transcurso normal del protocolo TCP existe una finalización de la transmi
 
 Para almacenar la información, también se hace uso de \texttt{FlowGroup}. En este, tenemos un \texttt{HashMap} para tener acceso en tiempo constante a los flujos y una cola de prioridad para mantener un orden temporal. En este caso, el criterio que se sigue consiste en tener los flujos que han tenido una recepción de un paquete más nuevo más atrás de la cola. Es decir, si en el flujo $A$ el último paquete ha sido en $t=10$ y en el flujo $B$ ha sido en $t=5$, el flujo $B$ se encontraría antes del flujo $A$. Cada vez que actualizamos la información de un flujo a partir de un paquete, actualizamos la posición de este para que esté al final de la cola.
 
-\subsection{Generación de estadísticas}
+\subsection{Generación de estadísticas} \label{statsgen}
 
 Cada vez que, a partir de un paquete con un protocolo soportado, se crea o se identifica el flujo de transporte respectivo, se han de acumular una serie de datos para poder generar unas estadísticas del flujo. Cuando el flujo se considera finalizado o se 'cierra' y se emiten las estadísticas de este, se utiliza esta información acumulada para generarlas. Después, estos valores son emitidos como se indica en \ref{flowwrite}.
 
@@ -232,7 +232,27 @@ Con esto, en el momento de cerrar el flujo y emitir las estadísticas, se genera
   \item \texttt{active\_group\_backward\_byte\_second\_average}: la cadencia media de datos en los grupos activos del flujo hacia el iniciador de la transmisión
 \end{enumerate}
 
-\subsection{Escritura y etiquetado de flujos} \label{flowwrite}
+\subsection{Etiquetado de flujos} \label{flowtag}
 
-Por hacer
+Una vez se considera un flujo cerrado, si el usuario ha proporcionado un archivo 'ground truth' se intenta encontrar una etiqueta para el flujo en cuestión. Con los datos proporcionados por el usuario, se intenta encontrar una etiqueta se corresponda con el valor deseado. En caso de no encontrar la etiqueta correcta, se asigna 'benign'.
+
+El formato esperado del archivo consiste en un archivo CSV con las columnas de IP de origen, IP de destino, marcas temporales en tiempo UNIX expresado en microsegundos del inicio y final y la etiqueta deseada. Estos valores son cargados en un \texttt{HashMap} que relaciona cada par de direcciones IP con una lista ordenada de intervalos con sus respectivas etiquetas. Para poder cargar los valores de manera correcta, se requiere que no haya intervalos solapados.
+
+Para seleccionar la etiqueta específica de la lista ordenada, se busca con búsqueda binaria el rango de los intervalos que solapan con el flujo a etiquetar. Si hay más de uno, se selecciona el que tenga mayor rango solapado.
+
+\subsection{Escritura de flujos} \label{flowwrite}
+
+Una vez cerrado el flujo de red y etiquetado en caso de ser necesario, se emite las estadísticas indicadas en \ref{statsgen} en formato CSV. Existen dos posibilidades, emitir los resultados a la salida estándar o a una serie de archivos con un prefijo en común. En caso de que el usuario haya indicado que se muestre por salida estándar, se emiten los resultados directamente. Sin embargo, si el usuario ha indicado un prefijo de archivo para escribir los resultados, se mantiene un contador del número de líneas emitidas. Cada diez millones de líneas, se genera un archivo nuevo para evitar generar archivos intratables. Los archivos se nombran con el prefijo indicado por el usuario y la marca de tiempo en la que se han creado. Adicionalmente, se incluye una cabecera indicando el significado del valor del CSV.
+
+Independientemente de si se ha utilizado un formato de salida u otro, se añaden las siguientes características a cada flujo para poder correlacionar la información con otras fuentes en caso de desearlo:
+
+\begin{enumerate}
+  \item \texttt{source\_ip}: la dirección IP del iniciador de la transmisión.
+  \item \texttt{source\_port}: el puerto de la capa de transporte del iniciador de la transmisión.
+  \item \texttt{dest\_ip}: la dirección IP del receptor inicial de la transmisión.
+  \item \texttt{dest\_port}: el puerto de la capa de transporte del receptor inicial de la transmisión.
+  \item \texttt{transport\_protocol}: el identificador de la capa de transporte \cite{ipprotocolnumbers}
+  \item \texttt{first\_packet\_time}: el tiempo UNIX expresado en microsegundos del primer paquete en el flujo
+  \item \texttt{last\_packet\_time}:  el tiempo UNIX expresado en microsegundos del último paquete en el flujo
+\end{enumerate}
 
