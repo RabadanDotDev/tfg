@@ -93,8 +93,8 @@ impl FlowStat for ByteCount {
         write!(writer, "backward_packet_bytes_std,")?;
 
         write!(writer, "bidirectional_bytes_s,")?;
-        write!(writer, "backward_bytes_s,")?;
         write!(writer, "forward_bytes_s,")?;
+        write!(writer, "backward_bytes_s,")?;
 
         write!(writer, "down_up_bytes_ratio,")?;
 

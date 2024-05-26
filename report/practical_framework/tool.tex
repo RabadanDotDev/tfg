@@ -107,9 +107,80 @@ Para almacenar la información, también se hace uso de \texttt{FlowGroup}. En e
 
 \subsection{Generación de estadísticas}
 
-(estadisticas ejecucion)
+Cada vez que, a partir de un paquete con un protocolo soportado, se crea o se identifica el flujo de transporte respectivo, se han de acumular una serie de datos para poder generar unas estadísticas del flujo. Cuando el flujo se considera finalizado o se 'cierra' y se emiten las estadísticas de este, se utiliza esta información acumulada para generarlas. Después, estos valores son emitidos como se indica en \ref{flowwrite}.
 
-(estadisticas paquetes)
+La información se acumula durante el transcurso de la ejecución es diversa. Las estadísticas escogidas para generar han sido basadas en las utilizadas en CICFlowMeter como vimos en \ref{cicflowfeatures}. En conjunto, mantenemos:
+
+\begin{itemize}
+  \item La marca de tiempo del primer y último paquete
+  \item Una lista de protocolos detectados. En el momento, lo hemos mantenido en sí, se ha detectado el protocolo TCP y/o el protocolo UDP.
+  \item El recuento de paquetes desde el que ha iniciado la emisión (forward) o hacia este (backward).
+  \item Un \texttt{RunningStat} del número de bytes enviados en cada dirección (forward/backward) y en ambas (bidirectional).
+  \item Un \texttt{RunningStat} del periodo de llegada entre paquetes en cada dirección (forward/backward) y en ambas (bidirectional). Adicionalmente, se mantiene una marca de tiempo del último paquete en cada dirección para facilitar el cálculo
+  \item El número de flags TCP vistas en las dos direcciones. Adicionalmente, mantenemos un recuento separado de los flags PSH y URG de cada dirección.
+  \item Un \texttt{RunningStat} para información específica sobre las longitudes en bytes de la cabecera de la capa de transporte y las longitudes de los campos de datos.
+  \item El número de paquetes enviados desde el iniciador de la conexión con un campo de datos en la capa de transporte no vacía
+  \item El tamaño de la ventana inicial TCP en cada dirección, si está disponible.
+  \item Dos \texttt{RunningStat} para tener un recuento de los tiempos que el flujo ha estado activo (menos de un segundo de separación entre paquetes) e inactivo pero sin ser cerrado. Adicionalmente, hay un recuento de cuantos grupos activos ha habido.
+\end{itemize}
+
+Los \texttt{RunningStat} mencionados son utilizados para mantener, como su nombre indica, información estadística calculada de forma iterativa. Concretamente, mantenemos en cada uno el número de valores, la suma, el valor mínimo, el valor máximo, la media y la 'diferencia al cuadrado'. Esta ultima, la mantenemos como valor parcial para obtener la variancia y la distribución estándar, como se indica en la página 232 de 'The art of computer programming' \cite{10.5555/270146}. Específicamente, primero se define la recurrencia \ref{eq:meanrec} para calcular la media de forma iterativa. A continuación, se utiliza esta para obtener la recurrencia de la 'diferencia al cuadrado' mostrada en \ref{eq:sqrrec}, de la cual podemos obtener la varianza como se indica en \ref{eq:variancereq}. A partir de esta, podemos obtener la desviación estándar (\sigma).
+
+\begin{equation} \label{eq:meanrec}
+  \biggl\{
+      \begin{array}{l}
+        M_{0} = 0\\
+        M_{k} = M_{k-1} + {{ x_{k} - M_{k-1} } \over {k}}  \\
+      \end{array} 
+\end{equation}
+
+\begin{equation} \label{eq:sqrrec}
+  \biggl\{
+      \begin{array}{l}
+        S_{0} = 0 \\
+        S_{k} = S_{k-1} + ( x_{k} - M_{k-1} ) * ( x_{k} - M_{k} )
+      \end{array}      
+\end{equation}
+
+\begin{equation} \label{eq:variancereq}
+  \biggl\{
+    \sigma^2_{k} = {S_{k} \over {(k - 1)}}
+\end{equation}
+
+Con esto, en el momento de cerrar el flujo y emitir las estadísticas, se generan los siguientes valores:
+
+\begin{enumerate}
+  \item \texttt{duration\_seconds}: duración en segundos del flujo
+  \item \texttt{has\_tcp}: 1 si se utiliza TCP en el flujo, 0 en caso contrario.
+  \item \texttt{has\_udp}: 1 si se utiliza UDP en el flujo, 0 en caso contrario.
+  %%
+  \item \texttt{bidirectional\_packet\_count}: el número total de paquetes enviados
+  \item \texttt{forward\_packet\_count}: el número total de paquetes enviados desde el iniciador de la transmisión
+  \item \texttt{backward\_packet\_count}: el número total de paquetes enviados hacia el iniciador de la transmisión
+  \item \texttt{bidirectional\_packet\_second}: la cadencia media de paquetes por segundo en ambas direcciones
+  \item \texttt{forward\_packet\_second}: la cadencia media de paquetes por segundo en desde el iniciador de la transmisión
+  \item \texttt{backward\_packet\_second}: la cadencia media de paquetes por segundo en hacia el iniciador de la transmisión
+  %%
+  \item \texttt{bidirectional\_packet\_bytes\_sum}: suma total de bytes capturados de los paquetes capturados en ambas direcciones.
+  \item \texttt{bidirectional\_packet\_bytes\_max}: tamaño del paquete más grande capturado en ambas direcciones.
+  \item \texttt{bidirectional\_packet\_bytes\_min}: tamaño del paquete más pequeño capturado en ambas direcciones.
+  \item \texttt{bidirectional\_packet\_bytes\_mean}: tamaño medio de los paquetes capturados en ambas direcciones.
+  \item \texttt{bidirectional\_packet\_bytes\_std}: desviación estándar de los paquetes capturados en ambas direcciones.
+  \item \texttt{forward\_packet\_bytes\_sum}: suma total de bytes capturados originados por el iniciador de la transmisión.
+  \item \texttt{forward\_packet\_bytes\_max}: tamaño del paquete más grande capturado originado por el iniciador de la transmisión.
+  \item \texttt{forward\_packet\_bytes\_min}: tamaño del paquete más pequeño capturado originado por el iniciador de la transmisión.
+  \item \texttt{forward\_packet\_bytes\_mean}: tamaño medio de los paquetes capturados originados por el iniciador de la transmisión.
+  \item \texttt{forward\_packet\_bytes\_std}: desviación estándar de los paquetes capturados originados por el iniciador de la transmisión.
+  \item \texttt{backward\_packet\_bytes\_sum}: suma total de bytes capturados originados por el receptor inicial de la transmisión.
+  \item \texttt{backward\_packet\_bytes\_max}: tamaño del paquete más grande capturado originado por el receptor inicial de la transmisión.
+  \item \texttt{backward\_packet\_bytes\_min}: tamaño del paquete más pequeño capturado originado por el receptor inicial de la transmisión.
+  \item \texttt{backward\_packet\_bytes\_mean}: tamaño medio de los paquetes capturados originados por el receptor inicial de la transmisión. 
+  \item \texttt{backward\_packet\_bytes\_std}: desviación estándar de los paquetes capturados originados por el receptor inicial de la transmisión.
+  \item \texttt{bidirectional\_bytes\_s}: cadencia media de datos en bytes por segundo en ambas direcciones
+  \item \texttt{forward\_bytes\_s}: cadencia media de datos en bytes por segundo desde el iniciador de la transmisión
+  \item \texttt{backward\_bytes\_s}: cadencia media de datos en bytes por segundo hacia el iniciador de la transmisión
+  \item \texttt{down\_up\_bytes\_ratio}: ratio entre los bytes capturados entre las dos direcciones
+\end{enumerate}
 
 \subsection{Escritura y etiquetado de flujos} \label{flowwrite}
 
