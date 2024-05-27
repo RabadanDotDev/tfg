@@ -1,0 +1,289 @@
+from pathlib import Path
+from glob import glob
+from datetime import datetime
+from natsort import natsorted
+import numpy as np
+import pandas as pd
+
+CICDDOS_2019_CSVS_PATH = Path('/Datasets/CICDDoS2019/csv/')
+CICDDOS_2019_CSVS_PATH_RES = Path("./tmp/CICDDoS2019_gt.csv")
+BOT_IOT_CSVS_PATH = Path("/Datasets/Bot-IoT/Dataset/Entire Dataset/")
+BOT_IOT_FEATURE_NAMES = Path("/Datasets/Bot-IoT/Dataset/Entire Dataset/UNSW_2018_IoT_Botnet_Dataset_Feature_Names.csv")
+BOT_IOT_PATH_RES = Path("./tmp/BoT-IoT_gt.csv")
+TON_IOT_CSVS_PATH = Path('/Datasets/TON-IoT/Processed_datasets/Processed_Network_dataset/')
+TON_IOT_CSVS_PATH_RES = Path("./tmp/TON-IoT_gt.csv")
+
+def test_combine_discard():
+    df = pd.DataFrame({
+        'source_ip'             : ["0.0.0.1", "0.0.0.1", "0.0.0.1", "0.0.0.1", "0.0.0.1"],
+        'dest_ip'               : ["0.0.0.2", "0.0.0.2", "0.0.0.3", "0.0.0.2", "0.0.0.2"],
+        'timestamp_micro_start' : [        0,        2,          7,         8,        12],
+        'timestamp_micro_end'   : [        1,        3,         10,        11,        21],
+        'label'                 : [      'a',      'a',        'a',       'b',       'a']
+    })
+
+    df_res = pd.DataFrame({
+        'source_ip'             : ["0.0.0.1", "0.0.0.1", "0.0.0.1"],
+        'dest_ip'               : ["0.0.0.2", "0.0.0.3", "0.0.0.2"],
+        'timestamp_micro_start' : [        0,         7,        12],
+        'timestamp_micro_end'   : [        3,        10,        21],
+        'label'                 : [      'a',       'a',       'a']
+    })
+
+    df = combine_discard(df, 'b').sort_values('timestamp_micro_start', ignore_index=True)
+
+    assert df.equals(df_res)
+
+def remap_labels(df: pd.DataFrame) -> pd.DataFrame:
+    mappings = {
+        # cicddos
+        "DrDoS_DNS"                     : "ddos_dns",
+        "DrDoS_LDAP"                    : "ddos_ldap",
+        "DrDoS_MSSQL"                   : "ddos_mssql",
+        "DrDoS_NetBIOS"                 : "ddos_netbios",
+        "DrDoS_NTP"                     : "ddos_ntp",
+        "DrDoS_SNMP"                    : "ddos_snmp",
+        "DrDoS_SSDP"                    : "ddos_ssdp",
+        "DrDoS_UDP"                     : "ddos_udp",
+        "LDAP"                          : "ddos_ldap",
+        "MSSQL"                         : "ddos_mssql",
+        "NetBIOS"                       : "ddos_netbios",
+        "Portmap"                       : "ddos_portmap",
+        "Syn"                           : "ddos_syn",
+        "TFTP"                          : "ddos_tftp",
+        "UDP"                           : "ddos_udp",
+        "UDP-lag"                       : "ddos_udp_lag",
+        "UDPLag"                        : "ddos_udp_lag",
+        "WebDDoS"                       : "ddos_web",
+        # toniot
+        "backdoor"                      : "backdoor",
+        "ddos"                          : "ddos",
+        "dos"                           : "dos",
+        "injection"                     : "injection",
+        "mitm"                          : "mitm",
+        "password"                      : "password",
+        "ransomware"                    : "ransomware",
+        "scanning"                      : "scanning",
+        "xss"                           : "xss",
+        # botiot
+        "DDoS_HTTP"                     : "ddos_http",
+        "DDoS_TCP"                      : "ddos_tcp",
+        "DDoS_UDP"                      : "ddos_udp",
+        "DoS_HTTP"                      : "dos_http",
+        "DoS_TCP"                       : "dos_tcp",
+        "DoS_UDP"                       : "dos_udp",
+        "Reconnaissance_OS_Fingerprint" : "reconnaissance_os_fingerprint",
+        "Reconnaissance_Service_Scan"   : "reconnaissance_service_scan",
+        "Theft_Data_Exfiltration"       : "theft_data_exfiltration",
+        "Theft_Keylogging"              : "theft_keylogging",
+    }
+
+    df['label'] = df['label'].replace(mappings)
+
+    return df
+
+def combine_discard(df: pd.DataFrame, benign_tag: str):
+    # Determine groups of labels that can be merged
+    df['group_within_ip_pair'] = df\
+        .groupby(by=['source_ip', 'dest_ip'])\
+        .label\
+        .transform(
+            lambda x: (x != x.shift()).cumsum() - 1
+        )
+
+    # Group values and take the min/max timestamps
+    df = df.groupby(by=['source_ip', 'dest_ip', 'group_within_ip_pair']).agg(
+        timestamp_micro_start=('timestamp_micro_start', 'min'),
+        timestamp_micro_end=('timestamp_micro_end', 'max'),
+        label=('label', 'first')
+    ).reset_index().drop(columns=["group_within_ip_pair"])
+
+    # Discard the benign tags
+    df = df.drop(df[df.label == benign_tag].index).reset_index(drop=True)
+
+    # Order by start timestamp
+    df = df.sort_values(by=['timestamp_micro_start', 'timestamp_micro_end'], ignore_index=True)
+
+    return df
+
+def extract(name, get_dataframe, result_path, discard_val):
+    # Load values
+    print(f"Loading {name} files")
+    start = datetime.now()
+    df = get_dataframe()
+    end = datetime.now()
+    print(f"Took {end-start} to load")
+
+    # Sort 
+    print(f"Sorting")
+    start = datetime.now()
+    df = df.sort_values(by=['timestamp_micro_start', 'timestamp_micro_end'], ignore_index=True)
+    end = datetime.now()
+    print(f"Took {end-start} to sort")
+
+    # Combine values
+    print("Combining and discarding values")
+    start = datetime.now()
+    df = combine_discard(df, discard_val)
+    end = datetime.now()
+    print(f"Took {end-start} to combine and discard values")
+
+    # Remap labels
+    df = remap_labels(df)
+
+    # Store results
+    print("Storing values")
+    start = datetime.now()
+    df.to_csv(result_path, index=False)
+    end = datetime.now()
+    print(f"Took {end-start} to store values")
+
+def get_dataframes_cicddos_2019() -> pd.DataFrame:
+    dataframes = []
+    files = glob(str(CICDDOS_2019_CSVS_PATH / "**/*.csv"))
+    files = natsorted(files)
+
+    for idx,file in enumerate(files):
+        # Read dataframe
+        print(f"{idx+1}/{len(files)} - Loading {file}")
+        df = pd.read_csv(file, low_memory=False)
+
+        # Keep only relevant columns
+        df = df[[" Source IP", " Destination IP", " Timestamp", " Flow Duration", " Label"]]
+
+        # Rename columns
+        df = df.rename(columns={\
+            ' Source IP': 'source_ip',\
+            ' Destination IP': 'dest_ip',\
+            ' Timestamp': 'timestamp_micro_start',\
+            ' Flow Duration': 'duration',\
+            ' Label': 'label',\
+        })
+
+        # Convert timestamp to unix time
+                
+        # The first value in csvs/03-11/Portmap.csv is 09:18:16.964447 
+        # The second packet in pcap/03-11/SAT-03-11-2018_0 is 2018-11-03 12:18:16.964447
+        # We use the timezone Etc/GMT+3 to move it back to (Etc/GMT+0) UTC+0
+        assert pd.Series([datetime.fromisoformat('2018-11-03T09:18:16.964447')]).\
+                    dt.tz_localize(tz='Etc/GMT+3').\
+                    dt.tz_convert(tz="Etc/GMT+0").\
+                    dt.tz_localize(None)[0]\
+            ==\
+                    pd.Timestamp('2018-11-03 12:18:16.964447')
+        df['timestamp_micro_start'] = pd.to_datetime(df['timestamp_micro_start']).\
+                                    dt.tz_localize(tz='Etc/GMT+3').\
+                                    dt.tz_convert(tz="Etc/GMT+0").\
+                                    dt.tz_localize(None).\
+                                    astype(int) // 1000
+
+        # Obtain last packet time
+        df['timestamp_micro_end'] = df['timestamp_micro_start'] + df['duration']
+        del df['duration']
+
+        # Append
+        dataframes.append(df)
+
+    return pd.concat(dataframes)
+
+def get_dataframes_botiot() -> pd.DataFrame:
+    dataframes = []
+    # Retrieve files
+    files = glob(str(BOT_IOT_CSVS_PATH / "*.csv"))
+    files = [f for f in files if f != str(BOT_IOT_FEATURE_NAMES)]
+    files = natsorted(files)
+
+    # Retrieve header names
+    names = None
+    with open(BOT_IOT_FEATURE_NAMES) as f:
+        names = f.read().strip().split(',')
+    
+    for idx,file in enumerate(files):
+        # Read dataframe
+        print(f"{idx+1}/{len(files)} - Loading {file}")
+        df = pd.read_csv(file, low_memory=False, header=None, names=names)
+
+        # Keep only relevant columns
+        df = df[["saddr", "daddr", 'stime', 'ltime', 'category', 'subcategory']]
+
+        # Rename columns
+        df = df.rename(columns={\
+            'saddr': 'source_ip',\
+            'daddr': 'dest_ip',\
+            'stime': 'timestamp_micro_start',\
+            'ltime': 'timestamp_micro_end',\
+            'category': 'label_1',\
+            'subcategory': 'label_2',\
+        })
+
+        # Convert timestamp to unix time
+        # Times are expressed as unix timestamps as seconds with a decimal part
+        df['timestamp_micro_start'] = (df['timestamp_micro_start'] * 1_000_000)\
+                                      .astype(int)
+        df['timestamp_micro_end'] = (df['timestamp_micro_end'] * 1_000_000)\
+                                      .astype(int)
+        
+        # Join label parts
+        df["label"] = df["label_1"] + '_' + df["label_2"]
+        del df["label_1"]
+        del df["label_2"]
+
+        # Append
+        dataframes.append(df)
+
+    return pd.concat(dataframes)
+
+def get_dataframes_toniot() -> pd.DataFrame:
+    dataframes = []
+
+    # Retrieve files
+    files = glob(str(TON_IOT_CSVS_PATH / "*.csv"))
+    files = natsorted(files)
+    
+    for idx,file in enumerate(files):
+        # Read dataframe
+        print(f"{idx+1}/{len(files)} - Loading {file}")
+        df = pd.read_csv(file, low_memory=False)
+
+        # Keep only relevant columns
+        df = df[["src_ip", "dst_ip", 'ts', 'duration', 'type']]
+
+        # Rename columns
+        df = df.rename(columns={\
+            'src_ip': 'source_ip',\
+            'dst_ip': 'dest_ip',\
+            'ts': 'timestamp_micro_start',\
+            'duration': 'duration',\
+            'type': 'label'
+        })
+
+        # Convert timestamp to unix time
+        # Times are expressed as unix timestamps as seconds
+        df['timestamp_micro_start'] = (df['timestamp_micro_start'] * 1_000_000)\
+                                      .astype(int)
+        
+        # Convert duration to microseconds
+        df['duration'] = (df['duration'] * 1_000_000)\
+                          .astype(int)
+        
+        # Force a minimum duration
+        df['duration'] = np.maximum(df['duration'], 1)
+        
+        # Obtain last packet time
+        df['timestamp_micro_end'] = df['timestamp_micro_start'] + df['duration']
+        del df['duration']
+
+        # Append
+        dataframes.append(df)
+
+    return pd.concat(dataframes)
+
+def main():
+    extract("CIC-DDos2019", get_dataframes_cicddos_2019, CICDDOS_2019_CSVS_PATH_RES, 'BENIGN')
+    extract("BoT-IoT", get_dataframes_botiot, BOT_IOT_PATH_RES, 'Normal_Normal')
+    extract("TON-IoT", get_dataframes_toniot, TON_IOT_CSVS_PATH_RES, 'normal')
+
+if __name__ == "__main__":
+    main()
+
+
