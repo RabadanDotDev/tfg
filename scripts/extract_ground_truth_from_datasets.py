@@ -85,14 +85,14 @@ def remap_labels(df: pd.DataFrame) -> pd.DataFrame:
 def combine_discard(df: pd.DataFrame, benign_tag: str):
     # Determine groups of labels that can be merged
     df['group_within_ip_pair'] = df\
-        .groupby(by=['source_ip', 'dest_ip'])\
+        .groupby(by=['low_ip', 'high_ip'])\
         .label\
         .transform(
             lambda x: (x != x.shift()).cumsum() - 1
         )
 
     # Group values and take the min/max timestamps
-    df = df.groupby(by=['source_ip', 'dest_ip', 'group_within_ip_pair']).agg(
+    df = df.groupby(by=['low_ip', 'high_ip', 'group_within_ip_pair']).agg(
         timestamp_micro_start=('timestamp_micro_start', 'min'),
         timestamp_micro_end=('timestamp_micro_end', 'max'),
         label=('label', 'first')
@@ -113,6 +113,16 @@ def extract(name, get_dataframe, result_path, discard_val):
     df = get_dataframe()
     end = datetime.now()
     print(f"Took {end-start} to load")
+
+    # Set order on src/dst IP addresses
+    min_ip = np.minimum(df['source_ip'], df['dest_ip'])
+    max_ip = np.maximum(df['source_ip'], df['dest_ip'])
+    df['source_ip'] = min_ip
+    df['dest_ip'] = max_ip
+    df = df.rename(columns={
+        "source_ip": "low_ip",
+        "dest_ip": "high_ip"
+    })
 
     # Sort 
     print(f"Sorting")
@@ -279,9 +289,9 @@ def get_dataframes_toniot() -> pd.DataFrame:
     return pd.concat(dataframes)
 
 def main():
-    extract("CIC-DDos2019", get_dataframes_cicddos_2019, CICDDOS_2019_CSVS_PATH_RES, 'BENIGN')
-    extract("BoT-IoT", get_dataframes_botiot, BOT_IOT_PATH_RES, 'Normal_Normal')
     extract("TON-IoT", get_dataframes_toniot, TON_IOT_CSVS_PATH_RES, 'normal')
+    extract("BoT-IoT", get_dataframes_botiot, BOT_IOT_PATH_RES, 'Normal_Normal')
+    extract("CIC-DDos2019", get_dataframes_cicddos_2019, CICDDOS_2019_CSVS_PATH_RES, 'BENIGN')
 
 if __name__ == "__main__":
     main()
