@@ -30,13 +30,14 @@ def test_combine_discard():
         'label'                 : [      'a',       'a',       'a']
     })
 
-    df = combine_discard(df, 'b').sort_values('timestamp_micro_start', ignore_index=True)
+    df = combine(df, 'b').sort_values('timestamp_micro_start', ignore_index=True)
 
     assert df.equals(df_res)
 
 def remap_labels(df: pd.DataFrame) -> pd.DataFrame:
     mappings = {
         # cicddos
+        "BENIGN"                        : "benign",
         "DrDoS_DNS"                     : "ddos_dns",
         "DrDoS_LDAP"                    : "ddos_ldap",
         "DrDoS_MSSQL"                   : "ddos_mssql",
@@ -54,8 +55,9 @@ def remap_labels(df: pd.DataFrame) -> pd.DataFrame:
         "UDP"                           : "ddos_udp",
         "UDP-lag"                       : "ddos_udp_lag",
         "UDPLag"                        : "ddos_udp_lag",
-        "WebDDoS"                       : "ddos_web",
+        "WebDDoS"                       : "benign",
         # toniot
+        "normal"                        : "benign",
         "backdoor"                      : "backdoor",
         "ddos"                          : "ddos",
         "dos"                           : "dos",
@@ -66,6 +68,7 @@ def remap_labels(df: pd.DataFrame) -> pd.DataFrame:
         "scanning"                      : "scanning",
         "xss"                           : "xss",
         # botiot
+        "Normal_Normal"                 : "benign",
         "DDoS_HTTP"                     : "ddos_http",
         "DDoS_TCP"                      : "ddos_tcp",
         "DDoS_UDP"                      : "ddos_udp",
@@ -82,7 +85,7 @@ def remap_labels(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-def combine_discard(df: pd.DataFrame, benign_tag: str):
+def combine(df: pd.DataFrame):
     # Determine groups of labels that can be merged
     df['group_within_ip_pair'] = df\
         .groupby(by=['low_ip', 'high_ip'])\
@@ -98,55 +101,68 @@ def combine_discard(df: pd.DataFrame, benign_tag: str):
         label=('label', 'first')
     ).reset_index().drop(columns=["group_within_ip_pair"])
 
-    # Discard the benign tags
-    df = df.drop(df[df.label == benign_tag].index).reset_index(drop=True)
+    return df
 
-    # Order by start timestamp
-    df = df.sort_values(by=['timestamp_micro_start', 'timestamp_micro_end'], ignore_index=True)
+def force_remove_overlaps(df: pd.DataFrame) -> pd.DataFrame:
+    # Find overlapping consecutive rows
+    overlaps_with_previous = (df.timestamp_micro_start <= df.timestamp_micro_end.shift(1)   ) & (df.low_ip == df.low_ip.shift( 1)) & (df.high_ip == df.high_ip.shift( 1))
+    overlaps_with_next     = (df.timestamp_micro_end   >= df.timestamp_micro_start.shift(-1)) & (df.low_ip == df.low_ip.shift(-1)) & (df.high_ip == df.high_ip.shift(-1))
+    
+    # Set overlaps in the middle of the overlap
+    df['timestamp_micro_start_og'] = df['timestamp_micro_start']
+    df['timestamp_micro_end_og'] = df['timestamp_micro_end']
+
+    df.loc[overlaps_with_previous, 'timestamp_micro_start'] = ((df.timestamp_micro_start_og + df.timestamp_micro_end_og.shift(1)) // 2 + 1)[overlaps_with_previous]
+    df.loc[overlaps_with_next, 'timestamp_micro_end'] = ((df.timestamp_micro_end_og + df.timestamp_micro_start_og.shift(-1)) // 2)[overlaps_with_next]
+
+    #del df['timestamp_micro_end_og']
+    #del df['timestamp_micro_end_og']
+
+    df['overlaps_with_previous'] = overlaps_with_previous
+    df['overlaps_with_next'] = overlaps_with_next
 
     return df
 
-def extract(name, get_dataframe, result_path, discard_val):
+def extract(name, get_dataframe, result_path):
     # Load values
     print(f"Loading {name} files")
-    start = datetime.now()
-    df = get_dataframe()
-    end = datetime.now()
-    print(f"Took {end-start} to load")
+    df: pd.DataFrame = get_dataframe()
+
+    # Remap labels
+    print(f"Remapping labels")
+    df = remap_labels(df)
 
     # Set order on src/dst IP addresses
+    print(f"Reordering addresses")
+
     min_ip = np.minimum(df['source_ip'], df['dest_ip'])
     max_ip = np.maximum(df['source_ip'], df['dest_ip'])
     df['source_ip'] = min_ip
     df['dest_ip'] = max_ip
+
     df = df.rename(columns={
         "source_ip": "low_ip",
-        "dest_ip": "high_ip"
+        "dest_ip": "high_ip",
     })
 
     # Sort 
-    print(f"Sorting")
-    start = datetime.now()
+    print(f"Sorting values")
     df = df.sort_values(by=['timestamp_micro_start', 'timestamp_micro_end'], ignore_index=True)
-    end = datetime.now()
-    print(f"Took {end-start} to sort")
+
+    # Discard the benign tags
+    print(f"Discarding benign values")
+    df = df.drop(df[df.label == 'benign'].index).reset_index(drop=True)
 
     # Combine values
-    print("Combining and discarding values")
-    start = datetime.now()
-    df = combine_discard(df, discard_val)
-    end = datetime.now()
-    print(f"Took {end-start} to combine and discard values")
+    print(f"Combining non benign values")
+    df = combine(df)
 
-    # Remap labels
-    df = remap_labels(df)
+    # Remove overlaps if there are any remaining
+    print(f"Force removing overlaps")
+    df = force_remove_overlaps(df)
 
     # Store results
-    print("Storing values")
-    start = datetime.now()
     df.to_csv(result_path, index=False)
-    end = datetime.now()
-    print(f"Took {end-start} to store values")
 
 def get_dataframes_cicddos_2019() -> pd.DataFrame:
     dataframes = []
@@ -289,11 +305,9 @@ def get_dataframes_toniot() -> pd.DataFrame:
     return pd.concat(dataframes)
 
 def main():
-    extract("TON-IoT", get_dataframes_toniot, TON_IOT_CSVS_PATH_RES, 'normal')
-    extract("BoT-IoT", get_dataframes_botiot, BOT_IOT_PATH_RES, 'Normal_Normal')
-    extract("CIC-DDos2019", get_dataframes_cicddos_2019, CICDDOS_2019_CSVS_PATH_RES, 'BENIGN')
+    extract("TON-IoT", get_dataframes_toniot, TON_IOT_CSVS_PATH_RES)
+    extract("BoT-IoT", get_dataframes_botiot, BOT_IOT_PATH_RES)
+    extract("CIC-DDos2019", get_dataframes_cicddos_2019, CICDDOS_2019_CSVS_PATH_RES)
 
 if __name__ == "__main__":
     main()
-
-

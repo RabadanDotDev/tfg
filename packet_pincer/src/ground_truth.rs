@@ -15,8 +15,8 @@ use crate::TransportFlow;
 
 #[derive(Debug, Deserialize)]
 struct GroundTruthRecord {
-    source_ip: IpAddr,
-    dest_ip: IpAddr,
+    low_ip: IpAddr,
+    high_ip: IpAddr,
     timestamp_micro_start: i64,
     timestamp_micro_end: i64,
     label: String,
@@ -37,7 +37,7 @@ impl GroundTruth {
         for result in reader.deserialize() {
             // Decode line
             let record: GroundTruthRecord = result?;
-            let host_pair = HostPair::from_ip_pair(record.source_ip, record.dest_ip);
+            let host_pair = HostPair::from_ip_pair(record.low_ip, record.high_ip);
             let label = Label::from(
                 record.timestamp_micro_start,
                 record.timestamp_micro_end,
@@ -225,11 +225,12 @@ impl Label {
         let end = DateTime::from_timestamp_micros(timestamp_micro_end)
             .ok_or::<Box<dyn Error>>("Invalid timestamp".into())?;
 
+        let label: Rc<str> = Rc::from(label);
+
         if end < start {
             return Err("End timestamp cannot be previous than start timestamp".into());
         }
 
-        let label = Rc::from(label);
         Ok(Label { start, end, label })
     }
 
