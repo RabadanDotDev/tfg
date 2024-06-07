@@ -98,12 +98,252 @@ Podemos ver que, a pesar del gran número de datos a procesar, los tiempos de ej
 
 Finalmente, en la tabla \ref{table:generatedfilesoffline} podemos ver la magnitud de datos generados. En total, contamos con más de 49 GiB de datos, los cuales comprenden casi 79 millones de registros. En el momento de tratar estos datos, tendremos que tener en cuenta que los modelos y pasos a realizar deben ser capaces de operar con esta magnitud de datos con los recursos disponibles.
 
-\subsection{Preprocessamiento datos generados}
+\subsection{Descripción de las características de los datos generados}
+
+\subsubsection{Etiquetas}
+
+\subsubsection{Protocolo}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/boolean_values.png}
+        \caption{CIC-DDoS2019}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/boolean_values.png}
+        \caption{BoT-IoT}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/boolean_values.png}
+        \caption{TON-IoT}
+    \end{subfigure}
+       \caption{Balance TCP (columna izquierda) y UDP (columna derecha)}
+       \label{fig:packet_pincer_tcp_udp}
+\end{figure}
+
+\subsubsection{Duración}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/duration_seconds_log_x_log_y.png}
+        \caption{CIC-DDoS2019}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/duration_seconds_log_x_log_y.png}
+        \caption{BoT-IoT}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/duration_seconds_log_x_log_y.png}
+        \caption{TON-IoT}
+    \end{subfigure}
+       \caption{Distribución de la duración de los flujos}
+       \label{fig:packet_pincer_duration}
+\end{figure}
+
+\subsubsection{Recuento paquetes}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_packet_count_log_x_log_y.png}
+        \caption{CIC-DDoS2019 (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_packet_count_log_x_log_y.png}
+        \caption{CIC-DDoS2019 (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_packet_count_log_x_log_y.png}
+        \caption{CIC-DDoS2019 (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_packet_count_log_x_log_y.png}
+        \caption{BoT-IoT (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_packet_count_log_x_log_y.png}
+        \caption{BoT-IoT (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_packet_count_log_x_log_y.png}
+        \caption{BoT-IoT (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_packet_count_log_x_log_y.png}
+        \caption{TON-IoT (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_packet_count_log_x_log_y.png}
+        \caption{TON-IoT (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_packet_count_log_x_log_y.png}
+        \caption{TON-IoT (backward)}
+    \end{subfigure}
+       \caption{Distribución del número de paquetes}
+       \label{fig:packet_pincer_packet_count}
+\end{figure}
+
+\subsubsection{Cadencia paquetes}
 
 por hacer
+%,"bidirectional_packet_second","forward_packet_second","backward_packet_second",
+
+\subsubsection{Numero de bytes transmitidos por flujo}
+
+por hacer
+%bidirectional_packet_bytes_sum, forward_packet_bytes_sum, backward_packet_bytes_sum
+
+\subsubsection{Numero de bytes máximos por flujo}
+
+por hacer
+%bidirectional_packet_bytes_max, forward_packet_bytes_max, backward_packet_bytes_max
+
+\subsubsection{Numero de bytes mínimos por flujo}
+
+por hacer
+%bidirectional_packet_bytes_min, forward_packet_bytes_min, backward_packet_bytes_min
+
+\subsubsection{Numero de bytes medio por flujo}
+
+por hacer
+%bidirectional_packet_bytes_mean, forward_packet_bytes_mean, backward_packet_bytes_mean
+
+por hacer
+\subsubsection{Variación del numero de bytes por flujo}
+
+%bidirectional_packet_bytes_std, forward_packet_bytes_std, backward_packet_bytes_std
+
+por hacer
+\subsubsection{Balance subida bajada del numero de bytes}
+
+%"down_up_bytes_ratio"
+
+por hacer
+\subsubsection{Cadencia datos}
+
+%,"bidirectional_bytes_s","forward_bytes_s","backward_bytes_s",
+
+por hacer
+\subsubsection{Tiempo de llegada máxima}
+
+por hacer
+%"bidirectional_inter_arrival_time_max","forward_inter_arrival_time_max","backward_inter_arrival_time_max",
+
+\subsubsection{Tiempo de llegada mínima}
+
+por hacer
+%"bidirectional_inter_arrival_time_min","forward_inter_arrival_time_min","backward_inter_arrival_time_min",
+
+\subsubsection{Tiempo de llegada media}
+
+por hacer
+%"bidirectional_inter_arrival_time_mean","forward_inter_arrival_time_mean","backward_inter_arrival_time_mean",
+
+\subsubsection{Variación de los tiempos de llegada}
+
+por hacer
+%"bidirectional_inter_arrival_time_std","forward_inter_arrival_time_std","backward_inter_arrival_time_std",
+
+\subsubsection{Flags cabecera TCP}
+
+por hacer
+%"bidirectional_tcp_cwr_flags_count",
+%"bidirectional_tcp_ece_flags_count",
+%"bidirectional_tcp_urg_flags_count",
+%"bidirectional_tcp_ack_flags_count",
+%"bidirectional_tcp_psh_flags_count",
+%"bidirectional_tcp_rst_flags_count",
+%"bidirectional_tcp_syn_flags_count",
+%"bidirectional_tcp_fin_flags_count",
+
+%forward_tcp_psh_flags_count,backward_tcp_psh_flags_count
+%"forward_tcp_urg_flags_count","backward_tcp_urg_flags_count",
+
+\subsubsection{Suma total de bytes en las cabeceras de transporte}
+
+por hacer
+%"forward_transport_header_bytes_sum",backward_transport_header_bytes_sum
+
+\subsubsection{Media de bytes enviados sobre la capa de transporte en un paquete}
+
+por hacer
+%"forward_transport_payload_bytes_mean",backward_transport_payload_bytes_mean
+
+\subsubsection{Bytes mínimos enviados sobre la capa de transporte}
+
+por hacer
+%"forward_transport_payload_bytes_min",
+
+\subsubsection{Numero de paquetes enviados con datos en la capa de transporte}
+
+por hacer
+%"forward_transport_packets_with_payload_count",
+
+\subsubsection{Ventana TCP inicial}
+
+por hacer
+%"forward_tcp_initial_window_bytes","backward_tcp_initial_window_bytes",
+
+\subsubsection{Tiempos de actividad mínimos}
+
+por hacer
+%"idle_seconds_min",active_seconds_min
+
+\subsubsection{Tiempos de actividad máximos}
+
+por hacer
+%""idle_seconds_max",active_seconds_max
+
+\subsubsection{Tiempos de actividad medios}
+
+por hacer
+%""idle_seconds_mean",active_seconds_mean
+
+\subsubsection{Variación de tiempos de actividad}
+
+por hacer
+%""idle_seconds_std"active_seconds_std
+
+\subsubsection{Media de paquetes por grupo activo}
+
+por hacer
+%"active_group_forward_packet_average","active_group_backward_packet_average",
+
+\subsubsection{Media de bytes por grupo activo}
+
+por hacer
+%"active_group_forward_byte_average","active_group_backward_byte_average",
+
+\subsubsection{Cadencia de bytes por grupo activo}
+
+por hacer
+%"active_group_forward_byte_second_average","active_group_backward_byte_second_average"
 
 \subsection{Definición y evaluación de la tarea a realizar}
 
+por hacer
+
+\subsection{Preprocessamiento}
+
+\subsubsection{Combinación etiquetas}
+por hacer
+
+\subsubsection{Omisión de características inicial}
+por hacer
+
+\subsubsection{Escalado y normalización}
+por hacer
+
+\subsubsection{Selección de características?}
+por hacer
+
+\subsubsection{Reducción dimensionalidad?}
 por hacer
 
 \subsection{Entrenamiento de modelos}
