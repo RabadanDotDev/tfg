@@ -6,7 +6,7 @@ En esta sección definiremos los diferentes protocolos y formatos de red que ser
 
 \subsubsection{Descripción}
 
-El formato libpcap es un formato de captura de trazas de red utilizado en TcpDump, WinDump, Wireshark, entre otros \cite{pcapfileformatwireshark} \cite{pcapfileformatrfc}. La estructura general consiste en una cabecera de fichero y a continuación uno cero o más 'Packet Records' o registros de paquetes. Cada uno de estos contiene una cabecera con información de la captura y bytes provenientes del paquete capturado. Adicionalmente, el orden de los campos de los bits dentro de las cabeceras depende del formato nativo de la máquina donde se capturaron los paquetes. 
+\texttt{libpcap} es un formato de captura de trazas de red utilizado en TcpDump, WinDump, Wireshark, entre otros \cite{pcapfileformatwireshark} \cite{pcapfileformatrfc}. La estructura general consiste en una cabecera de fichero y a continuación cero o más 'Packet Records' o registros de paquetes. Cada uno de estos contiene una cabecera con información de la captura y bytes provenientes del paquete capturado. Adicionalmente, el orden de los campos de los bits dentro de las cabeceras depende del formato nativo de la máquina donde se capturaron los paquetes. 
 
 \subsubsection{Cabecera de fichero}
 
@@ -29,7 +29,7 @@ El formato libpcap es un formato de captura de trazas de red utilizado en TcpDum
     \label{fig:libpcap_file_header}
 \end{figure}
 
-El orden de los campos en la cabecera del fichero es como podemos ver en la Figura \ref{fig:libpcap_file_header}. El significado de los campos es el siguiente:
+El orden de los campos en la cabecera del fichero es como se muestra en la Figura \ref{fig:libpcap_file_header}. El significado de los campos es el siguiente:
 
 \begin{enumerate}
     \item \textbf{Número mágico}: Permite identificar el archivo como pcap, conocer la precisión de los campos de tiempo y saber el orden de bits de las cabeceras. El valor del campo en hexadecimal es \texttt{0xA1B2C3D4} si tenemos segundos y microsegundos. En caso de que sea \texttt{0xA1B23C4D}, tenemos precisión de nanosegundos en vez de microsegundos. Finalmente, si el primer byte del fichero tiene el valor \texttt{0xA1}, los campos tienen el orden 'big endian' (los bytes más significativos aparecen primero). En el caso opuesto, tienen el orden 'little endian' (los bytes menos significativos aparecen primero).
@@ -38,12 +38,12 @@ El orden de los campos en la cabecera del fichero es como podemos ver en la Figu
     \item \textbf{Reservado 1}: Valor no utilizado en la actualidad. En versiones antiguas se utilizaba para marcar la diferencia de huso horario.
     \item \textbf{Reservado 2}: Valor no utilizado en la actualidad. En versiones antiguas se utilizaba para indicar la precisión de las marcas de tiempo.
     \item \textbf{Longitud máxima capturada}: Número máximo de bytes de los paquetes originales que pueden ser incluidos en la traza de red. Si hay algún paquete que originalmente es más grande que este tamaño, se trunca a la longitud indicada.    \item \textbf{FCS/f}: si el bit 'f' está a 1, los siguientes 3 bits indican el número de bytes de detección de errores añadidos a continuación. 
-    \item \textbf{Tipo capa de enlace}: Número identificando el tipo de la capa de enlace utilizado. Algunos ejemplos son 1 para una trama Ethernet (IEEE 802.3) o 113 para 'Linux Cooked Capture v1' \cite{linktypetcpdump}
+    \item \textbf{Tipo capa de enlace}: Número que identifica el tipo de la capa de enlace utilizado. Algunos ejemplos son 1 para una trama Ethernet (IEEE 802.3) o 113 para 'Linux Cooked Capture v1' \cite{linktypetcpdump}.
 \end{enumerate}
 
 \subsubsection{Registro de paquete}
 
-El orden de los campos en la cabecera del fichero es como podemos ver en la Figura \ref{fig:libpcap_file_packet_record}. La marca se encuentra representada como el número de segundos y micro/nanosegundos (dependiendo de la cabecera del fichero) transcurridos desde el 1 de enero de 1970 a las 00:00 UTC. Se incluye el tamaño del paquete original y el capturado, ya que no todos los paquetes de la captura tienen necesariamente el mismo tamaño que el original ni entre ellos.
+El orden de los campos en la cabecera del fichero es se muestra ver en la Figura \ref{fig:libpcap_file_packet_record}. La marca se encuentra representada como el número de segundos y micro/nanosegundos (dependiendo de la cabecera del fichero) transcurridos desde el 1 de enero de 1970 a las 00:00 UTC. Se incluye el tamaño del paquete original y el capturado, ya que no todos los paquetes de la captura tienen necesariamente el mismo tamaño que el original ni tienen todos el mismo tamaño.
 
 \begin{figure}[h]
     \begin{center}
@@ -88,7 +88,7 @@ Para decidir como interpretar el campo de longitud o tipo, se ha de determinar s
 
 \subsection{Linux Cooked Capture v1 (SLL)} \label{sllformat}
 
-'Linux Cooked Capture v1' es un pseudo-protocolo utilizado por libpcap para capturar de la interfaz 'any' (todas las interfaces de red al mismo tiempo) y en dispositivos donde las cabeceras de la capa de enlace no están disponibles \cite{sllwireshark}. Una indicación del formato de los paquetes lo podemos encontrar en la web de tcpdump \cite{slltcpdump} y es como podemos observar en la Figura \ref{fig:linux_cooked_capture_struct}.
+'Linux Cooked Capture v1' es un pseudo-protocolo utilizado por libpcap para capturar de la interfaz 'any' (todas las interfaces de red al mismo tiempo) y en dispositivos donde las cabeceras de la capa de enlace no están disponibles \cite{sllwireshark}. Una indicación del formato de los paquetes lo podemos encontrar en la web de tcpdump \cite{slltcpdump} y es como se muestra en la Figura \ref{fig:linux_cooked_capture_struct}.
 
 \begin{figure}[H]
     \begin{center}
@@ -125,9 +125,9 @@ El tipo de paquete proviene de \texttt{if\_packet.h} \cite{linuxifpacket}. En el
     \item \textbf{PACKET\_MULTICAST} (2): El paquete ha sido enviado a un grupo en el que pertenecia el dispositivo capturador.
     \item \textbf{PACKET\_OTHERHOST} (3): El paquete ha sido enviado hacia otro dispositivo diferente al capturador.
     \item \textbf{PACKET\_OUTGOING} (4): El paquete ha sido enviado por parte del capturador.
-    \item \textbf{PACKET\_LOOPBACK} (5): El paquete ha sido enviado hacia sí mismo
-    \item \textbf{PACKET\_USER} (6): El paquete se ha enviado a 'user space' o entorno de ejecución no privilegiado (especifico de Linux)
-    \item \textbf{PACKET\_KERNEL} (7):  El paquete se ha enviado a 'kernel space' o entorno de ejecución privilegiado (especifico de Linux)
+    \item \textbf{PACKET\_LOOPBACK} (5): El paquete ha sido enviado hacia sí mismo.
+    \item \textbf{PACKET\_USER} (6): El paquete se ha enviado a 'user space' o entorno de ejecución no privilegiado (especifico de Linux).
+    \item \textbf{PACKET\_KERNEL} (7):  El paquete se ha enviado a 'kernel space' o entorno de ejecución privilegiado (especifico de Linux).
 \end{itemize}
 
 El tipo de 'ARPHRD\_' proviene de \texttt{if\_arp.h} \cite{linuxifarp}. Este indica, el tipo de paquete capturado en la siguiente capa, similar a lo indicado en los registros de paquetes. Las posibilidades indicadas en la web de tcpdump son las siguientes:
@@ -144,7 +144,7 @@ Los campos de la longitud de la dirección de capa de enlace y la dirección com
 
 \subsection{IP} \label{ipformat}
 
-El protocolo de Internet (IP) es una tecnología de conmutación de paquetes basada en 'datagramas' \cite{iptechslides}. No está orientado a la conexión (los datagramas son enviados sin establecer una conexión) y se hace una entrega de mejor esfuerzo (no se dan garantías de que los datos lleguen o como a su destino). Está ubicado en la capa de red, donde los puntos de destino se les llama 'hosts' y los datagramas se transmiten a través de intermediarios (routers), los cuales entre ellos se comunican con otro protocolo de una capa inferior. Existen actualmente dos versiones del protocolo, principalmente la versión 4 y la versión 6.
+El protocolo de Internet (IP) es una tecnología de conmutación de paquetes basada en 'datagramas' \cite{iptechslides}. No está orientado a la conexión (los datagramas son enviados sin establecer una conexión) y se hace una entrega de mejor esfuerzo (no se dan garantías de que los datos lleguen a su destino, sigan una ruta definida o no sufran cambios durante el enrutamiento). Está ubicado en la capa de red, donde los puntos de destino se les llama 'hosts' y los datagramas se transmiten a través de intermediarios (routers), los cuales entre ellos se comunican con otro protocolo de una capa inferior. Existen actualmente dos versiones del protocolo, principalmente la versión 4 y la versión 6.
 
 \subsubsection{IP versión 4} \label{ipv4format}
 
@@ -185,12 +185,12 @@ La versión 4 del protocolo IP es la más utilizada en la actualidad \cite{ipv4u
     \item \textbf{Versión}: La versión del protocolo. Ha de contener siempre el valor 4.
     \item \textbf{IHL}: La longitud total de la cabecera es expresada como el número de grupos de 32 bits que hay en la cabecera. El valor mínimo es 5, indicando que solo hay 20 Bytes sin opciones adicionales. El valor máximo que puede representar con 4 bits es 15, indicando que hay un total de 60 Bytes.
     \item \textbf{DSCP}: Código de servicio diferenciado. En la especificación original RFC791 \cite{rfc791}, se indica que este campo permite indicar preferencias de como tratar el paquete (menor latencia, mayor fiabilidad). Sin embargo, en RFC 2474 \cite{rfc2474}, se modificó para que indicase un identificador de servicios diferenciados.
-    \item \textbf{ECN}: Indicador para notificar a los hosts la existencia de congestión definido en RFC 3168 \cite{rfc3168}
+    \item \textbf{ECN}: Indicador para notificar a los hosts la existencia de congestión definido en RFC 3168 \cite{rfc3168}.
     \item \textbf{Longitud total}: Longitud total del datagrama, incluyendo la cabecera IP. El tamaño mínimo es 20 Bytes (el tamaño de la cabecera) y el máximo, el valor máximo representable con 16 bits (65635). En caso de que la longitud sea mayor que la que admita la capa inferior, se fragmentará el datagrama.
     \item \textbf{Identificador}: Identificador del paquete. Es utilizado para reconstruir datagramas fragmentados.
     \item \textbf{Flgs}: Indicadores para controlar la fragmentación de paquetes. El primero se encuentra sin uso y está reservado, el segundo es un indicador de que el paquete no ha de ser fragmentado (DF) y el tercero indica que hay más fragmentos después del actual (MF).
     \item \textbf{Offset del fragmento}: Indica el número de grupos de 8 bytes de offset después del inicio de los datos del fragmento. Por ejemplo, si fragmentamos por la mitad un campo de datos de 16 Bytes en dos datagramas, el primero tendrá un 0 y el segundo un 1 en este campo.
-    \item \textbf{TTL}: El número de saltos máximo permitido que el paquete puede atravesar, aunque originalmente indicaba segundos. Esto es utilizado para evitar que haya paquetes en un bucle en caso de que haya tablas de enrutamiento mal configuradas.
+    \item \textbf{TTL}: El número máximo permitido de saltos que el paquete puede atravesar, aunque originalmente indicaba segundos. Esto es utilizado para evitar que haya paquetes en un bucle en caso de que haya tablas de enrutamiento mal configuradas.
     \item \textbf{Protocolo}: El identificador del protocolo de la siguiente capa. Por ejemplo, TCP es 6 y UDP es 17 \cite{ipprotocolnumbers}.
     \item \textbf{Checksum}: Código de verificación para detectar errores en la cabecera del datagrama.
     \item \textbf{Dirección origen}: Dirección del host que ha enviado el datagrama.
@@ -208,7 +208,7 @@ La versión 6 del protocolo IP es una versión diseñada para ser un sucesor a I
     \item \textbf{Etiqueta de flujo}: Etiqueta para identificar un flujo de datos entre dos nodos. Permite correlacionar diferentes datagramas enviados entre hosts.
     \item \textbf{Longitud de los datos}: El tamaño total del campo de datos, incluyendo cabeceras de extensión. No se incluye la cabecera de IPv6 en el recuento.
     \item \textbf{Siguiente cabecera}: El contenido del campo de datos definido por los números IP registrados \cite{ipprotocolnumbers}. Normalmente, indica el protocolo de la capa de transporte, pero hay números definidos para extensiones de la cabecera.
-    \item \textbf{Límite de saltos}: Número de saltos entre routers que el datagrama puede realizar antes de ser descartado. Es el equivalente al TTL de IPv4
+    \item \textbf{Límite de saltos}: Número de saltos entre routers que el datagrama puede realizar antes de ser descartado. Es el equivalente al TTL de IPv4.
     \item \textbf{Dirección origen}: Dirección del host que ha enviado el datagrama.
     \item \textbf{Dirección destino}: Dirección de destino del datagrama.
 \end{enumerate}
@@ -242,7 +242,7 @@ Cabe notar que no hay un 'checksum' como en IPv4, ya que las capas de enlace y l
 
 \subsection{UDP} \label{udpformat}
 
-UDP es un protocolo minimalista para permitir enviar mensajes entre permitir enviar mensajes entre programas sobre IP \cite{rfc768}. Ofrece características adicionales sobre IP reducidas: diferenciación de puertos y detección de errores en los datos. Como podemos ver en la Figura \ref{fig:udp_packet} tenemos un puerto de origen y uno de destino, la longitud del mensaje incluyendo la cabecera y un campo de checksum. Este se calcula con el mensaje como tal y se le añade una pseudocabecera como en la Figura \ref{fig:udp_packet_pseudoheader}
+UDP es un protocolo minimalista para permitir enviar mensajes entre programas sobre IP \cite{rfc768}. Ofrece características adicionales sobre IP reducidas: diferenciación de puertos y detección de errores en los datos. Como podemos ver en la Figura \ref{fig:udp_packet} tenemos un puerto de origen y uno de destino, la longitud del mensaje, incluyendo la cabecera y un campo de checksum. Este se calcula con el mensaje como tal y se le añade una pseudocabecera como en la Figura \ref{fig:udp_packet_pseudoheader}.
 
 \begin{figure}[h]
     \minipage{0.5\textwidth}
@@ -314,19 +314,19 @@ UDP es un protocolo minimalista para permitir enviar mensajes entre permitir env
 TCP es un protocolo orientado a la conexión, el cual ofrece la capacidad de enviar un flujo bidireccional de bytes de forma fiable y ordenada. Adicionalmente, permite hacer un control de la congestión para evitar saturar la red, detectar errores y retransmitir paquetes perdidos \cite{rfc9293}. Las unidades del protocolo son llamadas segmentos y en la Figura \ref{fig:tcp_paquet} podemos ver su estructura. Los campos en este consisten en:
 
 \begin{enumerate}
-    \item \textbf{Puerto de origen}: El número indicando el puerto de origen
-    \item \textbf{Puerto de destino}:  El número indicando el puerto de destino
+    \item \textbf{Puerto de origen}: El número indicando el puerto de origen.
+    \item \textbf{Puerto de destino}:  El número indicando el puerto de destino.
     \item \textbf{Número de secuencia}: Si SYN está a 0, el número de secuencia del primer byte del campo de datos. Si SYN está a 1, el número de secuencia inicial, siendo el primer byte el siguiente número. La recomendación es inicializar este número de forma aleatoria.
     \item \textbf{Número de reconocimiento} y \textbf{ACK}: Si ACK está a 1, el número de secuencia del siguiente byte que el emisor del segmento espera.  La recomendación es inicializar este número de forma aleatoria.
     \item \textbf{Offset}: El número de grupos de 32 bits en la cabecera TCP. La definición del protocolo garantiza que la longitud de la cabecera es un múltiplo de 32 bits.
     \item \textbf{CWR}: Indicador que el tamaño de ventana de congestión se encuentra reducida.
-    \item \textbf{ECE}: Copia del bit ECN de la cabecera IP
+    \item \textbf{ECE}: Copia del bit ECN de la cabecera IP.
     \item \textbf{URG} y \textbf{Puntero URG}: Si URG está a 1, el puntero URG indica un offset respecto al número de secuencia donde hay datos considerados urgentes.
-    \item \textbf{PSH}: Si está a 1, se indica que se han de pasar los datos a la capa de aplicación por parte del receptor lo antes posible.
-    \item \textbf{RST}: Si está a 1, se indica que la conexión se ha reseteado y, dependiendo del estado de la conexión, se ha de actuar de una manera u otra. Se utiliza cuando se recibe un segmento que no corresponde a la conexión enviada.
+    \item \textbf{PSH}: Si está a 1, indica que se han de pasar los datos a la capa de aplicación por parte del receptor lo antes posible.
+    \item \textbf{RST}: Si está a 1, indica que la conexión se ha reseteado y, dependiendo del estado de la conexión, se ha de actuar de una manera u otra. Se utiliza cuando se recibe un segmento que no corresponde a la conexión enviada.
     \item \textbf{SYN}: Sincronización de número de secuencia. Es utilizado para iniciar una conexión.
     \item \textbf{FIN}: El emisor no enviará más datos. 
     \item \textbf{Tamaño de ventana}: El número de bytes a partir del número de reconocimiento que el emisor puede aceptar. Este número va variando según el algoritmo de control de la congestión.
-    \item \textbf{Checksum}: Código de verificación para detectar errores en el paquete. Utiliza una pseudocabecera similar al caso de UDP representada en la Figura \ref{fig:udp_packet_pseudoheader}
-    \item \textbf{Opciones}: Campo opcional de opciones. No es frecuentemente utilizado
+    \item \textbf{Checksum}: Código de verificación para detectar errores en el paquete. Utiliza una pseudocabecera similar al caso de UDP representada en la Figura \ref{fig:udp_packet_pseudoheader}.
+    \item \textbf{Opciones}: Campo opcional de opciones. No es utilizado con frecuencia.
 \end{enumerate}

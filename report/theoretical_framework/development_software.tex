@@ -1,12 +1,12 @@
 \section{Software para el desarrollo}
 
-En esta sección resumiremos los diferentes elementos software que serán utilizados para el desarrollo del trabajo y no sean mencionados en otros puntos. Concretamente, se indicarán los lenguajes de programación utilizados y los programas excepto Tshark, además de la razón de su uso.
+En esta sección resumiremos los diferentes elementos software que serán utilizados para el desarrollo del trabajo y no hayan sido mencionados en otros puntos. Concretamente, se indicarán los lenguajes de programación utilizados y los programas excepto Tshark, ya que se explicó en la sección \ref{tshark}, además de la razón de su uso.
 
 \subsection{Lenguajes de programación}
 
 \subsubsection{Rust}
 
-Rust es un lenguaje de programación compilado de propósito general y multiparadigma \cite{blandy2017programming} \cite{klabnik2018rust}. Este trata de garantizar que todas las referencias a memoria sean válidas e impedir condiciones de carrera sin tener necesidad de un 'recolector de basura' como Java o Python. Esto lo hace a través de, en el momento de compilación, comprobar que los usos de memoria sean correctos. 
+Rust es un lenguaje de programación compilado de propósito general y multiparadigma \cite{blandy2017programming} \cite{klabnik2018rust}. Este trata de garantizar que todas las referencias a memoria sean válidas e impedir condiciones de carrera sin tener necesidad de un 'recolector de basura' como Java o Python. Esto lo hace en el momento de compilación, a través de comprobar que los usos de memoria sean correctos. 
 
 Debido a que garantizar con exactitud si un programa hace uso de la memoria de forma correcta es un reto, el compilador toma una posición más conservadora. En caso de que el programador tenga más información y sepa que un uso de memoria que el compilador rechaza es correcto, existen métodos para hacer que el compilador lo acepte. Ejemplos son el uso de \texttt{unwrap()} para acceder a valores opcionales, el cual, si no contiene el valor esperado, interrumpe el programa en vez de corromper la memoria, o bloques \texttt{unsafe}, donde el programador ha de manualmente comprobar que no se está accediendo a memoria inválida.
 
@@ -14,7 +14,7 @@ Se ha escogido este lenguaje para el desarrollo de la herramienta debido a la ca
 
 \subsubsection{Bash}
 
-Bash, también conocido como GNU Bash, es un programa Shell y un lenguaje de comandos asociado que formaba originalmente parte del sistema operativo GNU \cite{gnubashweb} \cite{gnubashmanual}. Se puede ejecutar de forma interactiva, donde escribimos los comandos directamente en el terminal, o de manera no interactiva, donde le pasamos un archivo con la lista de comandos a ejecutar. Los comandos pueden ser palabras intrínsecas del lenguaje (\texttt{if}, \texttt{do}, entre otros) o programas para ser ejecutado. Adicionalmente, tiene soporte para bucles, guardar y expandir variables, funciones, listas, ente otros.
+Bash, también conocido como GNU Bash, es un programa Shell y un lenguaje de comandos asociado que formaba originalmente parte del sistema operativo GNU \cite{gnubashweb} \cite{gnubashmanual}. Se puede ejecutar de forma interactiva, donde escribimos los comandos directamente en el terminal, o de manera no interactiva, donde le pasamos un archivo con la lista de comandos a ejecutados. Los comandos pueden ser palabras intrínsecas del lenguaje (\texttt{if}, \texttt{do}, entre otros) o programas para ser ejecutado. Adicionalmente, tiene soporte para bucles, guardar y expandir variables, funciones, listas, ente otros.
 
 Se ha escogido Bash porque es la Shell utilizada por defecto en muchas distribuciones Linux. Con esta, automatizaremos tareas que requieran tratar archivos con herramientas existentes, como por ejemplo \texttt{tshark}.
 
@@ -34,7 +34,7 @@ Se utilizará LaTeX para la escritura de la memoria y otros documentos del proye
 
 \subsubsection{Git}
 
-Git es un sistema de versión de control distribuido, el que mantiene versiones de archivos y su evolución en el tiempo \cite{chacon2014pro}. Se considera un sistema distribuido, ya que no requiere de un servidor central que gestione el control de versiones, sino que se hace en cada nodo y a continuación se sincroniza el estado. Tiene una gran flexibilidad, permitiendo, entre muchas cosas, tener versiones alternativas del estado del código en 'ramas', revertir cambios, encontrar cuando se modificó una línea y su historia. Adicionalmente, todas las actualizaciones tienen comprobaciones de integridad y se pueden opcionalmente firmar criptográficamente.
+Git es un sistema de versión de control distribuido, que mantiene versiones de archivos y su evolución en el tiempo \cite{chacon2014pro}. Se considera un sistema distribuido, ya que no requiere de un servidor central que gestione el control de versiones, sino que se hace en cada nodo y a continuación se sincroniza el estado. Tiene una gran flexibilidad, permitiendo, entre muchas cosas, tener versiones alternativas del estado del código en 'ramas', revertir cambios, encontrar cuando se modificó una línea y su historia. Adicionalmente, todas las actualizaciones tienen comprobaciones de integridad y se pueden opcionalmente firmar criptográficamente.
 
 Se utilizará este programa para realizar el control de versiones de todo el proyecto. Desde la redacción de la memoria, el desarrollo de la herramienta y los scripts en Bash o Python asociados. Se ha escogido este debido a su popularidad y por el hecho de que servicios como GitHub permiten mantener una copia de todo el historial en la nube.
 

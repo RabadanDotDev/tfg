@@ -1,6 +1,6 @@
 \section{Desarollo packet pincer}
 
-En esta sección veremos el funcionamiento de cada parte de la herramienta, la cual se ha llamado 'packet pincer' por el momento. Veremos qué y cuáles argumentos de consola acepta, como realiza la lectura de paquetes tanto en tiempo real como por trazas. A continuación se explicarán los diferentes pasos que llevan a cabo en el momento al analizar un paquete y como se realiza la generación de estadísticas. Finalmente, veremos como se realiza el etiquetado automático de los flujos y se escriben emiten los resultados.
+En esta sección veremos el funcionamiento de cada parte de la herramienta, la cual se ha llamado 'packet pincer' por el momento. Veremos qué y cuáles argumentos de consola acepta, como realiza la lectura de paquetes tanto en tiempo real como por trazas. A continuación se explicarán los diferentes pasos que se llevan a cabo en el momento de analizar un paquete y como se realiza la generación de estadísticas. Finalmente, veremos como se realiza el etiquetado automático de los flujos y se emiten los resultados.
 
 Un esquema del flujo principal de la aplicación se puede observar en la Figura \ref{fig:packetpincerexecution}. Como podemos ver, se van extrayendo paquetes mientras se encuentren disponibles. Cuando se obtiene uno, en caso de ser un paquete IPv4 fragmentado, se intenta reconstruir o se guarda en caso de no poder. A continuación, se comprueba si la herramienta soporta analizar el paquete indicado y, en caso afirmativo, acumula la información en el flujo de transporte respectivo. Finalmente, se 'cierran' los flujos antiguos, es decir, se emite la información relevante y a continuación se descarta el resto de información acumulada.
 
@@ -21,8 +21,8 @@ El programa está pensado para ser ejecutado desde el terminal. Debido a esto, h
 Para hacer la gestión de los argumentos enviados por el terminal, se ha hecho uso de la librería (o 'crate', en la nomenclatura utilizada en Rust) clap \cite{Knapp_clap_2024}. Concretamente, se ha hecho uso de la funcionalidad 'derive', la cual permite expresar los argumentos a pasar como un tipo del lenguaje de forma declarativa. Adicionalmente, la librería añade diversas funcionalidades que mejoran la experiencia de usuario. A partir de nuestras definiciones, se muestran unas indicaciones de uso si se ejecuta \texttt{packet\_pincer --help} o si se pasan argumentos inválidos. Los argumentos definidos para el programa consisten en:
 
 \begin{enumerate}
-  \item Opcionalmente indicar si escribir los resultados generados en archivos (indicando su prefijo), en la salida estándar o no emitir nada.
-  \item Opcionalmente indicar si un archivo en formato csv de las etiquetas que han de ponerse en los flujos. En caso de que se especifique este archivo y no haya etiqueta correspondiente, se generará una llamada 'benign'.
+  \item Opcionalmente, indicar si escribir los resultados generados en archivos o en la salida estándar. Si no se especifica, no se emite nada.
+  \item Opcionalmente, indicar un archivo con etiquetas para los flujos. En caso de que se especifique este archivo y no haya etiqueta correspondiente para un flujo determinado, se asignará 'benign'
   \item Indicación del origen de los paquetes a analizar. Este puede ser 'offline' (a partir de una traza de red o un directorio de estas) u 'online' (a partir de una interficie de red).
 \end{enumerate}
 
@@ -38,9 +38,9 @@ Para realizar la lectura de paquetes, tanto en tiempo real como a partir de arch
 
 \subsubsection{Detalles de implementación comunes}
 
-A pesar de que la librería ofrece casi todas las funcionalidades que se requieren, no ofrece soporte para leer desde una lista de archivos, sino que hemos de leer de cada uno individualmente. Debido a esto, se ha creado la envoltura 'PacketCapture' disponible en \texttt{packet\_capture.rs} en el anexo 2 o en el repositorio de GitHub. En esta, se permite crear una instancia a partir de una ruta, que puede ser un archivo, un directorio o una interfaz de red. Adicionalmente, permite al usuario del módulo hacer una petición para procesar el siguiente paquete. Esto se hace a través de pasar una clausura que acepta un 'PacketOrigin' (ruta del archivo o nombre, interfaz), un 'LinkType' (el tipo de la capa de enlace \cite{linktypetcpdump}) y una referencia al paquete a tratar. La función de procesamiento extrae el siguiente paquete y llama a la clausura, devolviendo un valor afirmativo si se ha podido extraer un paquete o un valor negativo en caso de contrario.
+A pesar de que la librería ofrece casi todas las funcionalidades que se requieren, no ofrece soporte para leer desde una lista de archivos, sino que hemos de leer de cada uno individualmente. Debido a esto, se ha creado la envoltura 'PacketCapture' disponible en \texttt{packet\_capture.rs} en el anexo 2 o en el repositorio de GitHub. En esta, se permite crear una instancia a partir de una ruta, que puede ser un archivo, un directorio o una interfaz de red. Adicionalmente, permite al usuario del módulo hacer una petición para procesar el siguiente paquete. Esto se hace a través de pasar una clausura que acepta un 'PacketOrigin' (ruta del archivo o nombre, interfaz), un 'LinkType' (el tipo de la capa de enlace \cite{linktypetcpdump}) y una referencia al paquete a tratar. La función de procesamiento extrae el siguiente paquete y llama a la clausura, devolviendo un valor afirmativo si se ha podido extraer un paquete o un valor negativo en caso contrario.
 
-Se hace uso de una clausura en vez de devolver una referencia al paquete debido a que el compilador no lo permitía. Después de investigar, esto era causado por el hecho que la librería pcap, dentro de la instancia 'Capture', tenía una referencia a un trozo de memoria. Al seguir manteniendo una referencia a la captura después de ejecutar la función, esto causaba que el compilador no pudiese garantizar que esta referencia fuese válida. En cambio, al pasar una clausura se puede asegurar a que se haga un uso correcto de la memoria al poder indicarlo en el prototipo de la función proporcionada por el usuario del módulo.
+Se hace uso de una clausura en vez de devolver una referencia al paquete debido a que el compilador no lo permitía. Después de investigar, esto era causado por el hecho que la librería pcap, dentro de la instancia 'Capture', tenía una referencia a un trozo de memoria. Al seguir manteniendo una referencia a la captura después de ejecutar la función, esto causaba que el compilador no pudiese garantizar que esta referencia fuese válida. En cambio, al pasar una clausura se puede asegurar que se haga un uso correcto de la memoria al poder indicarlo en el prototipo de la función proporcionada por el usuario del módulo.
 
 \subsubsection{Lectura de paquetes en tiempo real}
 
@@ -52,7 +52,7 @@ El caso de la lectura de trazas es más complicado. Debido a que se quiere admit
 \begin{enumerate}
   \item \textbf{OwnedPacket}: Un paquete el cual 'posee' la memoria a la que hace referencia. A diferencia del que nos proporciona la librería pcap, no hace referencia a una sección de memoria que puede formar o no parte de otra mayor, permitiéndonos garantizar que las referencias a memoria son válidas.
   \item \textbf{FileCapture}: Una envoltura de una 'Capture' de la librería pcap con su ruta de origen y el siguiente paquete que se debe tratar extraído. Esto se hace para poder ordenar las diferentes 'FileCapture' según el tiempo de captura del paquete.
-  \item \textbf{FileCaptureCollection}: Un conjunto de 'FileCapture'. Está estructurado en dos campos: un 'HashMap' de la librería estándar y en una cola de prioridad \cite{priority-queue}. El primero es utilizado para poder acceder en tiempo constante a cualquier 'FileCapture' a partir de su ruta y el segundo para tener una lista ordenada de más a menos antiguo del siguiente paquete a analizar. Esto es necesario debido a que hay algunos conjuntos de datos contienen archivos que se solapan en el tiempo.
+  \item \textbf{FileCaptureCollection}: Un conjunto de 'FileCapture'. Está estructurado en dos campos: un 'HashMap' de la librería estándar y en una cola de prioridad \cite{priority-queue}. El primero es utilizado para poder acceder en tiempo constante a cualquier 'FileCapture' a partir de su ruta y el segundo para tener una lista ordenada de más a menos antiguo del siguiente paquete a analizar. Esto es necesario debido a que algunos conjuntos de datos contienen archivos que se solapan en el tiempo.
 \end{enumerate}
 
 Para generar la instancia a partir de la ruta, navegamos por todos los archivos y directorios de esta haciendo uso de walkdir \cite{walkdir}. Por cada archivo, intentamos abrirlo como captura pcap y, en caso de no ser posible, lo saltamos. Una vez abierto, extraemos el primer paquete de la captura y creamos un 'FileCapture' con las tres partes necesarias. Finalmente, creamos el 'HashMap' con todas las capturas abiertas y la cola de prioridad para poder acceder a las capturas de forma ordenada.
@@ -73,7 +73,7 @@ Después de un primer análisis, se observó que la librería soportaba interpre
 
 \subsubsection{Extensión librería}
 
-Para realizar esto, primero se creó un 'issue' en el repositorio original el 24 de abril de 2024 para indicar al desarrollador de la librería sobre la intención de hacer esta adición \cite{slladdsllissue}. No se recibió respuesta, pero se inició el trabajo para añadir el soporte. Durante los siguientes 5 días, se añadieron 4,145 líneas de código y se eliminaron 141. En estas, se incluye el formato SLL, el proceso para extraer los valores relevantes desde datos en crudo desde el formato SLL, tests y toda la documentación asociada. Se trató de mantener el estilo de la librería para asegurar que el desarrollador original aceptaría los cambios. Una vez finalizado, el 29 de abril se creó un 'pull request' para juntar los cambios \cite{slladdsllpr}. En esta instancia, el desarrollador contestó agradeciendo el trabajo realizado. Después de que lo revisara y arreglase algunos detalles de integración, el 2 de mayo juntó los cambios a la rama principal.
+Para realizar esto, primero se creó un 'issue' en el repositorio original el 24 de abril de 2024 para indicar al desarrollador de la librería sobre la intención de hacer esta adición \cite{slladdsllissue}. No se recibió respuesta, pero se inició el trabajo para añadir el soporte. Durante los siguientes 5 días, se añadieron 4145 líneas de código y se eliminaron 141. En estas, se incluye el formato SLL, el proceso para extraer los valores relevantes desde datos en crudo desde el formato SLL, tests y toda la documentación asociada. Se trató de mantener el estilo de la librería para asegurar que el desarrollador original aceptara los cambios. Una vez finalizado, el 29 de abril se creó un 'pull request' para juntar los cambios \cite{slladdsllpr}. En esta instancia, el desarrollador contestó agradeciendo el trabajo realizado. Después de que lo revisara y arreglase algunos detalles de integración, el 2 de mayo se juntaron los cambios a la rama principal.
 
 \subsubsection{Uso de la libreria}
 
@@ -109,17 +109,17 @@ Para almacenar la información, también se hace uso de \texttt{FlowGroup}. En e
 
 Cada vez que, a partir de un paquete con un protocolo soportado, se crea o se identifica el flujo de transporte respectivo, se han de acumular una serie de datos para poder generar unas estadísticas del flujo. Cuando el flujo se considera finalizado o se 'cierra' y se emiten las estadísticas de este, se utiliza esta información acumulada para generarlas. Después, estos valores son emitidos como se indica en \ref{flowwrite}.
 
-La información se acumula durante el transcurso de la ejecución es diversa. Las estadísticas escogidas para generar han sido basadas en las utilizadas en CICFlowMeter como vimos en \ref{cicflowfeatures}. En conjunto, mantenemos:
+La información que se acumula durante el transcurso de la ejecución es diversa. Las estadísticas escogidas para generar han sido basadas en las utilizadas en CICFlowMeter como vimos en \ref{cicflowfeatures}. En conjunto, mantenemos:
 
 \begin{itemize}
   \item La marca de tiempo del primer y último paquete
   \item Una lista de protocolos detectados. En el momento, lo hemos mantenido en sí, se ha detectado el protocolo TCP y/o el protocolo UDP.
   \item El recuento de paquetes desde el que ha iniciado la emisión (forward) o hacia este (backward).
   \item Un \texttt{RunningStat} del número de bytes enviados en cada dirección (forward/backward) y en ambas (bidirectional).
-  \item Un \texttt{RunningStat} del periodo de llegada entre paquetes en cada dirección (forward/backward) y en ambas (bidirectional). Adicionalmente, se mantiene una marca de tiempo del último paquete en cada dirección para facilitar el cálculo
+  \item Un \texttt{RunningStat} del periodo de llegada entre paquetes en cada dirección (forward/backward) y en ambas (bidirectional). Adicionalmente, se mantiene una marca de tiempo del último paquete en cada dirección para facilitar el cálculo.
   \item El número de flags TCP vistas en las dos direcciones. Adicionalmente, mantenemos un recuento separado de los flags PSH y URG de cada dirección.
   \item Un \texttt{RunningStat} para información específica sobre las longitudes en bytes de la cabecera de la capa de transporte y las longitudes de los campos de datos.
-  \item El número de paquetes enviados desde el iniciador de la conexión con un campo de datos en la capa de transporte no vacía
+  \item El número de paquetes enviados desde el iniciador de la conexión con un campo de datos en la capa de transporte no vacía.
   \item El tamaño de la ventana inicial TCP en cada dirección, si está disponible.
   \item Dos \texttt{RunningStat} para tener un recuento de los tiempos que el flujo ha estado activo (menos de un segundo de separación entre paquetes) e inactivo pero sin ser cerrado. Adicionalmente, hay un recuento de cuantos grupos activos ha habido.
 \end{itemize}
@@ -150,16 +150,16 @@ Los \texttt{RunningStat} mencionados son utilizados para mantener, como su nombr
 Con esto, en el momento de cerrar el flujo y emitir las estadísticas, se generan los siguientes valores:
 
 \begin{enumerate}
-  \item \texttt{duration\_seconds}: duración en segundos del flujo
+  \item \texttt{duration\_seconds}: duración en segundos del flujo.
   \item \texttt{has\_tcp}: 1 si se utiliza TCP en el flujo, 0 en caso contrario.
   \item \texttt{has\_udp}: 1 si se utiliza UDP en el flujo, 0 en caso contrario.
   %%
-  \item \texttt{bidirectional\_packet\_count}: el número total de paquetes enviados
-  \item \texttt{forward\_packet\_count}: el número total de paquetes enviados desde el iniciador de la transmisión
-  \item \texttt{backward\_packet\_count}: el número total de paquetes enviados hacia el iniciador de la transmisión
-  \item \texttt{bidirectional\_packet\_second}: la cadencia media de paquetes por segundo en ambas direcciones
-  \item \texttt{forward\_packet\_second}: la cadencia media de paquetes por segundo en desde el iniciador de la transmisión
-  \item \texttt{backward\_packet\_second}: la cadencia media de paquetes por segundo en hacia el iniciador de la transmisión
+  \item \texttt{bidirectional\_packet\_count}: el número total de paquetes enviados.
+  \item \texttt{forward\_packet\_count}: el número total de paquetes enviados desde el iniciador de la transmisión.
+  \item \texttt{backward\_packet\_count}: el número total de paquetes enviados hacia el iniciador de la transmisión.
+  \item \texttt{bidirectional\_packet\_second}: la cadencia media de paquetes por segundo en ambas direcciones.
+  \item \texttt{forward\_packet\_second}: la cadencia media de paquetes por segundo desde el iniciador de la transmisión.
+  \item \texttt{backward\_packet\_second}: la cadencia media de paquetes por segundo hacia el iniciador de la transmisión.
   %%
   \item \texttt{bidirectional\_packet\_bytes\_sum}: suma total de bytes capturados de los paquetes capturados en ambas direcciones.
   \item \texttt{bidirectional\_packet\_bytes\_max}: tamaño del paquete más grande capturado en ambas direcciones.
@@ -176,65 +176,65 @@ Con esto, en el momento de cerrar el flujo y emitir las estadísticas, se genera
   \item \texttt{backward\_packet\_bytes\_min}: tamaño del paquete más pequeño capturado originado por el receptor inicial de la transmisión.
   \item \texttt{backward\_packet\_bytes\_mean}: tamaño medio de los paquetes capturados originados por el receptor inicial de la transmisión. 
   \item \texttt{backward\_packet\_bytes\_std}: desviación estándar de los paquetes capturados originados por el receptor inicial de la transmisión.
-  \item \texttt{bidirectional\_bytes\_s}: cadencia media de datos en bytes por segundo en ambas direcciones
-  \item \texttt{forward\_bytes\_s}: cadencia media de datos en bytes por segundo desde el iniciador de la transmisión
-  \item \texttt{backward\_bytes\_s}: cadencia media de datos en bytes por segundo hacia el iniciador de la transmisión
-  \item \texttt{down\_up\_bytes\_ratio}: balance entre los bytes capturados entre las dos direcciones
+  \item \texttt{bidirectional\_bytes\_s}: cadencia media de datos en bytes por segundo en ambas direcciones.
+  \item \texttt{forward\_bytes\_s}: cadencia media de datos en bytes por segundo desde el iniciador de la transmisión.
+  \item \texttt{backward\_bytes\_s}: cadencia media de datos en bytes por segundo hacia el iniciador de la transmisión.
+  \item \texttt{down\_up\_bytes\_ratio}: balance entre los bytes capturados entre las dos direcciones.
   %%
-  \item \texttt{bidirectional\_inter\_arrival\_time\_max}: tiempo de llegada entre paquetes máximo en ambas direcciones
-  \item \texttt{bidirectional\_inter\_arrival\_time\_min}: tiempo de llegada entre paquetes mínimo en ambas direcciones
-  \item \texttt{bidirectional\_inter\_arrival\_time\_mean}: tiempo de llegada media de los paquetes en ambas direcciones
-  \item \texttt{bidirectional\_inter\_arrival\_time\_std}: desviación estándar del tiempo de llegada de los paquetes en ambas direcciones
-  \item \texttt{forward\_inter\_arrival\_time\_max}: tiempo de llegada entre paquetes máximo del iniciador de la transmisión
-  \item \texttt{forward\_inter\_arrival\_time\_min}: tiempo de llegada entre paquetes mínimo del iniciador de la transmisión
-  \item \texttt{forward\_inter\_arrival\_time\_mean}: tiempo de llegada media de los paquetes del iniciador de la transmisión
-  \item \texttt{forward\_inter\_arrival\_time\_std}: desviación estándar del tiempo de llegada de los paquetes del iniciador de la transmisión
-  \item \texttt{backward\_inter\_arrival\_time\_max}: tiempo de llegada entre paquetes máximo hacia el iniciador de la transmisión
-  \item \texttt{backward\_inter\_arrival\_time\_min}: tiempo de llegada entre paquetes mínimo hacia el iniciador de la transmisión
-  \item \texttt{backward\_inter\_arrival\_time\_mean}: tiempo de llegada media de los paquetes hacia el iniciador de la transmisión 
-  \item \texttt{backward\_inter\_arrival\_time\_std}: desviación estándar del tiempo de llegada de los paquetes hacia el iniciador de la transmisión
+  \item \texttt{bidirectional\_inter\_arrival\_time\_max}: tiempo de llegada entre paquetes máximo en ambas direcciones.
+  \item \texttt{bidirectional\_inter\_arrival\_time\_min}: tiempo de llegada entre paquetes mínimo en ambas direcciones.
+  \item \texttt{bidirectional\_inter\_arrival\_time\_mean}: tiempo de llegada media de los paquetes en ambas direcciones.
+  \item \texttt{bidirectional\_inter\_arrival\_time\_std}: desviación estándar del tiempo de llegada de los paquetes en ambas direcciones.
+  \item \texttt{forward\_inter\_arrival\_time\_max}: tiempo de llegada entre paquetes máximo del iniciador de la transmisión.
+  \item \texttt{forward\_inter\_arrival\_time\_min}: tiempo de llegada entre paquetes mínimo del iniciador de la transmisión.
+  \item \texttt{forward\_inter\_arrival\_time\_mean}: tiempo de llegada media de los paquetes del iniciador de la transmisión.
+  \item \texttt{forward\_inter\_arrival\_time\_std}: desviación estándar del tiempo de llegada de los paquetes del iniciador de la transmisión.
+  \item \texttt{backward\_inter\_arrival\_time\_max}: tiempo de llegada entre paquetes máximo hacia el iniciador de la transmisión.
+  \item \texttt{backward\_inter\_arrival\_time\_min}: tiempo de llegada entre paquetes mínimo hacia el iniciador de la transmisión.
+  \item \texttt{backward\_inter\_arrival\_time\_mean}: tiempo de llegada media de los paquetes hacia el iniciador de la transmisión.
+  \item \texttt{backward\_inter\_arrival\_time\_std}: desviación estándar del tiempo de llegada de los paquetes hacia el iniciador de la transmisión.
   %%
-  \item \texttt{bidirectional\_tcp\_cwr\_flags\_count}: número de paquetes en ambas direcciones con el campo 'cwr' de en la cabecera TCP activo
-  \item \texttt{bidirectional\_tcp\_ece\_flags\_count}: número de paquetes en ambas direcciones con el campo 'ece' de en la cabecera TCP activo
-  \item \texttt{bidirectional\_tcp\_urg\_flags\_count}: número de paquetes en ambas direcciones con el campo 'urg' de en la cabecera TCP activo
-  \item \texttt{bidirectional\_tcp\_ack\_flags\_count}: número de paquetes en ambas direcciones con el campo 'ack' de en la cabecera TCP activo
-  \item \texttt{bidirectional\_tcp\_psh\_flags\_count}: número de paquetes en ambas direcciones con el campo 'psh' de en la cabecera TCP activo
-  \item \texttt{bidirectional\_tcp\_rst\_flags\_count}: número de paquetes en ambas direcciones con el campo 'rst' de en la cabecera TCP activo
-  \item \texttt{bidirectional\_tcp\_syn\_flags\_count}: número de paquetes en ambas direcciones con el campo 'syn' de en la cabecera TCP activo
-  \item \texttt{bidirectional\_tcp\_fin\_flags\_count}: número de paquetes en ambas direcciones con el campo 'fin' de en la cabecera TCP activo
-  \item \texttt{forward\_tcp\_psh\_flags\_count}: número de paquetes desde el iniciador de la transmisión con el campo 'psh' de en la cabecera TCP activo
-  \item \texttt{forward\_tcp\_urg\_flags\_count}: número de paquetes desde el iniciador de la transmisión con el campo 'urg' de en la cabecera TCP activo
-  \item \texttt{backward\_tcp\_psh\_flags\_count}: número de paquetes hacia el iniciador de la transmisión con el campo 'psh' de en la cabecera TCP activo
-  \item \texttt{backward\_tcp\_urg\_flags\_count}: número de paquetes hacia el iniciador de la transmisión con el campo 'urg' de en la cabecera TCP activo
+  \item \texttt{bidirectional\_tcp\_cwr\_flags\_count}: número de paquetes en ambas direcciones con el campo 'cwr' de la cabecera TCP activo.
+  \item \texttt{bidirectional\_tcp\_ece\_flags\_count}: número de paquetes en ambas direcciones con el campo 'ece' de la cabecera TCP activo.
+  \item \texttt{bidirectional\_tcp\_urg\_flags\_count}: número de paquetes en ambas direcciones con el campo 'urg' de la cabecera TCP activo.
+  \item \texttt{bidirectional\_tcp\_ack\_flags\_count}: número de paquetes en ambas direcciones con el campo 'ack' de la cabecera TCP activo.
+  \item \texttt{bidirectional\_tcp\_psh\_flags\_count}: número de paquetes en ambas direcciones con el campo 'psh' de la cabecera TCP activo.
+  \item \texttt{bidirectional\_tcp\_rst\_flags\_count}: número de paquetes en ambas direcciones con el campo 'rst' de la cabecera TCP activo.
+  \item \texttt{bidirectional\_tcp\_syn\_flags\_count}: número de paquetes en ambas direcciones con el campo 'syn' de la cabecera TCP activo.
+  \item \texttt{bidirectional\_tcp\_fin\_flags\_count}: número de paquetes en ambas direcciones con el campo 'fin' de la cabecera TCP activo.
+  \item \texttt{forward\_tcp\_psh\_flags\_count}: número de paquetes desde el iniciador de la transmisión con el campo 'psh' de la cabecera TCP activo.
+  \item \texttt{forward\_tcp\_urg\_flags\_count}: número de paquetes desde el iniciador de la transmisión con el campo 'urg' de la cabecera TCP activo.
+  \item \texttt{backward\_tcp\_psh\_flags\_count}: número de paquetes hacia el iniciador de la transmisión con el campo 'psh' de la cabecera TCP activo.
+  \item \texttt{backward\_tcp\_urg\_flags\_count}: número de paquetes hacia el iniciador de la transmisión con el campo 'urg' de la cabecera TCP activo.
   %%
-  \item \texttt{forward\_transport\_header\_bytes\_sum}: la suma total del número de bytes en las cabeceras de transporte de los paquetes del iniciador de la transmisión
-  \item \texttt{forward\_transport\_payload\_bytes\_mean}: la media del número de bytes de datos de la capa de transporte de los paquetes del iniciador de la transmisión
-  \item \texttt{forward\_transport\_payload\_bytes\_min}: el mínimo del número de bytes de datos de la capa de transporte de los paquetes del iniciador de la transmisión
-  \item \texttt{forward\_transport\_packets\_with\_payload\_count}: el número de paquetes del iniciador de la conexión con el campo de datos de la capa de transporte no vacío
-  \item \texttt{forward\_tcp\_initial\_window\_bytes}: la ventana TCP inicial, o número de bytes aceptados, por parte del iniciador de la transmisión, si aplica
-  \item \texttt{backward\_transport\_header\_bytes\_sum}: la suma total del número de bytes en las cabeceras de transporte de los paquetes hacia el iniciador de la transmisión
-  \item \texttt{backward\_transport\_payload\_bytes\_mean}: la media número de bytes de datos de la capa de transporte de los paquetes hacia el iniciador de la transmisión
-  \item \texttt{backward\_tcp\_initial\_window\_bytes}: la ventana TCP inicial, o número de bytes aceptados, por parte del receptor inicial de la transmisión, si aplica
+  \item \texttt{forward\_transport\_header\_bytes\_sum}: la suma total del número de bytes en las cabeceras de transporte de los paquetes del iniciador de la transmisión.
+  \item \texttt{forward\_transport\_payload\_bytes\_mean}: la media del número de bytes de datos de la capa de transporte de los paquetes del iniciador de la transmisión.
+  \item \texttt{forward\_transport\_payload\_bytes\_min}: el mínimo del número de bytes de datos de la capa de transporte de los paquetes del iniciador de la transmisión.
+  \item \texttt{forward\_transport\_packets\_with\_payload\_count}: el número de paquetes del iniciador de la conexión con el campo de datos de la capa de transporte no vacío.
+  \item \texttt{forward\_tcp\_initial\_window\_bytes}: la ventana TCP inicial, o número de bytes aceptados, por parte del iniciador de la transmisión, si aplica.
+  \item \texttt{backward\_transport\_header\_bytes\_sum}: la suma total del número de bytes en las cabeceras de transporte de los paquetes hacia el iniciador de la transmisión.
+  \item \texttt{backward\_transport\_payload\_bytes\_mean}: la media del número de bytes de datos de la capa de transporte de los paquetes hacia el iniciador de la transmisión.
+  \item \texttt{backward\_tcp\_initial\_window\_bytes}: la ventana TCP inicial, o número de bytes aceptados, por parte del receptor inicial de la transmisión, si aplica.
   %%
-  \item \texttt{idle\_seconds\_min}: el tiempo mínimo el cual el flujo estuvo inactivo antes de volver a estar activo
-  \item \texttt{idle\_seconds\_max}: el tiempo máximo el cual el flujo estuvo inactivo antes de volver a estar activo
-  \item \texttt{idle\_seconds\_mean}: el tiempo medio el cual el flujo estuvo inactivo antes de volver a estar activo
-  \item \texttt{idle\_seconds\_std}: la desviación estándar del tiempo en el cual el flujo estuvo inactivo antes de volver a estar activo
-  \item \texttt{active\_seconds\_min}: el tiempo mínimo el cual el flujo estuvo activo antes de pasar a estar activo
-  \item \texttt{active\_seconds\_max}: el tiempo máximo el cual el flujo estuvo activo antes de pasar a estar activo
-  \item \texttt{active\_seconds\_mean}: el tiempo medio el cual el flujo estuvo activo antes de pasar a estar activo 
-  \item \texttt{active\_seconds\_std}: la desviación estándar del tiempo en el cual el flujo estuvo activo antes de pasar a estar activo
-  \item \texttt{active\_group\_forward\_packet\_average}: el número de paquetes medio en los grupos activos del flujo del iniciador de la transmisión
-  \item \texttt{active\_group\_backward\_packet\_average}: el número de paquetes medio en los grupos activos del flujo hacia el iniciador de la transmisión
-  \item \texttt{active\_group\_forward\_byte\_average}: el número de bytes transmitidos medio en los grupos activos del flujo del iniciador de la transmisión
-  \item \texttt{active\_group\_backward\_byte\_average}: el número de bytes transmitidos medios en los grupos activos del flujo hacia el iniciador de la transmisión
-  \item \texttt{active\_group\_forward\_byte\_second\_average}: la cadencia media de datos en los grupos activos del flujo del iniciador de la transmisión
-  \item \texttt{active\_group\_backward\_byte\_second\_average}: la cadencia media de datos en los grupos activos del flujo hacia el iniciador de la transmisión
+  \item \texttt{idle\_seconds\_min}: el tiempo mínimo en el cual el flujo estuvo inactivo antes de volver a estar activo.
+  \item \texttt{idle\_seconds\_max}: el tiempo máximo en el cual el flujo estuvo inactivo antes de volver a estar activo.
+  \item \texttt{idle\_seconds\_mean}: el tiempo medio en el cual el flujo estuvo inactivo antes de volver a estar activo.
+  \item \texttt{idle\_seconds\_std}: la desviación estándar del tiempo en el cual el flujo estuvo inactivo antes de volver a estar activo.
+  \item \texttt{active\_seconds\_min}: el tiempo mínimo en el cual el flujo estuvo activo antes de pasar a estar activo.
+  \item \texttt{active\_seconds\_max}: el tiempo máximo en el cual el flujo estuvo activo antes de pasar a estar activo.
+  \item \texttt{active\_seconds\_mean}: el tiempo medio en el cual el flujo estuvo activo antes de pasar a estar activo.
+  \item \texttt{active\_seconds\_std}: la desviación estándar del tiempo en el cual el flujo estuvo activo antes de pasar a estar activo.
+  \item \texttt{active\_group\_forward\_packet\_average}: el número de paquetes medio en los grupos activos del flujo del iniciador de la transmisión.
+  \item \texttt{active\_group\_backward\_packet\_average}: el número de paquetes medio en los grupos activos del flujo hacia el iniciador de la transmisión.
+  \item \texttt{active\_group\_forward\_byte\_average}: el número medio de bytes transmitidos en los grupos activos del flujo del iniciador de la transmisión.
+  \item \texttt{active\_group\_backward\_byte\_average}: el número medio de bytes transmitidos en los grupos activos del flujo hacia el iniciador de la transmisión.
+  \item \texttt{active\_group\_forward\_byte\_second\_average}: la cadencia media de datos en los grupos activos del flujo del iniciador de la transmisión.
+  \item \texttt{active\_group\_backward\_byte\_second\_average}: la cadencia media de datos en los grupos activos del flujo hacia el iniciador de la transmisión.
 \end{enumerate}
 
 \subsection{Etiquetado de flujos} \label{flowtag}
 
-Una vez se considera un flujo cerrado, si el usuario ha proporcionado un archivo 'ground truth' se intenta encontrar una etiqueta para el flujo en cuestión. Con los datos proporcionados por el usuario, se intenta encontrar una etiqueta se corresponda con el valor deseado. En caso de no encontrar la etiqueta correcta, se asigna 'benign'.
+Una vez se considera un flujo cerrado, si el usuario ha proporcionado un archivo 'ground truth' se intenta encontrar una etiqueta para el flujo en cuestión. Con los datos proporcionados por el usuario, se intenta encontrar una etiqueta que se corresponda con el valor deseado. En caso de no encontrar la etiqueta correcta, se asigna 'benign'.
 
 El formato esperado del archivo consiste en un archivo CSV con las columnas de IP de origen, IP de destino, marcas temporales en tiempo UNIX expresado en microsegundos del inicio y final y la etiqueta deseada. Estos valores son cargados en un \texttt{HashMap} que relaciona cada par de direcciones IP con una lista ordenada de intervalos con sus respectivas etiquetas. Para poder cargar los valores de manera correcta, se requiere que no haya intervalos solapados.
 
@@ -251,9 +251,9 @@ Independientemente de si se ha utilizado un formato de salida u otro, se añaden
   \item \texttt{source\_port}: el puerto de la capa de transporte del iniciador de la transmisión.
   \item \texttt{dest\_ip}: la dirección IP del receptor inicial de la transmisión.
   \item \texttt{dest\_port}: el puerto de la capa de transporte del receptor inicial de la transmisión.
-  \item \texttt{transport\_protocol}: el identificador de la capa de transporte \cite{ipprotocolnumbers}
-  \item \texttt{first\_packet\_time}: el tiempo UNIX expresado en microsegundos del primer paquete en el flujo
-  \item \texttt{last\_packet\_time}:  el tiempo UNIX expresado en microsegundos del último paquete en el flujo
-  \item \texttt{label}: la etiqueta seleccionada, si existe
+  \item \texttt{transport\_protocol}: el identificador de la capa de transporte \cite{ipprotocolnumbers}.
+  \item \texttt{first\_packet\_time}: el tiempo UNIX expresado en microsegundos del primer paquete en el flujo.
+  \item \texttt{last\_packet\_time}:  el tiempo UNIX expresado en microsegundos del último paquete en el flujo.
+  \item \texttt{label}: la etiqueta seleccionada, si existe.
 \end{enumerate}
 

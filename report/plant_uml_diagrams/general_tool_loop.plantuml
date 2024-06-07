@@ -1,10 +1,10 @@
 @startuml
 
 start
-while (paquete disponible?)
+while (paquete disponible?) is (si)
   if (paquete IPv4 fragmentado?) then (si)
 
-    if (existe flujo de red relacionado?) then (no)
+    if (existe flujo de red relacionado?) then (si)
       :actualizar flujo de red;
     else (no)
       :crear flujo de red;
@@ -23,18 +23,18 @@ while (paquete disponible?)
   else (no)
   endif
 
-  while (existe flujo de red antiguo?)
+  while (existe flujo de red antiguo?) is (si)
     :cerrar flujo de red más antiguo;
-  endwhile
+  endwhile (no)
 
-  while (existe flujo de transporte antiguo?)
+  while (existe flujo de transporte antiguo?) is (si)
     :cerrar flujo de transporte más antiguo;
-  endwhile
-endwhile
+  endwhile (no)
+endwhile (no)
 
-while (existe flujo de transporte?)
+while (existe flujo de transporte?) is (si)
   :cerrar flujo de transporte más antiguo;
-endwhile
+endwhile (no)
 
 stop
 @enduml
