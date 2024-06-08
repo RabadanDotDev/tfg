@@ -100,7 +100,7 @@ Finalmente, en la tabla \ref{table:generatedfilesoffline} podemos ver la magnitu
 
 \subsection{Descripción de las características de los datos generados}
 
-Una vez procesadas las trazas de red en crudo y obtenido las estadísticas de los flujos, haremos un primer análisis de los datos generados. Con esta información, decidiremos, en el siguiente punto, la tarea a realizar y a continuación cómo preprocesaremos los datos antes de aplicar los algoritmos de \gls{ml}. El script utilizado para extraer los datos y generar los gráficos es \texttt{packet\_pincer\_results\_plots.py},
+Una vez procesadas las trazas de red en crudo y obtenido las estadísticas de los flujos, haremos un primer análisis superficial de los datos generados. Con esta información, decidiremos, en el siguiente punto, la tarea a realizar y a continuación cómo preprocesaremos los datos antes de aplicar los algoritmos de \gls{ml}. El script utilizado para extraer los datos y generar los gráficos es \texttt{packet\_pincer\_results\_plots.py},
 
 \subsubsection{Etiquetas}
 
@@ -297,7 +297,7 @@ La distribución de las diferentes cadencias de paquetes se puede observar en la
     \label{table:packet_pincer_packet_second_zeroes}
 \end{table}
 
-\subsubsection{Numero de bytes transmitidos por flujo}
+\subsubsection{Número de bytes transmitidos por flujo}
 
 \begin{figure}[H]
     \centering
@@ -338,7 +338,7 @@ La distribución de las diferentes cadencias de paquetes se puede observar en la
 
 La distribución de las sumas totales de los bytes transmitidos por cada flujo está representada en la Figura \ref{fig:packet_pincer_packet_bytes_sum}. Podemos ver que en algunos casos la distribución parece marcada por la ley the Zipf, pero otro se asemeja más a una distribución normal al expresarlo en una gráfica log-log. Adicionalmente, en otros tenemos una caída notable a partir de cierto punto. Aparte de las peticiones que no reciben respuesta, no hay registros con ceros.
 
-\subsubsection{Numero de bytes máximos por flujo}
+\subsubsection{Número de bytes máximos por flujo}
 
 Si observamos las distribuciones de los bytes máximos en paquetes por flujo representadas en la Figura \ref{fig:packet_pincer_packet_bytes_max}, podemos ver que en general son similares. Sin embargo, las respuestas (backward) en CIC-DDos2019 (CD en la figura), la 'cola' de la distribución parece haber sido cortada. Adicionalmente, en los otros dos conjuntos de datos los picos son menos pronunciados en este caso.
 
@@ -379,10 +379,46 @@ Si observamos las distribuciones de los bytes máximos en paquetes por flujo rep
        \label{fig:packet_pincer_packet_bytes_max}
 \end{figure}
 
-\subsubsection{Numero de bytes mínimos por flujo}
+\subsubsection{Número de bytes mínimos por flujo}
 
-por hacer
-%bidirectional_packet_bytes_min, forward_packet_bytes_min, backward_packet_bytes_min
+Para el caso de bytes mínimos en paquetes, podemos ver que en la Figura \ref{fig:packet_pincer_packet_bytes_min} nos encontramos con un caso similar al caso de los máximos. Sin embargo, para el caso de CIC-DDoS, el corte es en una magnitud menor y en los otros parece haber más huecos y concentraciones en ciertos puntos de la distribución.
+
+\begin{figure}[H]
+    \centering
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_packet_bytes_min_log_x_log_y.png}
+        \caption{CD (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_packet_bytes_min_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_packet_bytes_min_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_packet_bytes_min_log_x_log_y.png}
+        \caption{BI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_packet_bytes_min_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_packet_bytes_min_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_packet_bytes_min_log_x_log_y.png}
+        \caption{TI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_packet_bytes_min_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_packet_bytes_min_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+    \hfill
+       \caption{Distribución de los máximos bytes transmitidos en un paquete por flujo}
+       \label{fig:packet_pincer_packet_bytes_min}
+\end{figure}
 
 \subsubsection{Numero de bytes medio por flujo}
 
