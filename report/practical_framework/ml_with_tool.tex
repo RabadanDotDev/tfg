@@ -204,7 +204,7 @@ La columna de duración contiene un bastes flujos que duran 0 segundos, además 
 \begin{figure}[H]
     \centering
     \hfill
-    \begin{subfigure}[b]{0.27\textwidth}
+    \begin{subfigure}[b]{0.26\textwidth}
         \centering
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_packet_count_log_x_log_y.png}
         \caption{CD (bidir.)}
@@ -214,7 +214,7 @@ La columna de duración contiene un bastes flujos que duran 0 segundos, además 
         \caption{CD (backward)}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.27\textwidth}
+    \begin{subfigure}[b]{0.26\textwidth}
         \centering
         \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_packet_count_log_x_log_y.png}
         \caption{BI (bidir.)}
@@ -224,7 +224,7 @@ La columna de duración contiene un bastes flujos que duran 0 segundos, además 
         \caption{BI (backward)}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.27\textwidth}
+    \begin{subfigure}[b]{0.26\textwidth}
         \centering
         \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_packet_count_log_x_log_y.png}
         \caption{TI (bidir.)}
@@ -247,7 +247,7 @@ En este caso, para la columna del recuento de paquetes de regreso, tenemos que l
 \begin{figure}[H]
     \centering
     \hfill
-    \begin{subfigure}[b]{0.27\textwidth}
+    \begin{subfigure}[b]{0.26\textwidth}
         \centering
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_packet_second_linear_x_log_y.png}
         \caption{CD (bidir.)}
@@ -257,7 +257,7 @@ En este caso, para la columna del recuento de paquetes de regreso, tenemos que l
         \caption{CD (backward)}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.27\textwidth}
+    \begin{subfigure}[b]{0.26\textwidth}
         \centering
         \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_packet_second_linear_x_log_y.png}
         \caption{BI (bidir.)}
@@ -267,7 +267,7 @@ En este caso, para la columna del recuento de paquetes de regreso, tenemos que l
         \caption{BI (backward)}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.27\textwidth}
+    \begin{subfigure}[b]{0.26\textwidth}
         \centering
         \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_packet_second_linear_x_log_y.png}
         \caption{TI (bidir.)}
@@ -340,8 +340,44 @@ La distribución de las sumas totales de los bytes transmitidos por cada flujo e
 
 \subsubsection{Numero de bytes máximos por flujo}
 
-por hacer
-%bidirectional_packet_bytes_max, forward_packet_bytes_max, backward_packet_bytes_max
+Si observamos las distribuciones de los bytes máximos en paquetes por flujo representadas en la Figura \ref{fig:packet_pincer_packet_bytes_max}, podemos ver que en general son similares. Sin embargo, las respuestas (backward) en CIC-DDos2019 (CD en la figura), la 'cola' de la distribución parece haber sido cortada. Adicionalmente, en los otros dos conjuntos de datos los picos son menos pronunciados en este caso.
+
+\begin{figure}[H]
+    \centering
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_packet_bytes_max_log_x_log_y.png}
+        \caption{CD (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_packet_bytes_max_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_packet_bytes_max_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_packet_bytes_max_log_x_log_y.png}
+        \caption{BI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_packet_bytes_max_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_packet_bytes_max_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_packet_bytes_max_log_x_log_y.png}
+        \caption{TI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_packet_bytes_max_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_packet_bytes_max_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+    \hfill
+       \caption{Distribución de los máximos bytes transmitidos en un paquete por flujo}
+       \label{fig:packet_pincer_packet_bytes_max}
+\end{figure}
 
 \subsubsection{Numero de bytes mínimos por flujo}
 
