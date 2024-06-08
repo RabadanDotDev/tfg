@@ -570,12 +570,48 @@ Podemos en la figura \ref{fig:packet_pincer_down_up_bytes_ratio} que la gran may
        \label{fig:packet_pincer_bytes_s}
 \end{figure}
 
-En la Figura \ref{fig:packet_pincer_bytes_s} podemos ver la distribución de las diferentes cadencias medias de bytes transmitidos por flujos. Podemos observar que hay mayor variedad en el caso de CIC-DDOS2019, mientras que en las otras los valores son más bajos y se encuentran más concentrados. Estos valores pueden aportar información sobre transmisiones en las que haya habido mayor o menor actividad.
+En la Figura \ref{fig:packet_pincer_bytes_s} podemos ver la distribución de las diferentes cadencias medias de bytes transmitidos por flujos. Podemos observar que hay mayor variedad en el caso de CIC-DDoS2019, mientras que en las otras los valores son más bajos y se encuentran más concentrados. Estos valores pueden aportar información sobre transmisiones en las que haya habido mayor o menor actividad.
 
 \subsubsection{Tiempo de llegada máxima}
 
-por hacer
-%"bidirectional_inter_arrival_time_max","forward_inter_arrival_time_max","backward_inter_arrival_time_max",
+\begin{figure}[H]
+    \centering
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_inter_arrival_time_max_log_x_log_y.png}
+        \caption{CD (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_inter_arrival_time_max_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_inter_arrival_time_max_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_inter_arrival_time_max_log_x_log_y.png}
+        \caption{BI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_inter_arrival_time_max_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_inter_arrival_time_max_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_inter_arrival_time_max_log_x_log_y.png}
+        \caption{TI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_inter_arrival_time_max_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_inter_arrival_time_max_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+    \hfill
+       \caption{Distribución del número de paquetes}
+       \label{fig:packet_pincer_inter_arrival_time_max}
+\end{figure}
+
+% por hacer cuando se regeneren los datos
 
 \subsubsection{Tiempo de llegada mínima}
 

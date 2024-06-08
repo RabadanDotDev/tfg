@@ -76,7 +76,7 @@ impl FlowStat for Interarrival {
         } else if let Some(backward_last_time) = self.backward_last_time {
             let backward_increment: u64 =
                 (time - backward_last_time).num_microseconds().unwrap() as u64;
-            self.bidirectional_iat.include(backward_increment);
+            self.backward_iat.include(backward_increment);
             self.backward_last_time = Some(time);
         } else {
             self.backward_last_time = Some(time);
