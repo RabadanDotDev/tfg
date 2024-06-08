@@ -461,11 +461,47 @@ Las distribuciones de los bytes medios de la Figura \ref{fig:packet_pincer_packe
        \label{fig:packet_pincer_packet_bytes_mean}
 \end{figure}
 
-\subsubsection{Variación del numero de bytes por flujo}
+\subsubsection{Desviación estándar del numero de bytes por flujo}
 
-%bidirectional_packet_bytes_std, forward_packet_bytes_std, backward_packet_bytes_std
+Las distribuciones de las diferentes desviaciones estándar son variadas. Tenemos en muchos casos donde la desviación es 0, la cual puede ser causada por flujos con paquetes muy iguales o los casos donde no se transmite nada, ya que se asigna 0 en ese caso. De todas formas, para todos los casos, donde no son 0, hay una variedad de distribuciones. En el caso de CIC-DDoS2019, se asemeja a sus distribuciones anteriores en el caso bidireccional y hacia el receptor inicial. Hacia el transmisor inicial está invertida, teniendo mucha variabilidad en los diferentes tamaños de las comunicaciones. La gran diferencia de variabilidad es quizá debido a los efectos del control de congestión de las transmisiones. Dependiendo del estado de la red, los diferentes dispositivos transmitirán de una forma más constante y predecible y en otras se tendrán que ir adaptando a tiempo real al nivel de congestión.
 
-por hacer
+\begin{figure}[H]
+    \centering
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_packet_bytes_std_log_x_log_y.png}
+        \caption{CD (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_packet_bytes_std_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_packet_bytes_std_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_packet_bytes_std_log_x_log_y.png}
+        \caption{BI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_packet_bytes_std_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_packet_bytes_std_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_packet_bytes_std_log_x_log_y.png}
+        \caption{TI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_packet_bytes_std_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_packet_bytes_std_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+    \hfill
+       \caption{Desviación estándard del número de bytes transmitidos en un paquete por flujo}
+       \label{fig:packet_pincer_packet_bytes_std}
+\end{figure}
+
 \subsubsection{Balance subida bajada del numero de bytes}
 
 %"down_up_bytes_ratio"
