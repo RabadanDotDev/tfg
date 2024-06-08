@@ -155,30 +155,26 @@ Podemos observar también que el tipo principal de ataques es 'DDoS', el cual se
 
 \subsubsection{Protocolo}
 
-\begin{figure}[H]
+Respecto a los protocolos utilizados, podemos ver en la Tabla \ref{table:packetpincerasprotocols} cómo en general está relativamente balanceado entre TCP y UDP, aunque en cada conjunto de datos el peso que tienen está más sesgado hacia un lado u otro.
+
+\begin{table}[H]
     \centering
-    \begin{subfigure}[b]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/boolean_values.png}
-        \caption{CIC-DDoS2019}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/boolean_values.png}
-        \caption{BoT-IoT}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/boolean_values.png}
-        \caption{TON-IoT}
-    \end{subfigure}
-       \caption{Balance TCP (columna izquierda) y UDP (columna derecha)}
-       \label{fig:packet_pincer_tcp_udp}
-\end{figure}
+    \begin{tabular}{|c | c c |}
+        \hline
+        \textbf{Conjunto de datos} & \textbf{TCP}          & \textbf{UDP}         \\  \hline
+        CIC-DDoS2019               &  3 922 955  (64,56\%) &  21 53 277 (35,44\%) \\
+        Bot-IoT                    &  5 899 808  (12,51\%) & 412 59 776 (87,49\%) \\
+        TON-IoT                    & 23 871 127  (93,11\%) &  17 66 982 (6,89\%)  \\
+        Total                      & 33 693 890  (42,72\%) & 451 80 035 (57,28\%) \\
+        \hline
+    \end{tabular}
+    \caption{Protocolo de transporte utilizado por conjunto de datos}
+    \label{table:packetpincerasprotocols}
+\end{table}
 
 \subsubsection{Duración}
+
+La columna de duración contiene un bastes flujos que duran 0 segundos, además de flujos relativamente cortos como podemos ver en la Figura \ref{fig:packet_pincer_duration}.  Para tener gráficos útiles, hace falta aplicar una escala logarítmica tanto en la magnitud como en la cantidad de flujos. Para evitar infinitos al aplicar el logaritmo a los flujos con 0, sumamos 1 a todos los datos. La cantidad de ceros es el 2.73\% (12 89 300), 1.12\% (68 292) y 42.68\% (10 942 625) en CIC-DDoS2019, BoT-Iot y TON-IoT, respectivamente.
 
 \begin{figure}[H]
     \centering
@@ -207,38 +203,44 @@ Podemos observar también que el tipo principal de ataques es 'DDoS', el cual se
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.32\textwidth}
+    \hfill
+    \begin{subfigure}[b]{0.27\textwidth}
         \centering
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_packet_count_log_x_log_y.png}
-        \caption{CIC-DDoS2019 (bidir.)}
+        \caption{CD (bidir.)}
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_packet_count_log_x_log_y.png}
-        \caption{CIC-DDoS2019 (forward)}
+        \caption{CD (forward)}
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_packet_count_log_x_log_y.png}
-        \caption{CIC-DDoS2019 (backward)}
+        \caption{CD (backward)}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{0.27\textwidth}
         \centering
         \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_packet_count_log_x_log_y.png}
-        \caption{BoT-IoT (bidir.)}
+        \caption{BI (bidir.)}
         \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_packet_count_log_x_log_y.png}
-        \caption{BoT-IoT (forward)}
+        \caption{BI (forward)}
         \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_packet_count_log_x_log_y.png}
-        \caption{BoT-IoT (backward)}
+        \caption{BI (backward)}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{0.27\textwidth}
         \centering
         \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_packet_count_log_x_log_y.png}
-        \caption{TON-IoT (bidir.)}
+        \caption{TI (bidir.)}
         \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_packet_count_log_x_log_y.png}
-        \caption{TON-IoT (forward)}
+        \caption{TI (forward)}
         \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_packet_count_log_x_log_y.png}
-        \caption{TON-IoT (backward)}
+        \caption{TI (backward)}
     \end{subfigure}
+    \hfill
        \caption{Distribución del número de paquetes}
        \label{fig:packet_pincer_packet_count}
 \end{figure}
+
+Podemos observar en la Figura \ref{fig:packet_pincer_packet_count} que tenemos una situación parecida al caso de la duración con el recuento de paquetes. La mayoría de los flujos tienen una cantidad de paquetes intercambiados reducida. Adicionalmente, en la mayoría hay una caída clara a partir de un punto, aunque en otros es más progresivo. Para CIC-DDoS2019 (CD en la figura) y en el caso bidireccional de ToN-IoT (TI en la figura), podemos observar cierta tendencia que predice la ley de Zipf.
+
+En este caso, para la columna del recuento de paquetes de regreso, tenemos que la cantidad de ceros es el 96.19\% (45 363 137), 44.38\% (2696542) y 43.73\% (11 211 906) en CIC-DDoS2019, BoT-Iot y TON-IoT, respectivamente.
 
 \subsubsection{Cadencia paquetes}
 
