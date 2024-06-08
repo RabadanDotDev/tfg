@@ -502,11 +502,35 @@ Las distribuciones de las diferentes desviaciones estándar son variadas. Tenemo
        \label{fig:packet_pincer_packet_bytes_std}
 \end{figure}
 
-\subsubsection{Balance subida bajada del numero de bytes}
+\subsubsection{Balance entre subida y bajada}
 
-%"down_up_bytes_ratio"
+El balance o la razón entre la subida y bajada consiste en dividir la cantidad de bytes enviados por el receptor inicial entre los enviados por el iniciador de la comunicación. De esta manera, se puede inferir si la comunicación es principalmente de bajada (un valor inferior a 1), de subida (un valor superior a 1) o hay una comunicación a iguales. En el primer caso, se puede dar al visitar la web o descargar archivos. El segundo en casos donde se suban datos, como subir fotos a un servicio Cloud. Finalmente, el tercero podría consistir en, por ejemplo, en una llamada de voz o videoconferencia. 
 
-por hacer
+Podemos en la figura \ref{fig:packet_pincer_down_up_bytes_ratio} que la gran mayoría de comunicaciones se concentran en la parte baja del gráfico, indicando que suelen ser o de bajada o la cantidad de datos enviados no suele ser muy grande. Sin embargo, hay una cantidad relevante de flujos en la que el emisor de la comunicación envía muchos más datos de los que recibe. Esto puede estar relacionado con posibles ataques, donde las comunicaciones normales tienen un ratio más bajo.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/down_up_bytes_ratio_log_x_log_y.png}
+        \caption{CIC-DDoS2019}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/down_up_bytes_ratio_log_x_log_y.png}
+        \caption{BoT-IoT}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/down_up_bytes_ratio_log_x_log_y.png}
+        \caption{TON-IoT}
+    \end{subfigure}
+       \caption{Distribución de la duración de los flujos}
+       \label{fig:packet_pincer_down_up_bytes_ratio}
+\end{figure}
+
 \subsubsection{Cadencia datos}
 
 %,"bidirectional_bytes_s","forward_bytes_s","backward_bytes_s",
