@@ -420,12 +420,47 @@ Para el caso de bytes mínimos en paquetes, podemos ver que en la Figura \ref{fi
        \label{fig:packet_pincer_packet_bytes_min}
 \end{figure}
 
-\subsubsection{Numero de bytes medio por flujo}
+\subsubsection{Número de bytes medio por flujo}
 
-por hacer
-%bidirectional_packet_bytes_mean, forward_packet_bytes_mean, backward_packet_bytes_mean
+Las distribuciones de los bytes medios de la Figura \ref{fig:packet_pincer_packet_bytes_mean} se asemejan a las de los recuentos de los bytes totales, pero suavizadas. Podemos ver que, en el caso bidireccional de TON-IoT (TI en la figura), la gráfica se mantiene en número de flujos alto durante un mayor rango de medias antes de caer.
 
-por hacer
+\begin{figure}[H]
+    \centering
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_packet_bytes_mean_log_x_log_y.png}
+        \caption{CD (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_packet_bytes_mean_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_packet_bytes_mean_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_packet_bytes_mean_log_x_log_y.png}
+        \caption{BI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_packet_bytes_mean_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_packet_bytes_mean_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_packet_bytes_mean_log_x_log_y.png}
+        \caption{TI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_packet_bytes_mean_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_packet_bytes_mean_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+    \hfill
+       \caption{Distribución de los bytes medios transmitidos en un paquete por flujo}
+       \label{fig:packet_pincer_packet_bytes_mean}
+\end{figure}
+
 \subsubsection{Variación del numero de bytes por flujo}
 
 %bidirectional_packet_bytes_std, forward_packet_bytes_std, backward_packet_bytes_std
