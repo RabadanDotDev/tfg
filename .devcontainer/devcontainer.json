@@ -3,7 +3,7 @@
 	"image": "mcr.microsoft.com/devcontainers/base:debian",
 
 	"features": {
-		"ghcr.io/prulloac/devcontainer-features/latex:1.2.0": {
+		"ghcr.io/prulloac/devcontainer-features/latex:1": {
 			"packages": "cases,multirow,pgf-umlcd,listings,appendix,bytefield,fontspec,xcolor,babel-spanish,babel-catalan,xkeyval,imakeidx,tocloft,etoolbox,glossaries,glossaries-spanish,hyphen-spanish,titlesec,blindtext,caption,float"
 		},
 		"ghcr.io/devcontainers/features/python:1": {},

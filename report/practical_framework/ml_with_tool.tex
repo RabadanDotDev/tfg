@@ -100,9 +100,58 @@ Finalmente, en la tabla \ref{table:generatedfilesoffline} podemos ver la magnitu
 
 \subsection{Descripción de las características de los datos generados}
 
-Una vez procesadas las trazas de red en crudo y obtenido las estadísticas de los flujos, haremos un primer análisis de los datos generados. Con esta información, decidiremos, en el siguiente punto, la tarea a realizar y a continuación cómo preprocesaremos los datos antes de aplicar los algoritmos de \gls{ml}.
+Una vez procesadas las trazas de red en crudo y obtenido las estadísticas de los flujos, haremos un primer análisis de los datos generados. Con esta información, decidiremos, en el siguiente punto, la tarea a realizar y a continuación cómo preprocesaremos los datos antes de aplicar los algoritmos de \gls{ml}. El script utilizado para extraer los datos y generar los gráficos es \texttt{packet\_pincer\_results\_plots.py},
 
 \subsubsection{Etiquetas}
+
+En la Tabla \ref{table:packetpincerassignedlabels} podemos observar las etiquetas asignadas por cada conjunto de datos. Como se puede observar, apenas hay coincidencias de etiquetas entre conjuntos de datos. Hay ataques de diferentes tipos y diferentes conjuntos que tienen uno u otro nivel de concreción.
+
+\begin{table}[H]
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{|c | r r r | c |}
+            \hline
+            \textbf{Etiqueta}               & \textbf{CIC-DDoS2019}            & \textbf{Bot-IoT}            & \textbf{TON-IoT}            & \textbf{Total} \\  \hline
+            benign                          &                57 240 (0,121\%)  &            7 672 (0,126\%)  &        4 743 908 (18,503\%) &   4808820 (6,097\%) \\
+            backdoor                        &                     0            &                0            &           17 231 (0,067\%)  &   17231 (0,022\%) \\
+            ddos                            &                     0            &                0            &        4 511 400 (17,596\%) &   4511400 (5,720\%) \\
+            ddos\_dns                       &                   483 (0,001\%)  &                0            &                0            &   483 (0,001\%) \\
+            ddos\_http                      &                     0            &           19 173 (0,316\%)  &                0            &   19173 (0,024\%) \\
+            ddos\_ldap                      &             1 567 742 (3,324\%)  &                0            &                0            &   1567742 (1,988\%) \\
+            ddos\_mssql                     &             6 185 802 (13,117\%) &                0            &                0            &   6185802 (7,843\%) \\
+            ddos\_netbios                   &             3 195 621 (6,776\%)  &                0            &                0            &   3195621 (4,052\%) \\
+            ddos\_ntp                       &                   547 (0,001\%)  &                0            &                0            &   547 (0,001\%) \\
+            ddos\_portmap                   &               121 842 (0,258\%)  &                0            &                0            &   121842 (0,154\%) \\
+            ddos\_snmp                      &             2 926 086 (6,205\%)  &                0            &                0            &   2926086 (3,710\%) \\
+            ddos\_ssdp                      &             1 688 442 (3,580\%)  &                0            &                0            &   1688442 (2,141\%) \\
+            ddos\_syn                       &             4 747 814 (10,068\%) &                0            &                0            &   4747814 (6,019\%) \\
+            ddos\_tcp                       &                     0            &        1 048 576 (17,257\%) &                0            &   1048576 (1,329\%) \\
+            ddos\_tftp                      &            10 530 665 (22,330\%) &                0            &                0            &   10530665 (13,351\%) \\
+            ddos\_udp                       &            11 423 042 (24,222\%) &        1 048 576 (17,257\%) &                0            &   12471618 (15,812\%) \\
+            ddos\_udp\_lag                  &             4 714 258 (9,996\%)  &                0            &                0            &   4714258 (5,977\%) \\
+            dos                             &                     0            &                0            &          187 839 (0,733\%)  &   187839 (0,238\%) \\
+            dos\_http                       &                     0            &           28 552 (0,470\%)  &                0            &   28552 (0,036\%) \\
+            dos\_tcp                        &                     0            &        1 048 576 (17,257\%) &                0            &   1048576 (1,329\%) \\
+            dos\_udp                        &                     0            &        1 048 576 (17,257\%) &                0            &   1048576 (1,329\%) \\
+            injection                       &                     0            &                0            &          447 142 (1,744\%)  &   447142 (0,567\%) \\
+            mitm                            &                     0            &                0            &              912 (0,004\%)  &   912 (0,001\%) \\
+            password                        &                     0            &                0            &        1 629 843 (6,357\%)  &   1629843 (2,066\%) \\
+            ransomware                      &                     0            &                0            &            2 644 (0,010\%)  &   2644 (0,003\%) \\
+            reconnaissance\_os\_fingerprint &                     0            &          357 180 (5,878\%)  &                0            &   357180 (0,453\%) \\
+            reconnaissance\_service\_scan   &                     0            &        1 467 774 (24,156\%) &                0            &   1467774 (1,861\%) \\
+            scanning                        &                     0            &                0            &       12 104 883 (47,214\%) &   12104883 (15,347\%) \\
+            theft\_data\_exfiltration       &                     0            &              112 (0,002\%)  &                0            &   112 (0,000\%) \\
+            theft\_keylogging               &                     0            &            1 465 (0,024\%)  &                0            &   1465 (0,002\%) \\
+            xss                             &                     0            &                0            &        1 992 307 (7,771\%)  &   1992307 (2,526\%) \\
+            \hline
+        \end{tabular}
+    }
+    \caption{Etiquetas asignadas por cada conjunto de datos}
+    \label{table:packetpincerassignedlabels}
+\end{table}
+
+CIC-DDoS2019 contiene etiquetas 'DDoS', con especificadores del protocolo de aplicación y benignos. A su vez, BoT-IoT tiene benignos, etiquetas 'DDoS' y 'DoS' con especificadores del protocolo de transporte y HTTP, además de dos de escaneo (sistema operativo y de servicios) y robo de datos (data y keylogging). Finalmente, Ton-IoT tiene los benignos, etiquetas 'DDoS' y 'DoS' sin concreción, diferentes tipos de intento de ataques específicos (injection, mitm, ransomware, xss, backdoor) y escaneo.
+
+Podemos observar también que el tipo principal de ataques es 'DDoS', el cual se encuentra alrededor del 68\%. Después tenemos un 17\% de flujos relacionados con el escaneo, un 6\% de flujos benignos y luego el resto de etiquetas en una posición más residual. Esto puede suponer un problema, ya que datos tan desbalanceados pueden dificultar el entrenar modelos útiles. Adicionalmente, es posible que estos datos no representen correctamente un entorno real y, por tanto, los modelos entrenados con estos no generalicen correctamente a otros entornos.
 
 \subsubsection{Protocolo}
 
