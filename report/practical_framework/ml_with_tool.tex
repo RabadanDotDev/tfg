@@ -615,8 +615,45 @@ La distribución de los tiempos de llegada máxima entre paquetes la podemos obs
 
 \subsubsection{Tiempo de llegada mínima}
 
-por hacer
-%"bidirectional_inter_arrival_time_min","forward_inter_arrival_time_min","backward_inter_arrival_time_min",
+
+\begin{figure}[H]
+    \centering
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_inter_arrival_time_min_log_x_log_y.png}
+        \caption{CD (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_inter_arrival_time_min_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_inter_arrival_time_min_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_inter_arrival_time_min_log_x_log_y.png}
+        \caption{BI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_inter_arrival_time_min_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_inter_arrival_time_min_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_inter_arrival_time_min_log_x_log_y.png}
+        \caption{TI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_toniot/forward_inter_arrival_time_min_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_toniot/backward_inter_arrival_time_min_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+    \hfill
+       \caption{Distribución del número de paquetes}
+       \label{fig:packet_pincer_inter_arrival_time_min}
+\end{figure}
+
+Para el caso de las llegadas medias, como podemos ver en la Figura \ref{fig:packet_pincer_inter_arrival_time_min}, tenemos que las distribuciones en BoT-Iot y TON-IoT son similares. Sin embargo, sin contar los ceros, en CIC-DDoS2019 tenemos que el caso bidireccional y hacia el receptor inicial tenemos mayor cantidad en la parte alta. Adicionalmente, BoT-IoT no tenemos el mismo pico en para el caso donde se transmiten datos hacia el emisor inicial.
 
 \subsubsection{Tiempo de llegada media}
 
