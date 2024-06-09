@@ -607,7 +607,7 @@ En la Figura \ref{fig:packet_pincer_bytes_s} podemos ver la distribución de las
         \caption{TI (backward)}
     \end{subfigure}
     \hfill
-       \caption{Distribución del número de paquetes}
+       \caption{Distribución del tiempo de llegada máxima entre paquetes}
        \label{fig:packet_pincer_inter_arrival_time_max}
 \end{figure}
 
@@ -648,7 +648,7 @@ La distribución de los tiempos de llegada máxima entre paquetes la podemos obs
         \caption{TI (backward)}
     \end{subfigure}
     \hfill
-       \caption{Distribución del número de paquetes}
+       \caption{Distribución del tiempo de llegada mínima entre paquetes}
        \label{fig:packet_pincer_inter_arrival_time_min}
 \end{figure}
 
@@ -691,7 +691,7 @@ Si observamos las distribuciones del tiempo de llegada media de la Figura \ref{f
         \caption{TI (backward)}
     \end{subfigure}
     \hfill
-       \caption{Distribución del número de paquetes}
+       \caption{Distribución de la media del tiempo de llegada entre paquetes}
        \label{fig:packet_pincer_inter_arrival_time_mean}
 \end{figure}
 
@@ -734,24 +734,203 @@ Este valor puede aportar información como en otros casos de la situación de la
         \caption{TI (backward)}
     \end{subfigure}
     \hfill
-       \caption{Distribución del número de paquetes}
+       \caption{Distribución de las distribuciones estándar del tiempo de llegada}
        \label{fig:packet_pincer_inter_arrival_time_std}
 \end{figure}
 
-\subsubsection{Flags cabecera TCP}
+\subsubsection{Flags CWR, ECE y URG en cabecera TCP}
 
-por hacer
-%"bidirectional_tcp_cwr_flags_count",
-%"bidirectional_tcp_ece_flags_count",
-%"bidirectional_tcp_urg_flags_count",
-%"bidirectional_tcp_ack_flags_count",
-%"bidirectional_tcp_psh_flags_count",
-%"bidirectional_tcp_rst_flags_count",
-%"bidirectional_tcp_syn_flags_count",
-%"bidirectional_tcp_fin_flags_count",
+Podemos ver en Figura \ref{fig:packet_pincer_bidirectional_tcp_cwr_flags_count}, Figura \ref{fig:packet_pincer_bidirectional_tcp_ece_flags_count} y Figura \ref{fig:packet_pincer_bidirectional_tcp_urg_flags_count} que apenas tenemos flujos que tengan las flags CWR, ECE o URG activas,
 
-%forward_tcp_psh_flags_count,backward_tcp_psh_flags_count
-%"forward_tcp_urg_flags_count","backward_tcp_urg_flags_count",
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_tcp_cwr_flags_count_linear_x_log_y.png}
+        \caption{CIC-DDoS2019}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_tcp_cwr_flags_count_linear_x_log_y.png}
+        \caption{BoT-IoT}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_tcp_cwr_flags_count_linear_x_log_y.png}
+        \caption{TON-IoT}
+    \end{subfigure}
+       \caption{Distribución de recuentos de paquetes con la flag CWR en TCP activa}
+       \label{fig:packet_pincer_bidirectional_tcp_cwr_flags_count}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_tcp_ece_flags_count_linear_x_log_y.png}
+        \caption{CIC-DDoS2019}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_tcp_ece_flags_count_linear_x_log_y.png}
+        \caption{BoT-IoT}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_tcp_ece_flags_count_linear_x_log_y.png}
+        \caption{TON-IoT}
+    \end{subfigure}
+       \caption{Distribución de recuentos de paquetes con la flag ECE en TCP activa}
+       \label{fig:packet_pincer_bidirectional_tcp_ece_flags_count}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_tcp_urg_flags_count_linear_x_log_y.png}
+        \caption{CIC-DDoS2019}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_tcp_urg_flags_count_linear_x_log_y.png}
+        \caption{BoT-IoT}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_tcp_urg_flags_count_linear_x_log_y.png}
+        \caption{TON-IoT}
+    \end{subfigure}
+       \caption{Distribución de recuentos de paquetes con la flag URG en TCP activa}
+       \label{fig:packet_pincer_bidirectional_tcp_urg_flags_count}
+\end{figure}
+
+\subsubsection{Flags ACK en cabecera TCP}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_tcp_ack_flags_count_log_x_log_y.png}
+        \caption{CIC-DDoS2019}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_tcp_ack_flags_count_log_x_log_y.png}
+        \caption{BoT-IoT}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_tcp_ack_flags_count_log_x_log_y.png}
+        \caption{TON-IoT}
+    \end{subfigure}
+       \caption{Distribución de recuentos de paquetes con la flag ACK en TCP activa}
+       \label{fig:packet_pincer_bidirectional_tcp_ack_flags_count}
+\end{figure}
+
+En una transmisión TCP, ambos nodos han de confirmar los datos que han recibido para que el otro pueda saber que puede enviar los siguientes. Si una conexión que debería tener más validaciones de recepción no las tiene, es posible que nos encontremos delante de un ataque. En la Figura \ref{fig:packet_pincer_bidirectional_tcp_ack_flags_count} podemos ver que los diferentes datasets tienen una forma similar, con algunos teniendo la caída antes que otros.
+
+\subsubsection{Flags PSH en cabecera TCP}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_tcp_psh_flags_count_log_x_log_y.png}
+        \caption{CD (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_tcp_psh_flags_count_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_tcp_psh_flags_count_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_tcp_psh_flags_count_log_x_log_y.png}
+        \caption{BI (bidir.)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/forward_tcp_psh_flags_count_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/backward_tcp_psh_flags_count_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_tcp_psh_flags_count_log_x_log_y.png}
+        \caption{TI (bidir.)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/forward_tcp_psh_flags_count_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/backward_tcp_psh_flags_count_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+       \caption{Distribución de recuentos de paquetes con la flag PSH en TCP activa}
+       \label{fig:packet_pincer_bidirectional_tcp_psh_flags_count}
+\end{figure}
+
+Por hacer
+
+\subsubsection{Flags RST en cabecera TCP}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_tcp_rst_flags_count_linear_x_log_y.png}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_tcp_rst_flags_count_log_x_log_y.png}
+        \caption{CIC-DDoS2019}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_tcp_rst_flags_count_linear_x_log_y.png}
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_tcp_rst_flags_count_log_x_log_y.png}
+        \caption{BoT-IoT}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_tcp_rst_flags_count_linear_x_log_y.png}
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_tcp_rst_flags_count_log_x_log_y.png}
+        \caption{TON-IoT}
+    \end{subfigure}
+       \caption{Distribución de recuentos de paquetes con la flag RST en TCP activa}
+       \label{fig:packet_pincer_bidirectional_tcp_rst_flags_count}
+\end{figure}
+
+\subsubsection{Flags FIN en cabecera TCP}
+
+Por hacer
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_tcp_fin_flags_count_log_x_log_y.png}
+        \caption{CIC-DDoS2019}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_tcp_fin_flags_count_log_x_log_y.png}
+        \caption{BoT-IoT}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_tcp_fin_flags_count_log_x_log_y.png}
+        \caption{TON-IoT}
+    \end{subfigure}
+       \caption{Distribución de recuentos de paquetes con la flag FIN en TCP activa}
+       \label{fig:packet_pincer_bidirectional_tcp_fin_flags_count}
+\end{figure}
 
 \subsubsection{Suma total de bytes en las cabeceras de transporte}
 
