@@ -461,7 +461,7 @@ Las distribuciones de los bytes medios de la Figura \ref{fig:packet_pincer_packe
        \label{fig:packet_pincer_packet_bytes_mean}
 \end{figure}
 
-\subsubsection{Desviación estándar del numero de bytes por flujo}
+\subsubsection{Desviación estándar del número de bytes por flujo}
 
 Las distribuciones de las diferentes desviaciones estándar son variadas. Tenemos en muchos casos donde la desviación es 0, la cual puede ser causada por flujos con paquetes muy iguales o los casos donde no se transmite nada, ya que se asigna 0 en ese caso. De todas formas, para todos los casos, donde no son 0, hay una variedad de distribuciones. En el caso de CIC-DDoS2019, se asemeja a sus distribuciones anteriores en el caso bidireccional y hacia el receptor inicial. Hacia el transmisor inicial está invertida, teniendo mucha variabilidad en los diferentes tamaños de las comunicaciones. La gran diferencia de variabilidad es quizá debido a los efectos del control de congestión de las transmisiones. Dependiendo del estado de la red, los diferentes dispositivos transmitirán de una forma más constante y predecible y en otras se tendrán que ir adaptando a tiempo real al nivel de congestión.
 
@@ -661,7 +661,7 @@ Si observamos las distribuciones del tiempo de llegada media de la Figura \ref{f
 \begin{figure}[H]
     \centering
     \hfill
-    \begin{subfigure}[b]{0.26\textwidth}
+    \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_inter_arrival_time_mean_log_x_log_y.png}
         \caption{CD (bidir.)}
@@ -671,7 +671,7 @@ Si observamos las distribuciones del tiempo de llegada media de la Figura \ref{f
         \caption{CD (backward)}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.26\textwidth}
+    \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_inter_arrival_time_mean_log_x_log_y.png}
         \caption{BI (bidir.)}
@@ -681,7 +681,7 @@ Si observamos las distribuciones del tiempo de llegada media de la Figura \ref{f
         \caption{BI (backward)}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.26\textwidth}
+    \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_inter_arrival_time_mean_log_x_log_y.png}
         \caption{TI (bidir.)}
@@ -695,10 +695,48 @@ Si observamos las distribuciones del tiempo de llegada media de la Figura \ref{f
        \label{fig:packet_pincer_inter_arrival_time_mean}
 \end{figure}
 
-\subsubsection{Variación de los tiempos de llegada}
+\subsubsection{Desviación estándar de los tiempos de llegada}
 
-por hacer
-%"bidirectional_inter_arrival_time_std","forward_inter_arrival_time_std","backward_inter_arrival_time_std",
+Para el caso de la desviación estándar, tenemos un caso parecido a las medias como podemos ver en la figura \ref{fig:packet_pincer_inter_arrival_time_std}. De todas maneras, las magnitudes son algo menores y la distribución está más desplazadas hacia la izquierda. 
+
+Este valor puede aportar información como en otros casos de la situación de la congestión de la red y caracterizar mejor el flujo en cuestión. Si los tiempos de llegada varían mucho, puede ser señal de una conexión inestable o, en caso de ser un ataque, el intentar aparentar tener una conexión inestable para consumir recursos del sistema receptor.
+
+\begin{figure}[H]
+    \centering
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_inter_arrival_time_std_log_x_log_y.png}
+        \caption{CD (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_inter_arrival_time_std_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_inter_arrival_time_std_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_inter_arrival_time_std_log_x_log_y.png}
+        \caption{BI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_inter_arrival_time_std_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_inter_arrival_time_std_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_inter_arrival_time_std_log_x_log_y.png}
+        \caption{TI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_toniot/forward_inter_arrival_time_std_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_toniot/backward_inter_arrival_time_std_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+    \hfill
+       \caption{Distribución del número de paquetes}
+       \label{fig:packet_pincer_inter_arrival_time_std}
+\end{figure}
 
 \subsubsection{Flags cabecera TCP}
 
