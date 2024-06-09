@@ -615,7 +615,6 @@ La distribución de los tiempos de llegada máxima entre paquetes la podemos obs
 
 \subsubsection{Tiempo de llegada mínima}
 
-
 \begin{figure}[H]
     \centering
     \hfill
@@ -657,8 +656,44 @@ Para el caso de las llegadas medias, como podemos ver en la Figura \ref{fig:pack
 
 \subsubsection{Tiempo de llegada media}
 
-por hacer
-%"bidirectional_inter_arrival_time_mean","forward_inter_arrival_time_mean","backward_inter_arrival_time_mean",
+Si observamos las distribuciones del tiempo de llegada media de la Figura \ref{fig:packet_pincer_inter_arrival_time_mean}, sin tener en cuenta los ceros, podemos observar que en general hay bastante variedad entre los diferentes flujos. De todas maneras, en el caso de BoT-IoT hay mayor agrupación en la parte baja en el caso bidireccional y hacia el receptor inicial.
+
+\begin{figure}[H]
+    \centering
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_inter_arrival_time_mean_log_x_log_y.png}
+        \caption{CD (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_inter_arrival_time_mean_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_inter_arrival_time_mean_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_inter_arrival_time_mean_log_x_log_y.png}
+        \caption{BI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_inter_arrival_time_mean_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_inter_arrival_time_mean_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_inter_arrival_time_mean_log_x_log_y.png}
+        \caption{TI (bidir.)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_toniot/forward_inter_arrival_time_mean_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_toniot/backward_inter_arrival_time_mean_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+    \hfill
+       \caption{Distribución del número de paquetes}
+       \label{fig:packet_pincer_inter_arrival_time_mean}
+\end{figure}
 
 \subsubsection{Variación de los tiempos de llegada}
 
