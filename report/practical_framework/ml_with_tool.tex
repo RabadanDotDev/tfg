@@ -972,10 +972,38 @@ Las flags FIN en comunicaciones TCP suele haber 2, si se finaliza correctamente 
 
 La columna de las sumas totales de las cabeceras de transporte se generó debido a que aparecía en CICFlowMeter. Si observamos las distribuciones de la Figura \ref{fig:packet_pincer_bidirectional_transport_header_bytes_sum}, podemos ver que son similares al caso de la suma general. Hay ciertas variaciones, pero es posible que esté muy correlacionado y no aporte suficiente información adicional.
 
-\subsubsection{Media de bytes enviados sobre la capa de transporte en un paquete}
+\subsubsection{Media de bytes enviados sobre la capa de transporte por paquete}
 
-por hacer
-%"forward_transport_payload_bytes_mean",backward_transport_payload_bytes_mean
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_transport_payload_bytes_mean_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_transport_payload_bytes_mean_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/forward_transport_payload_bytes_mean_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/backward_transport_payload_bytes_mean_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/forward_transport_payload_bytes_mean_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/backward_transport_payload_bytes_mean_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+       \caption{Distribución de las medias de bytes en la capa de transporte por paquete}
+       \label{fig:packet_pincer_bidirectional_transport_payload_bytes_mean}
+\end{figure}
+
+La media de bytes enviados sobre la capa de transporte está en parte relacionada con la media de bytes total. Como podemos ver en la Figura \ref{fig:packet_pincer_bidirectional_transport_payload_bytes_mean}, hay cierta similitud en parte del gráfico si nos fijamos. De todas maneras, es posible que la diferencia entre estos dos sea relevante. Por ejemplo, un atacante puede iniciar y mantener conexiones sin enviar datos, provocando que el receptor tenga recursos asignados a esta conexión de los cuales no hace uso.
 
 \subsubsection{Bytes mínimos enviados sobre la capa de transporte}
 
