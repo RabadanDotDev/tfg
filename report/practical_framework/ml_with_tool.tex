@@ -1005,10 +1005,32 @@ La columna de las sumas totales de las cabeceras de transporte se generó debido
 
 La media de bytes enviados sobre la capa de transporte está en parte relacionada con la media de bytes total. Como podemos ver en la Figura \ref{fig:packet_pincer_bidirectional_transport_payload_bytes_mean}, hay cierta similitud en parte del gráfico si nos fijamos. De todas maneras, es posible que la diferencia entre estos dos sea relevante. Por ejemplo, un atacante puede iniciar y mantener conexiones sin enviar datos, provocando que el receptor tenga recursos asignados a esta conexión de los cuales no hace uso.
 
-\subsubsection{Bytes mínimos enviados sobre la capa de transporte}
+\subsubsection{Bytes mínimos enviados sobre la capa de transporte hacia el receptor inicial}
 
-por hacer
-%"forward_transport_payload_bytes_min",
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_transport_payload_bytes_min_log_x_log_y.png}
+        \caption{CD (forward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/forward_transport_payload_bytes_min_log_x_log_y.png}
+        \caption{BI (forward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/forward_transport_payload_bytes_min_log_x_log_y.png}
+        \caption{TI (forward)}
+    \end{subfigure}
+       \caption{Distribución de los bytes mímimos enviados en un paquete sobre la capa de transporte hacia el recpetor inicial}
+       \label{fig:packet_pincer_forward_transport_payload_bytes_min}
+\end{figure}
+
+En el caso de los bytes mínimos sobre la capa de transporte, las distribuciones tienen mayores diferencias, como se puede ver en la Figura \ref{fig:packet_pincer_forward_transport_payload_bytes_min}. De todas maneras, la densidad es parecida, teniendo huecos parecidos en la distribución en BoT-IOT. La situación es similar a lo anterior, es posible que no aporte mayor información si tenemos la columna del número de bytes en total o que el hecho que la diferencia sea de cierta manera sí que la aporte.
 
 \subsubsection{Numero de paquetes enviados con datos en la capa de transporte}
 
