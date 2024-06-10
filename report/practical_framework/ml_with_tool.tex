@@ -1192,10 +1192,38 @@ Las distribuciones para los tiempos de actividad máximos, como podemos ver en l
 
 Para los tiempos de actividad medios, podemos ver en la Figura \ref{fig:packet_pincer_active_seconds_mean} una situación similar a los dos puntos anteriores. Para el CICDDoS2019 y TON-IoT la distribución se mantiene, pero para BoT-IOT el caso activo es similar a los máximos y el caso inactivo a los mínimos.
 
-\subsubsection{Distribución estándard de los tiempos de actividad}
+\subsubsection{Desviación estándar de los tiempos de actividad}
 
-por hacer
-%""idle_seconds_std"active_seconds_std
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/active_seconds_std_log_x_log_y.png}
+        \caption{CD (active)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/idle_seconds_std_log_x_log_y.png}
+        \caption{CD (idle)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/active_seconds_std_log_x_log_y.png}
+        \caption{BI (active)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/idle_seconds_std_log_x_log_y.png}
+        \caption{BI (idle)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/active_seconds_std_log_x_log_y.png}
+        \caption{TI (active)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/idle_seconds_std_log_x_log_y.png}
+        \caption{TI (idle)}
+    \end{subfigure}
+       \caption{Distribución de las desviaciones estándar del tiempo de actividad}
+       \label{fig:packet_pincer_active_seconds_std}
+\end{figure}
+
+Como en otros casos, podemos ver en la Figura \ref{fig:packet_pincer_active_seconds_std} como la desviación estándar no se contiene en un rango más restringido. Esto es esperable, ya que dependiendo de las condiciones de red pueden hacer que los paquetes lleguen antes o después, se reordenen o se pierdan. Dependiendo de la comunicación, si esta variabilidad no es acotada, puede ser un problema para los dispositivos. Esto puede ser potencialmente utilizada por agentes mal intencionados que traten de atacar a los sistemas.
 
 \subsubsection{Media de paquetes por grupo activo}
 
