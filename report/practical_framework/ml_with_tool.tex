@@ -1,6 +1,6 @@
 \section{Uso de la herramienta}
 
-En esta sección haremos uso de la herramienta desarollada para procesar las trazas de red y usar los datos en algoritmos de \gls{ml}. Primero extraeremos las etiquetas de cada dataset para posteriormente ejecutar nuestra herramienta sobre los datos en crudo. Una vez tengamos las características extraídas, haremos una fase de preprocesamiento de los datos donde analizaremos las diferentes propiedades de este, escalando y normalizando los datos donde sea posible. Con los datos limpiados, realizaremos una selección de características para mantener solo las que se consideren más relevantes. Una vez hecho esto, detallaremos la tarea de \gls{ml} que se realizará y como evaluaremos los diferentes modelos. A continuación, entrenaremos diferentes modelos y valoraremos su efectividad. Finalmente, haremos una comparación de los modelos y decidiremos cuál es el que muestra mejor rendimiento.
+En esta sección haremos uso de la herramienta desarrollada para procesar las trazas de red y usar los datos en algoritmos de \gls{ml}. Primero extraeremos las etiquetas de cada dataset para posteriormente ejecutar nuestra herramienta sobre los datos en crudo. Una vez tengamos las características extraídas, haremos una fase de preprocesamiento de los datos donde analizaremos las diferentes propiedades de estos, escalando y normalizando los datos donde sea posible. Con los datos limpiados, realizaremos una selección de características para mantener solo las que se consideren más relevantes. Una vez hecho esto, detallaremos la tarea de \gls{ml} que se realizará y cómo evaluaremos los diferentes modelos. A continuación, entrenaremos diferentes modelos y valoraremos su efectividad. Finalmente, haremos una comparación de los modelos y decidiremos cuál es el que muestra mejor rendimiento.
 
 \subsection{Extracción etiquetas de los datasets}
 
@@ -198,8 +198,7 @@ La columna de duración contiene una cantidad considerable de flujos que duran 0
        \label{fig:packet_pincer_duration}
 \end{figure}
 
-\color{blue} %TODO remove this when revised
-\subsubsection{Recuento paquetes}
+\subsubsection{Recuento de paquetes}
 
 \begin{figure}[H]
     \centering
@@ -242,7 +241,7 @@ Podemos observar en la Figura \ref{fig:packet_pincer_packet_count} que tenemos u
 
 En este caso, para la columna del recuento de paquetes de regreso, tenemos que la cantidad de ceros es el 96.19\% (45 363 137), 44.38\% (2696542) y 43.73\% (11 211 906) en CIC-DDoS2019, BoT-Iot y TON-IoT, respectivamente.  Las otras dos no contienen ningún cero, debido a que si fuesen cero, el flujo no aparecería en los datos procesados.
 
-\subsubsection{Cadencia paquetes}
+\subsubsection{Cadencia de paquetes}
 
 \begin{figure}[H]
     \centering
@@ -336,11 +335,11 @@ La distribución de las diferentes cadencias de paquetes se puede observar en la
        \label{fig:packet_pincer_packet_bytes_sum}
 \end{figure}
 
-La distribución de las sumas totales de los bytes transmitidos por cada flujo está representada en la Figura \ref{fig:packet_pincer_packet_bytes_sum}. Podemos ver que en algunos casos la distribución parece marcada por la ley the Zipf, pero otro se asemeja más a una distribución normal al expresarlo en una gráfica log-log. Adicionalmente, en otros tenemos una caída notable a partir de cierto punto. Aparte de las peticiones que no reciben respuesta, no hay registros con ceros.
+La distribución de las sumas totales de los bytes transmitidos por cada flujo está representada en la Figura \ref{fig:packet_pincer_packet_bytes_sum}. Podemos ver que en algunos casos la distribución parece marcada por la ley de Zipf, pero otro se asemeja más a una distribución normal al expresarlo en una gráfica log-log. Adicionalmente, en otros tenemos una caída notable a partir de cierto punto. Aparte de las peticiones que no reciben respuesta, no hay registros con ceros.
 
 \subsubsection{Número de bytes máximos por flujo}
 
-Si observamos las distribuciones de los bytes máximos en paquetes por flujo representadas en la Figura \ref{fig:packet_pincer_packet_bytes_max}, podemos ver que en general son similares. Sin embargo, las respuestas (backward) en CIC-DDos2019 (CD en la figura), la 'cola' de la distribución parece haber sido cortada. Adicionalmente, en los otros dos conjuntos de datos los picos son menos pronunciados en este caso.
+Si observamos las distribuciones de los bytes máximos en paquetes por flujo representadas en la Figura \ref{fig:packet_pincer_packet_bytes_max}, podemos ver que en general son similares a las del punto anterior. Sin embargo, en el caso 'backward' del conjunto de datos de CIC-DDoS2019 (subfigura \ref{fig:packet_pincer_packet_bytes_max_backward}), podemos ver cómo la 'cola' de la distribución parece haber sido cortada. Adicionalmente, los picos parecen ser menos pronunciados para los otros dos conjuntos.
 
 \begin{figure}[H]
     \centering
@@ -352,7 +351,7 @@ Si observamos las distribuciones de los bytes máximos en paquetes por flujo rep
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_packet_bytes_max_log_x_log_y.png}
         \caption{CD (forward)}
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_packet_bytes_max_log_x_log_y.png}
-        \caption{CD (backward)}
+        \caption{CD (backward)} \label{fig:packet_pincer_packet_bytes_max_backward}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.26\textwidth}
@@ -381,7 +380,7 @@ Si observamos las distribuciones de los bytes máximos en paquetes por flujo rep
 
 \subsubsection{Número de bytes mínimos por flujo}
 
-Para el caso de bytes mínimos en paquetes, podemos ver que en la Figura \ref{fig:packet_pincer_packet_bytes_min} nos encontramos con un caso similar al caso de los máximos. Sin embargo, para el caso de CIC-DDoS, el corte es en una magnitud menor y en los otros parece haber más huecos y concentraciones en ciertos puntos de la distribución.
+Para el caso de bytes mínimos en paquetes, podemos ver que en la Figura \ref{fig:packet_pincer_packet_bytes_min} nos encontramos con una situación al caso de los máximos. Sin embargo, para CIC-DDoS2019, el corte es en una magnitud menor (subfigura \ref{fig:packet_pincer_packet_bytes_min_backward}) y en los otros parece haber más huecos y concentraciones en ciertos puntos de la distribución.
 
 \begin{figure}[H]
     \centering
@@ -393,7 +392,7 @@ Para el caso de bytes mínimos en paquetes, podemos ver que en la Figura \ref{fi
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_packet_bytes_min_log_x_log_y.png}
         \caption{CD (forward)}
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_packet_bytes_min_log_x_log_y.png}
-        \caption{CD (backward)}
+        \caption{CD (backward)} \label{fig:packet_pincer_packet_bytes_min_backward}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.26\textwidth}
@@ -416,13 +415,13 @@ Para el caso de bytes mínimos en paquetes, podemos ver que en la Figura \ref{fi
         \caption{TI (backward)}
     \end{subfigure}
     \hfill
-       \caption{Distribución de los máximos bytes transmitidos en un paquete por flujo}
+       \caption{Distribución de los mínimos bytes transmitidos en un paquete por flujo}
        \label{fig:packet_pincer_packet_bytes_min}
 \end{figure}
 
 \subsubsection{Número de bytes medio por flujo}
 
-Las distribuciones de los bytes medios de la Figura \ref{fig:packet_pincer_packet_bytes_mean} se asemejan a las de los recuentos de los bytes totales, pero suavizadas. Podemos ver que, en el caso bidireccional de TON-IoT (TI en la figura), la gráfica se mantiene en número de flujos alto durante un mayor rango de medias antes de caer.
+Las distribuciones de los bytes medios de la Figura \ref{fig:packet_pincer_packet_bytes_mean} se asemejan a las de los recuentos de los bytes totales, pero suavizadas. Podemos ver que, en el caso bidireccional de TON-IoT (subfigura \ref{fig:packet_pincer_packet_bytes_mean_ti_bidir}), la gráfica se mantiene en número de flujos alto durante un mayor rango de medias antes de caer.
 
 \begin{figure}[H]
     \centering
@@ -450,7 +449,7 @@ Las distribuciones de los bytes medios de la Figura \ref{fig:packet_pincer_packe
     \begin{subfigure}[b]{0.26\textwidth}
         \centering
         \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_packet_bytes_mean_log_x_log_y.png}
-        \caption{TI (bidir.)}
+        \caption{TI (bidir.)} \label{fig:packet_pincer_packet_bytes_mean_ti_bidir}
         \includegraphics[width=\textwidth]{media/packet_pincer_toniot/forward_packet_bytes_mean_log_x_log_y.png}
         \caption{TI (forward)}
         \includegraphics[width=\textwidth]{media/packet_pincer_toniot/backward_packet_bytes_mean_log_x_log_y.png}
@@ -463,7 +462,7 @@ Las distribuciones de los bytes medios de la Figura \ref{fig:packet_pincer_packe
 
 \subsubsection{Desviación estándar del número de bytes por flujo}
 
-Las distribuciones de las diferentes desviaciones estándar son variadas. Tenemos en muchos casos donde la desviación es 0, la cual puede ser causada por flujos con paquetes muy iguales o los casos donde no se transmite nada, ya que se asigna 0 en ese caso. De todas formas, para todos los casos, donde no son 0, hay una variedad de distribuciones. En el caso de CIC-DDoS2019, se asemeja a sus distribuciones anteriores en el caso bidireccional y hacia el receptor inicial. Hacia el transmisor inicial está invertida, teniendo mucha variabilidad en los diferentes tamaños de las comunicaciones. La gran diferencia de variabilidad es quizá debido a los efectos del control de congestión de las transmisiones. Dependiendo del estado de la red, los diferentes dispositivos transmitirán de una forma más constante y predecible y en otras se tendrán que ir adaptando a tiempo real al nivel de congestión.
+Las distribuciones de las diferentes desviaciones estándar son variadas. Tenemos en muchos casos donde la desviación es 0, la cual puede ser causada por flujos con paquetes muy iguales o los casos donde no se transmite nada, ya que se asigna 0 en ese caso. De todas formas, para todos los casos, donde no son 0, hay una variedad de distribuciones. En el caso de CIC-DDoS2019, se mantiene el estilo de sus distribuciones anteriores en el caso bidireccional y hacia el receptor inicial. Para el caso hacia el transmisor inicial (subfigura \ref{fig:packet_pincer_packet_bytes_std_cd_bw}) está invertida, teniendo mucha variabilidad en la cantidad total de bytes enviados. La gran diferencia de variabilidad es quizá debido a los efectos del control de congestión de las transmisiones. Dependiendo del estado de la red, los diferentes dispositivos transmitirán de una forma más constante y predecible y en otras se tendrán que ir adaptando a tiempo real al nivel de congestión.
 
 \begin{figure}[H]
     \centering
@@ -475,7 +474,7 @@ Las distribuciones de las diferentes desviaciones estándar son variadas. Tenemo
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_packet_bytes_std_log_x_log_y.png}
         \caption{CD (forward)}
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_packet_bytes_std_log_x_log_y.png}
-        \caption{CD (backward)}
+        \caption{CD (backward)} \label{fig:packet_pincer_packet_bytes_std_cd_bw}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.26\textwidth}
@@ -506,7 +505,7 @@ Las distribuciones de las diferentes desviaciones estándar son variadas. Tenemo
 
 El balance o la razón entre la subida y bajada consiste en dividir la cantidad de bytes enviados por el receptor inicial entre los enviados por el iniciador de la comunicación. De esta manera, se puede inferir si la comunicación es principalmente de bajada (un valor inferior a 1), de subida (un valor superior a 1) o hay una comunicación a iguales. En el primer caso, se puede dar al visitar la web o descargar archivos. El segundo en casos donde se suban datos, como subir fotos a un servicio Cloud. Finalmente, el tercero podría consistir en, por ejemplo, en una llamada de voz o videoconferencia. 
 
-Podemos en la figura \ref{fig:packet_pincer_down_up_bytes_ratio} que la gran mayoría de comunicaciones se concentran en la parte baja del gráfico, indicando que suelen ser o de bajada o la cantidad de datos enviados no suele ser muy grande. Sin embargo, hay una cantidad relevante de flujos en la que el emisor de la comunicación envía muchos más datos de los que recibe. Esto puede estar relacionado con posibles ataques, donde las comunicaciones normales tienen un ratio más bajo.
+Podemos ver en la Figura \ref{fig:packet_pincer_down_up_bytes_ratio} que la gran mayoría de comunicaciones se concentran en la parte baja del gráfico, indicando que suelen ser o de bajada o la cantidad de datos enviados no suele ser muy grande. Sin embargo, hay una cantidad relevante de flujos en la que el emisor de la comunicación envía muchos más datos de los que recibe. Esto puede estar relacionado con posibles ataques, donde las comunicaciones normales tienen un ratio más bajo.
 
 \begin{figure}[H]
     \centering
@@ -531,7 +530,7 @@ Podemos en la figura \ref{fig:packet_pincer_down_up_bytes_ratio} que la gran may
        \label{fig:packet_pincer_down_up_bytes_ratio}
 \end{figure}
 
-\subsubsection{Cadencia datos}
+\subsubsection{Cadencia de datos}
 
 \begin{figure}[H]
     \centering
@@ -611,7 +610,7 @@ En la Figura \ref{fig:packet_pincer_bytes_s} podemos ver la distribución de las
        \label{fig:packet_pincer_inter_arrival_time_max}
 \end{figure}
 
-La distribución de los tiempos de llegada máxima entre paquetes la podemos observar en la Figura \ref{fig:packet_pincer_inter_arrival_time_max}. Podemos ver que en los casos de CIC-DDoS2019 y TON-IOT, aparte de los ceros, se encuentra relativamente repartido. En cambio, en BoT-IoT hay una acumulación clara en cierto punto de la gráfica.
+La distribución de los tiempos de llegada máxima entre paquetes la podemos observar en la Figura \ref{fig:packet_pincer_inter_arrival_time_max}. Podemos ver que en los casos de CIC-DDoS2019 y TON-IOT, aparte de los ceros, la distribución de tiempos se encuentra relativamente repartida. En cambio, en BoT-IoT hay una acumulación clara en cierto punto de la gráfica.
 
 \subsubsection{Tiempo de llegada mínima}
 
@@ -635,7 +634,7 @@ La distribución de los tiempos de llegada máxima entre paquetes la podemos obs
         \includegraphics[width=\textwidth]{media/packet_pincer_botiot/forward_inter_arrival_time_min_log_x_log_y.png}
         \caption{BI (forward)}
         \includegraphics[width=\textwidth]{media/packet_pincer_botiot/backward_inter_arrival_time_min_log_x_log_y.png}
-        \caption{BI (backward)}
+        \caption{BI (backward)} \label{fig:packet_pincer_inter_arrival_time_min_bi_min}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.26\textwidth}
@@ -652,7 +651,7 @@ La distribución de los tiempos de llegada máxima entre paquetes la podemos obs
        \label{fig:packet_pincer_inter_arrival_time_min}
 \end{figure}
 
-Para el caso de las llegadas medias, como podemos ver en la Figura \ref{fig:packet_pincer_inter_arrival_time_min}, tenemos que las distribuciones en BoT-Iot y TON-IoT son similares. Sin embargo, sin contar los ceros, en CIC-DDoS2019 tenemos que el caso bidireccional y hacia el receptor inicial tenemos mayor cantidad en la parte alta. Adicionalmente, BoT-IoT no tenemos el mismo pico en para el caso donde se transmiten datos hacia el emisor inicial.
+Para el caso de las llegadas mínimas entre paquetes, como podemos ver en la Figura \ref{fig:packet_pincer_inter_arrival_time_min}, tenemos que las distribuciones en BoT-Iot y TON-IoT son similares. Sin embargo, sin contar los ceros, en CIC-DDoS2019 tenemos que el caso bidireccional y hacia el receptor inicial tenemos mayor cantidad en la parte alta. Adicionalmente, con BoT-IoT no tenemos el mismo pico en para el caso 'backwards' (subfigura \ref{fig:packet_pincer_inter_arrival_time_min_bi_min})
 
 \subsubsection{Tiempo de llegada media}
 
@@ -699,7 +698,7 @@ Si observamos las distribuciones del tiempo de llegada media de la Figura \ref{f
 
 Para el caso de la desviación estándar, tenemos un caso parecido a las medias como podemos ver en la figura \ref{fig:packet_pincer_inter_arrival_time_std}. De todas maneras, las magnitudes son algo menores y la distribución está más desplazadas hacia la izquierda. 
 
-Este valor puede aportar información como en otros casos de la situación de la congestión de la red y caracterizar mejor el flujo en cuestión. Si los tiempos de llegada varían mucho, puede ser señal de una conexión inestable o, en caso de ser un ataque, el intentar aparentar tener una conexión inestable para consumir recursos del sistema receptor.
+Este valor puede aportar información como en otros casos de la situación de la congestión de la red y caracterizar mejor el flujo en cuestión. Si los tiempos de llegada varían mucho, puede ser señal de una conexión inestable o, en caso de ser un ataque, sobre el intentar aparentar tener una conexión inestable para consumir recursos del sistema receptor.
 
 \begin{figure}[H]
     \centering
@@ -875,7 +874,7 @@ En una transmisión TCP, ambos nodos han de confirmar los datos que han recibido
        \label{fig:packet_pincer_bidirectional_tcp_psh_flags_count}
 \end{figure}
 
-La flag PSH en las cabeceras TCP, como se indicó en una sección anterior, son utilizadas para indicar al código que gestiona la capa de transporte proporcione los datos enviados lo antes posible a la capa de aplicación. Como se puede observar en la Figura \ref{fig:packet_pincer_bidirectional_tcp_psh_flags_count}, una gran cantidad de flujos no la utilizan. Sin embargo, también hay cierta cantidad que si lo hace, y en las gráficas log-log podemos ver como en general va decreciendo. En algunos casos es progresivo, pero en otros la caída es más notable.
+La flag PSH en las cabeceras TCP, como se indicó en una sección anterior, son utilizadas para indicar al código que gestiona la capa de transporte que proporcione los datos enviados lo antes posible a la capa de aplicación. Como se puede observar en la Figura \ref{fig:packet_pincer_bidirectional_tcp_psh_flags_count}, una gran cantidad de flujos no la utilizan. Sin embargo, también hay cierta cantidad que si lo hace, y en las gráficas log-log podemos ver como en general va decreciendo. En algunos casos es progresivo, pero en otros la caída es más notable.
 
 \subsubsection{Flags RST en cabecera TCP}
 
@@ -907,11 +906,11 @@ La flag PSH en las cabeceras TCP, como se indicó en una sección anterior, son 
        \label{fig:packet_pincer_bidirectional_tcp_rst_flags_count}
 \end{figure}
 
-Los flags RST provocan una finalización de la conexión más precipitada, fuerzan al iniciador de la conexión a volver a empezar la sincronización TCP inicial. En el mejor caso no se utiliza, pero como se puede observar en la Figura \ref{fig:packet_pincer_bidirectional_tcp_rst_flags_count}, tenemos ejemplos donde si se hace uso. Podemos ver que en CIC-DDoS2019 y BoT-IoT, aun utilizando un eje x linear (arriba) hay mucha variedad de flujos donde se utiliza, pero en TON-IoT hace falta tener la gráfica con el eje x en formato logarítmico (abajo) para poder observar más de tres columnas en el histograma. Es posible que esto haya sido debido en que en los dos primeros, se hagan ciertos ataques que hagan mal uso de este campo de la cabecera, mientras que en el tercero no.
+Los flags RST provocan una finalización de la conexión más precipitada, fuerzan al iniciador de la conexión a volver a empezar la sincronización TCP inicial. En el mejor caso no se utiliza, pero como se puede observar en la Figura \ref{fig:packet_pincer_bidirectional_tcp_rst_flags_count}, tenemos ejemplos donde si se hace uso. Podemos ver que en CIC-DDoS2019 y BoT-IoT, aun utilizando un eje x lineal (arriba) hay mucha variedad de flujos donde se utiliza, pero en TON-IoT hace falta tener la gráfica con el eje x en formato logarítmico (abajo) para poder observar más de tres columnas en el histograma. Es posible que esto haya sido debido a que en los dos primeros, se hagan ciertos ataques que hagan mal uso de este campo de la cabecera, mientras que en el tercero no.
 
 \subsubsection{Flags FIN en cabecera TCP}
 
-Las flags FIN en comunicaciones TCP suele haber 2, si se finaliza correctamente la comunicación o ninguna si no lo hace. En caso de haber más, puede ser señal de un ataque está ocurriendo En la Figura \ref{fig:packet_pincer_bidirectional_tcp_fin_flags_count} podemos comprobar que la mayoría de flujos no tienen, pero hay otros que superan las 2 y llegan a tener hasta 20.
+Las flags FIN en comunicaciones TCP suele haber 2, si se finaliza correctamente la comunicación o ninguna si no lo hace. En caso de haber más, puede ser señal de que un ataque está ocurriendo. En la Figura \ref{fig:packet_pincer_bidirectional_tcp_fin_flags_count} podemos comprobar que la mayoría de flujos no tienen, pero hay otros que superan las 2 y llegan a tener hasta 20.
 
 \begin{figure}[H]
     \centering
@@ -1003,7 +1002,7 @@ La columna de las sumas totales de las cabeceras de transporte se generó debido
        \label{fig:packet_pincer_bidirectional_transport_payload_bytes_mean}
 \end{figure}
 
-La media de bytes enviados sobre la capa de transporte está en parte relacionada con la media de bytes total. Como podemos ver en la Figura \ref{fig:packet_pincer_bidirectional_transport_payload_bytes_mean}, hay cierta similitud en parte del gráfico si nos fijamos. De todas maneras, es posible que la diferencia entre estos dos sea relevante. Por ejemplo, un atacante puede iniciar y mantener conexiones sin enviar datos, provocando que el receptor tenga recursos asignados a esta conexión de los cuales no hace uso.
+La media de bytes enviados sobre la capa de transporte está en parte relacionada con la media de bytes total. Como podemos ver en la Figura \ref{fig:packet_pincer_bidirectional_transport_payload_bytes_mean}, hay cierta similitud en parte del gráfico. De todas maneras, es posible que la diferencia entre estos dos sea relevante. Por ejemplo, un atacante puede iniciar y mantener conexiones sin enviar datos, provocando que el receptor tenga recursos asignados a esta conexión de los cuales no hace uso.
 
 \subsubsection{Bytes mínimos enviados sobre la capa de transporte hacia el receptor inicial}
 
@@ -1030,7 +1029,7 @@ La media de bytes enviados sobre la capa de transporte está en parte relacionad
        \label{fig:packet_pincer_forward_transport_payload_bytes_min}
 \end{figure}
 
-En el caso de los bytes mínimos sobre la capa de transporte, las distribuciones tienen mayores diferencias, como se puede ver en la Figura \ref{fig:packet_pincer_forward_transport_payload_bytes_min}. De todas maneras, la densidad es parecida, teniendo huecos parecidos en la distribución en BoT-IOT. La situación es similar a lo anterior, es posible que no aporte mayor información si tenemos la columna del número de bytes en total o que el hecho que la diferencia sea de cierta manera sí que la aporte.
+En el caso de los bytes mínimos sobre la capa de transporte, las distribuciones tienen mayores diferencias, como se puede ver en la Figura \ref{fig:packet_pincer_forward_transport_payload_bytes_min}. De todas maneras, la densidad es parecida, teniendo huecos parecidos en la distribución en BoT-IOT. La situación es similar a lo anterior, puede que no aporte información adicional tener la columna con el número total de bytes. Sin embargo, la diferencia en cierta manera podría proporcionar información útil.
 
 \subsubsection{Número de paquetes con datos enviados en la capa de transporte hacia el receptor inicial}
 
@@ -1095,7 +1094,7 @@ En una comunicación TCP, las ventanas iniciales suelen ser reducidas. Conforme 
 
 \subsubsection{Tiempos de actividad mínimos}
 
-Los tiempos de actividad mínimos nos pueden ayudar a ver si en un flujo la comunicación está siendo anormalmente lenta. En la Figura \ref{fig:packet_pincer_active_seconds_min} podemos ver como los tiempos activos e inactivos tienen distribuciones distintas. En el caso de CICDDoS2019 tenemos que los tiempos mínimos de actividad más grandes son menos frecuentes, mientras que los inactivos se mantienen relativamente plano. En BoT-IoT, tenemos que el dónde tenemos un valle en el caso activo, tenemos un pico en el caso inactivo. Finalmente, TON-IoT es una situación más exagerada, donde hay una caída más rápida en ToN-IoT para el caso activo, mientras que en el caso inactivo se mantiene más plano. Esto es esperable, ya que los dispositivos IoT que tratan de emular no están transmitiendo constantemente, sino que suelen enviar datos infrecuentemente para ahorrar batería.
+Los tiempos de actividad mínimos nos pueden ayudar a ver si en un flujo la comunicación está siendo anormalmente lenta. En la Figura \ref{fig:packet_pincer_active_seconds_min} podemos ver como los tiempos activos e inactivos tienen distribuciones distintas. En el caso de CICDDoS2019 tenemos que los tiempos mínimos de actividad más grandes son menos frecuentes, mientras que los inactivos se mantienen relativamente plano. En BoT-IoT, tenemos que donde tenemos un valle en el caso activo, tenemos un pico en el caso inactivo. Finalmente, TON-IoT es una situación más exagerada, donde hay una caída más rápida para el caso activo, en el caso inactivo se mantiene más plano. Esto es esperable, ya que los dispositivos IoT que tratan de emular no están transmitiendo constantemente, sino que suelen enviar datos infrecuentemente para ahorrar batería.
 
 \begin{figure}[H]
     \centering
@@ -1186,7 +1185,7 @@ Las distribuciones para los tiempos de actividad máximos, como podemos ver en l
         \includegraphics[width=\linewidth]{media/packet_pincer_toniot/idle_seconds_mean_log_x_log_y.png}
         \caption{TI (idle)}
     \end{subfigure}
-       \caption{Distribución de los tiempos de actividad máximos}
+       \caption{Distribución de los tiempos de actividad medios}
        \label{fig:packet_pincer_active_seconds_mean}
 \end{figure}
 
@@ -1289,7 +1288,7 @@ Debido a que nos hemos basado en las características de CICFlowMeter para defin
        \label{fig:packet_pincer_active_group_byte_average}
 \end{figure}
 
-Para el caso de los bytes por grupo activo, podemos ver en la Figura \ref{fig:packet_pincer_active_group_byte_average} que tenemos una situación similar. Las distribuciones son similares a la suma total, pero tienen algunos detalles distintos.
+Para el caso de la media bytes por grupo activo, podemos ver en la Figura \ref{fig:packet_pincer_active_group_byte_average} que tenemos una situación similar. Las distribuciones son similares a la suma total, pero tienen algunos detalles distintos.
 
 \subsubsection{Cadencia de bytes por grupo activo}
 
