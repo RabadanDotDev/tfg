@@ -1326,7 +1326,9 @@ A diferencia de los dos casos anteriores, podemos ver en la Figura \ref{fig:pack
 
 \subsection{Definición y evaluación de la tarea a realizar}
 
-por hacer
+Una vez hecho un análisis inicial de los datos, podemos ver que tenemos un conjunto de datos muy desbalanceado, tanto en etiquetas como en campos donde solo hay valores en ciertos casos. Como vimos en la Tabla \ref{table:packetpincerassignedlabels}, tenemos solo un 6\% de ejemplos de tráfico benigno y una serie de etiquetas con diferentes niveles de especificidad. Debido a esto, la tarea de \gls{ml} que realizaremos consistirá en clasificar un flujo determinado en benigno o maligno. 
+
+Debido al desbalance entre los benignos y no benignos, se ha de evitar hacer uso de la métrica de \textit{accuracy}. En todo caso, hemos de preferir utilizar la métrica de \textit{F-score} sobre esta, la cual combina \textit{recall} y \textit{precisión}, y permite evaluar de una mejor manera los conjuntos de datos de este estilo.
 
 \subsection{Preprocessamiento}
 
