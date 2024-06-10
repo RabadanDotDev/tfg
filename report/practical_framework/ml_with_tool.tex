@@ -1032,10 +1032,34 @@ La media de bytes enviados sobre la capa de transporte está en parte relacionad
 
 En el caso de los bytes mínimos sobre la capa de transporte, las distribuciones tienen mayores diferencias, como se puede ver en la Figura \ref{fig:packet_pincer_forward_transport_payload_bytes_min}. De todas maneras, la densidad es parecida, teniendo huecos parecidos en la distribución en BoT-IOT. La situación es similar a lo anterior, es posible que no aporte mayor información si tenemos la columna del número de bytes en total o que el hecho que la diferencia sea de cierta manera sí que la aporte.
 
-\subsubsection{Numero de paquetes enviados con datos en la capa de transporte}
+\subsubsection{Número de paquetes con datos enviados en la capa de transporte hacia el receptor inicial}
 
-por hacer
-%"forward_transport_packets_with_payload_count",
+Los protocolos de transporte suelen enviar paquetes con datos, excepto en la fase inicial de sincronización TCP. En algunos casos, pueden enviar paquetes vacíos para indicarse mutuamente que siguen estando disponibles y que la conexión se ha de mantener. Sin embargo, un atacante podría estar enviando muchos paquetes vacíos para colapsar un receptor que asume que los paquetes deberían contener datos. El receptor reservaría recursos para gestionar los paquetes, los cuales se desperdiciarían, ya que no contienen datos.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_transport_packets_with_payload_count_log_x_log_y.png}
+        \caption{CD (forward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/forward_transport_packets_with_payload_count_log_x_log_y.png}
+        \caption{BI (forward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/forward_transport_packets_with_payload_count_log_x_log_y.png}
+        \caption{TI (forward)}
+    \end{subfigure}
+       \caption{Distribución del número de paquetes enviados con datos en la capa de transporte hacia el receptor inicial}
+       \label{fig:packet_pincer_forward_transport_packets_with_payload_count}
+\end{figure}
+
+En la Figura \ref{fig:packet_pincer_forward_transport_packets_with_payload_count} podemos ver la distribución del recuento. Cada conjunto de datos presenta una distribución distinta, con un rango de magnitudes distinta.
 
 \subsubsection{Ventana TCP inicial}
 
