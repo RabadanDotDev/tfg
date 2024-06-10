@@ -875,7 +875,7 @@ En una transmisión TCP, ambos nodos han de confirmar los datos que han recibido
        \label{fig:packet_pincer_bidirectional_tcp_psh_flags_count}
 \end{figure}
 
-Por hacer
+La flag PSH en las cabeceras TCP, como se indicó en una sección anterior, son utilizadas para indicar al código que gestiona la capa de transporte proporcione los datos enviados lo antes posible a la capa de aplicación. Como se puede observar en la Figura \ref{fig:packet_pincer_bidirectional_tcp_psh_flags_count}, una gran cantidad de flujos no la utilizan. Sin embargo, también hay cierta cantidad que si lo hace, y en las gráficas log-log podemos ver como en general va decreciendo. En algunos casos es progresivo, pero en otros la caída es más notable.
 
 \subsubsection{Flags RST en cabecera TCP}
 
