@@ -1087,7 +1087,7 @@ En la Figura \ref{fig:packet_pincer_forward_transport_packets_with_payload_count
         \includegraphics[width=\linewidth]{media/packet_pincer_toniot/backward_tcp_initial_window_bytes_log_x_log_y.png}
         \caption{TI (backward)}
     \end{subfigure}
-       \caption{Tamaño de la ventana TCP inicial}
+       \caption{Distribución del tamaño de la ventanas TCP iniciales}
        \label{fig:packet_pincer_bidirectional_tcp_initial_window_bytes}
 \end{figure}
 
@@ -1095,8 +1095,36 @@ En una comunicación TCP, las ventanas iniciales suelen ser reducidas. Conforme 
 
 \subsubsection{Tiempos de actividad mínimos}
 
-por hacer
-%"idle_seconds_min",active_seconds_min
+Los tiempos de actividad mínimos nos pueden ayudar a ver si en un flujo la comunicación está siendo anormalmente lenta. En la Figura \ref{fig:packet_pincer_active_seconds_min} podemos ver como los tiempos activos e inactivos tienen distribuciones distintas. En el caso de CICDDoS2019 tenemos que los tiempos mínimos de actividad más grandes son menos frecuentes, mientras que los inactivos se mantienen relativamente plano. En BoT-IoT, tenemos que el dónde tenemos un valle en el caso activo, tenemos un pico en el caso inactivo. Finalmente, TON-IoT es una situación más exagerada, donde hay una caída más rápida en ToN-IoT para el caso activo, mientras que en el caso inactivo se mantiene más plano. Esto es esperable, ya que los dispositivos IoT que tratan de emular no están transmitiendo constantemente, sino que suelen enviar datos infrecuentemente para ahorrar batería.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/active_seconds_min_log_x_log_y.png}
+        \caption{CD (active)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/idle_seconds_min_log_x_log_y.png}
+        \caption{CD (idle)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/active_seconds_min_log_x_log_y.png}
+        \caption{BI (active)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/idle_seconds_min_log_x_log_y.png}
+        \caption{BI (idle)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/active_seconds_min_log_x_log_y.png}
+        \caption{TI (active)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/idle_seconds_min_log_x_log_y.png}
+        \caption{TI (idle)}
+    \end{subfigure}
+       \caption{Distribución de los tiempos de actividad mínimos}
+       \label{fig:packet_pincer_active_seconds_min}
+\end{figure}
 
 \subsubsection{Tiempos de actividad máximos}
 
