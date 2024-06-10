@@ -1227,18 +1227,102 @@ Como en otros casos, podemos ver en la Figura \ref{fig:packet_pincer_active_seco
 
 \subsubsection{Media de paquetes por grupo activo}
 
-por hacer
-%"active_group_forward_packet_average","active_group_backward_packet_average",
+Debido a que nos hemos basado en las características de CICFlowMeter para definir las utilizadas en packet\_pincer, se han creado las que indican información de grupos activos. En el caso de la cantidad de paquetes enviados en un grupo activo, podemos ver en la Figura \ref{fig:packet_pincer_active_group_packet_average} que las distribuciones tienen similitud al recuento total de paquetes. Sin embargo, existen diferencias debido a la diferencia de número de flujos activos por cada flujo. Es posible que esta información permita saber si, por ejemplo, un host está enviando una cantidad de paquetes al mismo tiempo desproporcionadamente grande o pequeña.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/active_group_forward_packet_average_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/active_group_backward_packet_average_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/active_group_forward_packet_average_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/active_group_backward_packet_average_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/active_group_forward_packet_average_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/active_group_backward_packet_average_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+       \caption{Distribución de la media de paquetes por grupo activo}
+       \label{fig:packet_pincer_active_group_packet_average}
+\end{figure}
 
 \subsubsection{Media de bytes por grupo activo}
 
-por hacer
-%"active_group_forward_byte_average","active_group_backward_byte_average",
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/active_group_forward_byte_average_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/active_group_backward_byte_average_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/active_group_forward_byte_average_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/active_group_backward_byte_average_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/active_group_forward_byte_average_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/active_group_backward_byte_average_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+       \caption{Distribución de la media de bytes por grupo activo}
+       \label{fig:packet_pincer_active_group_byte_average}
+\end{figure}
+
+Para el caso de los bytes por grupo activo, podemos ver en la Figura \ref{fig:packet_pincer_active_group_byte_average} que tenemos una situación similar. Las distribuciones son similares a la suma total, pero tienen algunos detalles distintos.
 
 \subsubsection{Cadencia de bytes por grupo activo}
 
-por hacer
-%"active_group_forward_byte_second_average","active_group_backward_byte_second_average"
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/active_group_forward_byte_second_average_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/active_group_backward_byte_second_average_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/active_group_forward_byte_second_average_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/active_group_backward_byte_second_average_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/active_group_forward_byte_second_average_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/active_group_backward_byte_second_average_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+       \caption{Distribución de la cadencia de bytes por grupo activo}
+       \label{fig:packet_pincer_active_group_byte_second_average}
+\end{figure}
+
+A diferencia de los dos casos anteriores, podemos ver en la Figura \ref{fig:packet_pincer_active_group_byte_second_average} como la distribución de la cadencia de bytes media por grupo activo no es similar al caso general. Este valor nos puede llegar a aportar una mayor información, ya que representa la cantidad de información que se suele enviar cada vez que el flujo es activo.
 
 \subsection{Definición y evaluación de la tarea a realizar}
 
