@@ -941,8 +941,36 @@ Las flags FIN en comunicaciones TCP suele haber 2, si se finaliza correctamente 
 
 \subsubsection{Suma total de bytes en las cabeceras de transporte}
 
-por hacer
-%"forward_transport_header_bytes_sum",backward_transport_header_bytes_sum
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_transport_header_bytes_sum_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_transport_header_bytes_sum_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/forward_transport_header_bytes_sum_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/backward_transport_header_bytes_sum_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/forward_transport_header_bytes_sum_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/backward_transport_header_bytes_sum_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+       \caption{Distribución de las sumas totales en las cabeceras de transporte}
+       \label{fig:packet_pincer_bidirectional_transport_header_bytes_sum}
+\end{figure}
+
+La columna de las sumas totales de las cabeceras de transporte se generó debido a que aparecía en CICFlowMeter. Si observamos las distribuciones de la Figura \ref{fig:packet_pincer_bidirectional_transport_header_bytes_sum}, podemos ver que son similares al caso de la suma general. Hay ciertas variaciones, pero es posible que esté muy correlacionado y no aporte suficiente información adicional.
 
 \subsubsection{Media de bytes enviados sobre la capa de transporte en un paquete}
 
