@@ -881,6 +881,7 @@ La flag PSH en las cabeceras TCP, como se indicó en una sección anterior, son 
 
 \begin{figure}[H]
     \centering
+    \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_tcp_rst_flags_count_linear_x_log_y.png}
@@ -901,6 +902,7 @@ La flag PSH en las cabeceras TCP, como se indicó en una sección anterior, son 
         \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_tcp_rst_flags_count_log_x_log_y.png}
         \caption{TON-IoT}
     \end{subfigure}
+    \hfill
        \caption{Distribución de recuentos de paquetes con la flag RST en TCP activa}
        \label{fig:packet_pincer_bidirectional_tcp_rst_flags_count}
 \end{figure}
@@ -909,24 +911,27 @@ Los flags RST provocan una finalización de la conexión más precipitada, fuerz
 
 \subsubsection{Flags FIN en cabecera TCP}
 
-Por hacer
+Las flags FIN en comunicaciones TCP suele haber 2, si se finaliza correctamente la comunicación o ninguna si no lo hace. En caso de haber más, puede ser señal de un ataque está ocurriendo En la Figura \ref{fig:packet_pincer_bidirectional_tcp_fin_flags_count} podemos comprobar que la mayoría de flujos no tienen, pero hay otros que superan las 2 y llegan a tener hasta 20.
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.26\textwidth}
+    \begin{subfigure}[b]{0.32\textwidth}
         \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_tcp_fin_flags_count_linear_x_log_y.png}
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/bidirectional_tcp_fin_flags_count_log_x_log_y.png}
         \caption{CIC-DDoS2019}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.26\textwidth}
+    \begin{subfigure}[b]{0.32\textwidth}
         \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_tcp_fin_flags_count_linear_x_log_y.png}
         \includegraphics[width=\linewidth]{media/packet_pincer_botiot/bidirectional_tcp_fin_flags_count_log_x_log_y.png}
         \caption{BoT-IoT}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.26\textwidth}
+    \begin{subfigure}[b]{0.32\textwidth}
         \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_tcp_fin_flags_count_linear_x_log_y.png}
         \includegraphics[width=\linewidth]{media/packet_pincer_toniot/bidirectional_tcp_fin_flags_count_log_x_log_y.png}
         \caption{TON-IoT}
     \end{subfigure}
