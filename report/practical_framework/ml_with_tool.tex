@@ -1,11 +1,10 @@
-\color{blue} %TODO remove this when revised
 \section{Uso de la herramienta}
 
-En esta sección trataremos el proceso de hacer uso de la herramienta para el entrenamiento de modelos. Primero extraeremos las etiquetas de cada dataset para posteriormente ejecutar nuestra herramienta sobre los datos en crudo. Una vez tengamos las características extraídas, haremos una fase de preprocesamiento de los datos donde analizaremos las diferentes propiedades de este, escalando y normalizando los datos donde posible. Con los datos limpiados, realizaremos una selección de características para mantener solo las que se consideren más relevantes. Una vez hecho esto, detallaremos la tarea de \gls{ml} que se realizará y como evaluaremos los diferentes modelos. A continuación, entrenaremos diferentes modelos y valoraremos su efectividad. Finalmente, haremos una comparación de los modelos y decidiremos cuál es el que muestra mejor rendimiento.
+En esta sección haremos uso de la herramienta desarollada para procesar las trazas de red y usar los datos en algoritmos de \gls{ml}. Primero extraeremos las etiquetas de cada dataset para posteriormente ejecutar nuestra herramienta sobre los datos en crudo. Una vez tengamos las características extraídas, haremos una fase de preprocesamiento de los datos donde analizaremos las diferentes propiedades de este, escalando y normalizando los datos donde sea posible. Con los datos limpiados, realizaremos una selección de características para mantener solo las que se consideren más relevantes. Una vez hecho esto, detallaremos la tarea de \gls{ml} que se realizará y como evaluaremos los diferentes modelos. A continuación, entrenaremos diferentes modelos y valoraremos su efectividad. Finalmente, haremos una comparación de los modelos y decidiremos cuál es el que muestra mejor rendimiento.
 
 \subsection{Extracción etiquetas de los datasets}
 
-Inicialmente, hemos de definir del 'ground truth' que proporcionaremos a la herramienta para realizar el etiquetado durante la ejecución. Es decir, hemos de indicar a la herramienta, a partir de pares de direcciones IP y rangos temporales, qué etiqueta deseamos que asigne para realizar lo indicado en \ref{flowtag}. Para hacer esto, haremos uso del script \texttt{extract\-\_ground\-\_truth\-\_from\-\_datasets.py} disponible en el anexo 1. En este, se lee la información de los archivos CSV ofrecidos en cada dataset presentado en el marco teórico y se transforma para tener el formato esperado. Las columnas que se requieren para la herramienta tener son:
+Inicialmente, hemos de definir el 'ground truth' que proporcionaremos a la herramienta para realizar el etiquetado durante la ejecución. Es decir, como vimos en \ref{flowtag}, hemos de indicar a la herramienta los pares de direcciones IP y rangos temporales con los cuales ha de encontrar coincidencias y con qué etiqueta deseamos que asigne. Para hacer esto, haremos uso del script \texttt{extract\-\_ground\-\_truth\-\_from\-\_datasets.py} disponible en el anexo 1. En este, se lee la información de los archivos CSV ofrecidos en cada dataset presentado en el marco teórico y se transforma para tener el formato esperado. Las columnas que se requieren tener para la herramienta son:
 
 \begin{itemize}
     \item \texttt{low\_ip}: la dirección IP del par de direcciones lexicográficamente menor.
@@ -15,7 +14,7 @@ Inicialmente, hemos de definir del 'ground truth' que proporcionaremos a la herr
     \item \texttt{label}: la etiqueta seleccionada.
 \end{itemize}
 
-Inicialmente, para cada dataset se renombran de las etiquetas de cada flujo para que sean consistentes. Adicionalmente, en CIC-DDos2019, se convierten todas las etiquetas de WebDDoS a 'benign' para luego poder descartarlas. Se ha decidido hacer esto debido a que había muchos flujos WebDDoS que solapaban con otros, cuando WebDDoS es una de las clases menos representadas, según vimos en el análisis de cada dataset. Si no las eliminásemos, habría que cambiar suposiciones esenciales realizadas tanto en la herramienta como en el planteamiento del formato de los 'ground truth'. Después de esto, tratamos cada conjunto de datos individualmente para obtener las diferentes columnas que se requieren.
+Inicialmente, para cada dataset se renombran las etiquetas de cada flujo para que sean consistentes. Adicionalmente, en CIC-DDos2019, se convierten todas las etiquetas de WebDDoS a 'benign' para luego poder descartarlas. Se ha decidido hacer esto debido a que había muchos flujos WebDDoS que solapaban con otros, cuando WebDDoS es una de las clases menos representadas, según vimos en el análisis de cada dataset. Si no las eliminásemos, habría que cambiar suposiciones esenciales realizadas tanto en la herramienta como en el planteamiento del formato de los 'ground truth'. Después de esto, tratamos cada conjunto de datos individualmente para obtener las diferentes columnas que se requieren.
 
 Para el caso de CIC-DDos2019, leemos el par de direcciones IP (' Source IP' y ' Destination IP'), la marca temporal inicial (' Timestamp'), la duración del flujo (' Flow Duration') y la etiqueta (' Label') de los registros. La marca temporal está representada como una fecha, siguiendo el formato 'YYYY-MM-DDTHH:MM:SS.SSSSSS'. Sin embargo, no hay ningún tipo de información de la zona horaria utilizada. Si observamos la primera marca de tiempo de los datos generados del 3 de noviembre, podemos ver que se aparece '2018-11-03T09:18:16.964447'. A su vez, si abrimos la primera traza de red del mismo día con WireShark, podemos ver que el segundo paquete tiene la marca de tiempo '2018-11-03 12:18:16.964447' en la zona horaria UTC+0. Correlacionando estos valores, podemos ver que todas las marcas de tiempo de los CSV proporcionados tienen 3 horas menos que UTC. A partir de esto, convertimos todos los valores de tiempo a tiempo UNIX expresados en microsegundos. Las duraciones de flujo ya están representadas en microsegundos, por lo que las utilizamos para encontrar el tiempo UNIX de la finalización del flujo.
 
@@ -25,7 +24,7 @@ Finalmente, en TON-IoT tenemos un caso similar que con CIC-DDos2019. Tenemos el 
 
 Después de poner el mismo formato numérico y semántico en los tres conjuntos de datos, podemos llegar a tener un número considerable de filas. Para hacerlo más fácilmente tratable, primero modificamos las columnas de las direcciones IP de origen y destino para tener una que sea lexicográficamente menor y otra mayor. Esto lo hacemos, ya que en la herramienta el orden del par de IP no es relevante, pero sí lo es para hacer la reducción. La reducción la hacemos a base de juntar intervalos de tiempo entre pares de IP con la misma etiqueta. Es decir, agrupamos todas las filas que tengan el mismo par de dirección IP de origen y destino, las ordenamos por tiempo y, si tenemos registros consecutivos que repiten etiqueta, las combinamos para tener un intervalo más grande que las agrupe. Una vez hecho esto, descartamos todas las filas que sean equivalentes a 'benign', ya que la herramienta pondrá esta etiqueta de todas formas si no hay un intervalo que corresponda.
 
-Después de la compresión, quedan algunos intervalos solapados con el mismo par de direcciones IP. Se han decidido modificar los tiempos de inicio y final para que, en los casos que estén solapados, los tiempos se modifiquen al "centro" de los dos. Es decir, si tenemos un intervalo en los tiempos $[0, 20]$ y otro $[10, 30]$, pasarían a ser $[0, 15]$ y $[15, 30]$ respectivamente. De la manera que está diseñada la herramienta, esta es la operación que tiene más sentido, ya que permite que los flujos se etiqueten con la etiqueta del intervalo con la que corresponden más.
+Después de la compresión, quedan algunos intervalos solapados con el mismo par de direcciones IP. Se ha decidido modificar los tiempos de inicio y final para que, en los casos que estén solapados, se modifiquen los tiempos al centro de los dos. Es decir, si tenemos un intervalo en los tiempos $[0, 20]$ y otro $[10, 30]$, pasarían a ser $[0, 15]$ y $[15, 30]$ respectivamente. De la manera que está diseñada la herramienta, esta es la operación que tiene más sentido, ya que permite que los flujos se etiqueten con la etiqueta del intervalo con la que corresponden más.
 
 Finalmente, renombramos las etiquetas para que sigan un formato similar y, por cada conjunto de datos, guardamos los datos resultantes en un CSV. No realizamos ningún tipo de fusión de etiquetas adicional, ya que esto se habrá de realizar en el momento en que hagamos el preprocesamiento de los datos generados. Los archivos obtenidos constan de 18 registros para CIC-DDos2019, 181 para BoT-IoT y 1667 para TON-IoT. Comparado con la cantidad original de registros (70 427 637, 73 370 442 y 22 339 021 respectivamente), es una reducción de información considerable.
 
@@ -66,9 +65,9 @@ Como podemos ver en la Tabla \ref{table:statsevalpacketoffline}, la mayor parte 
             \hline
             & \textbf{CIC-DDoS2019} & \textbf{Bot-IoT} & \textbf{TON-IoT} \\
             \hline
-            Tiempo total & 7m 36,532s & 8m4.634s & 3m39.632s \\
-            Tiempo en espacio de usuario & 6m 5,831s  & 7m33.534s & 3m6.868s \\
-            Tiempo en espacio de kernel  & 1m 26,014s & 0m28.862s 0 & 0m31.229s \\
+            Tiempo total                 & 7m 36,532s & 8m  4,634s & 3m 39,632s \\
+            Tiempo en espacio de usuario & 6m  5,831s & 7m 33,534s & 3m  6,868s \\
+            Tiempo en espacio de kernel  & 1m 26,014s & 0m 28,862s & 0m 31,229s \\
             \hline
         \end{tabular}
     \end{center}
@@ -155,7 +154,7 @@ Podemos observar también que el tipo principal de ataques es 'DDoS', el cual se
 
 \subsubsection{Protocolo}
 
-Respecto a los protocolos utilizados, podemos ver en la Tabla \ref{table:packetpincerasprotocols} cómo en general está relativamente balanceado entre TCP y UDP, aunque en cada conjunto de datos el peso que tienen está más sesgado hacia un lado u otro.
+Respecto a los protocolos utilizados, podemos ver en la Tabla \ref{table:packetpincerasprotocols} cómo en general los flujos con TCP y UDP estan relativamente balanceados, aunque en cada conjunto de datos el peso que tienen está más sesgado hacia un lado u otro.
 
 \begin{table}[H]
     \centering
@@ -174,7 +173,7 @@ Respecto a los protocolos utilizados, podemos ver en la Tabla \ref{table:packetp
 
 \subsubsection{Duración}
 
-La columna de duración contiene un bastes flujos que duran 0 segundos, además de flujos relativamente cortos como podemos ver en la Figura \ref{fig:packet_pincer_duration}.  Para tener gráficos útiles, hace falta aplicar una escala logarítmica tanto en la magnitud como en la cantidad de flujos. Para evitar infinitos al aplicar el logaritmo a los flujos con 0, sumamos 1 a todos los datos. La cantidad de ceros es el 2.73\% (12 89 300), 1.12\% (68 292) y 42.68\% (10 942 625) en CIC-DDoS2019, BoT-Iot y TON-IoT, respectivamente.
+La columna de duración contiene una cantidad considerable de flujos que duran 0 segundos, además de otros relativamente cortos, como podemos ver en la Figura \ref{fig:packet_pincer_duration}. Para tener gráficos útiles, hace falta aplicar una escala logarítmica tanto en la magnitud como en la cantidad de flujos. Para evitar infinitos al aplicar el logaritmo a los flujos con 0, sumamos 1 a todos los datos. La cantidad de ceros es el 2.73\% (12 89 300), 1.12\% (68 292) y 42.68\% (10 942 625) en CIC-DDoS2019, BoT-Iot y TON-IoT, respectivamente.
 
 \begin{figure}[H]
     \centering
@@ -199,6 +198,7 @@ La columna de duración contiene un bastes flujos que duran 0 segundos, además 
        \label{fig:packet_pincer_duration}
 \end{figure}
 
+\color{blue} %TODO remove this when revised
 \subsubsection{Recuento paquetes}
 
 \begin{figure}[H]
