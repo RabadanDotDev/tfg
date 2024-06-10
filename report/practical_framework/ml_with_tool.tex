@@ -1036,6 +1036,8 @@ En el caso de los bytes mínimos sobre la capa de transporte, las distribuciones
 
 Los protocolos de transporte suelen enviar paquetes con datos, excepto en la fase inicial de sincronización TCP. En algunos casos, pueden enviar paquetes vacíos para indicarse mutuamente que siguen estando disponibles y que la conexión se ha de mantener. Sin embargo, un atacante podría estar enviando muchos paquetes vacíos para colapsar un receptor que asume que los paquetes deberían contener datos. El receptor reservaría recursos para gestionar los paquetes, los cuales se desperdiciarían, ya que no contienen datos.
 
+En la Figura \ref{fig:packet_pincer_forward_transport_packets_with_payload_count} podemos ver la distribución del recuento. Cada conjunto de datos presenta una distribución distinta, con un rango de magnitudes distinta.
+
 \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.32\textwidth}
@@ -1058,13 +1060,38 @@ Los protocolos de transporte suelen enviar paquetes con datos, excepto en la fas
        \caption{Distribución del número de paquetes enviados con datos en la capa de transporte hacia el receptor inicial}
        \label{fig:packet_pincer_forward_transport_packets_with_payload_count}
 \end{figure}
-
-En la Figura \ref{fig:packet_pincer_forward_transport_packets_with_payload_count} podemos ver la distribución del recuento. Cada conjunto de datos presenta una distribución distinta, con un rango de magnitudes distinta.
-
 \subsubsection{Ventana TCP inicial}
 
-por hacer
-%"forward_tcp_initial_window_bytes","backward_tcp_initial_window_bytes",
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/forward_tcp_initial_window_bytes_log_x_log_y.png}
+        \caption{CD (forward)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/backward_tcp_initial_window_bytes_log_x_log_y.png}
+        \caption{CD (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/forward_tcp_initial_window_bytes_log_x_log_y.png}
+        \caption{BI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/backward_tcp_initial_window_bytes_log_x_log_y.png}
+        \caption{BI (backward)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/forward_tcp_initial_window_bytes_log_x_log_y.png}
+        \caption{TI (forward)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/backward_tcp_initial_window_bytes_log_x_log_y.png}
+        \caption{TI (backward)}
+    \end{subfigure}
+       \caption{Tamaño de la ventana TCP inicial}
+       \label{fig:packet_pincer_bidirectional_tcp_initial_window_bytes}
+\end{figure}
+
+En una comunicación TCP, las ventanas iniciales suelen ser reducidas. Conforme se progresa en la comunicación y se comprueba que la red no se encuentra saturada, son incrementadas progresivamente. Conocer la ventana inicial propuesta por el iniciador de la transmisión y su contraposición con la del receptor inicial, nos puede indicar si el iniciador está utilizando ventanas desproporcionadamente pequeñas o grandes. En la Figura \ref{fig:packet_pincer_bidirectional_tcp_initial_window_bytes} podemos ver las diferentes ventanas utilizadas. Podemos ver que en general hay algunas ventanas más comunes, aunque en TON-IoT las ventanas propuestas tienen mucha más variedad que en los otros casos.
 
 \subsubsection{Tiempos de actividad mínimos}
 
