@@ -905,6 +905,8 @@ La flag PSH en las cabeceras TCP, como se indicó en una sección anterior, son 
        \label{fig:packet_pincer_bidirectional_tcp_rst_flags_count}
 \end{figure}
 
+Los flags RST provocan una finalización de la conexión más precipitada, fuerzan al iniciador de la conexión a volver a empezar la sincronización TCP inicial. En el mejor caso no se utiliza, pero como se puede observar en la Figura \ref{fig:packet_pincer_bidirectional_tcp_rst_flags_count}, tenemos ejemplos donde si se hace uso. Podemos ver que en CIC-DDoS2019 y BoT-IoT, aun utilizando un eje x linear (arriba) hay mucha variedad de flujos donde se utiliza, pero en TON-IoT hace falta tener la gráfica con el eje x en formato logarítmico (abajo) para poder observar más de tres columnas en el histograma. Es posible que esto haya sido debido en que en los dos primeros, se hagan ciertos ataques que hagan mal uso de este campo de la cabecera, mientras que en el tercero no.
+
 \subsubsection{Flags FIN en cabecera TCP}
 
 Por hacer
