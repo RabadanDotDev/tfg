@@ -1128,8 +1128,36 @@ Los tiempos de actividad mínimos nos pueden ayudar a ver si en un flujo la comu
 
 \subsubsection{Tiempos de actividad máximos}
 
-por hacer
-%""idle_seconds_max",active_seconds_max
+Las distribuciones para los tiempos de actividad máximos, como podemos ver en la Figura \ref{fig:packet_pincer_active_seconds_max}, tienen una forma similar para los casos de CICDDoS2019 y TON-IoT. Para BoT-IOT, ya no tenemos el pico y el valle claros, sino que en el caso activo desciende más rápidamente y en el caso inactivo está más distribuido y hay un valle menos pronunciado.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/active_seconds_max_log_x_log_y.png}
+        \caption{CD (active)}
+        \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/idle_seconds_max_log_x_log_y.png}
+        \caption{CD (idle)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/active_seconds_max_log_x_log_y.png}
+        \caption{BI (active)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_botiot/idle_seconds_max_log_x_log_y.png}
+        \caption{BI (idle)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.26\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/active_seconds_max_log_x_log_y.png}
+        \caption{TI (active)}
+        \includegraphics[width=\linewidth]{media/packet_pincer_toniot/idle_seconds_max_log_x_log_y.png}
+        \caption{TI (idle)}
+    \end{subfigure}
+       \caption{Distribución de los tiempos de actividad máximos}
+       \label{fig:packet_pincer_active_seconds_max}
+\end{figure}
 
 \subsubsection{Tiempos de actividad medios}
 
