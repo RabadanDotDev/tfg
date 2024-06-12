@@ -5,3 +5,4 @@ distinctipy
 natsort
 scikit-learn
 BorutaPy
+seaborn
