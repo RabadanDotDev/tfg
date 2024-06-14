@@ -108,7 +108,7 @@ def cross_validation_run(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: Str
     axes[2].set_title("F1 score");
     axes[2].set_xlim([-0.025, 1.025])
     axes[2].grid(True, axis='y')
-    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_{name}_kfold.png", bbox_inches="tight")
+    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_v1_{name}_kfold.png", bbox_inches="tight")
 
 def grid_search_run(df_train: pd.DataFrame, skf: StratifiedKFold, name: str, model, params):
     print(f"{name} - Grid search validation run")
@@ -166,7 +166,7 @@ def train_run(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFol
     plt.xlabel('Predicted Labels')
     plt.ylabel('True Labels')
     plt.title('Confusion Matrix')
-    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_{name}.png", bbox_inches="tight")
+    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_v1_{name}.png", bbox_inches="tight")
     print(clasification_report)
 
 def naive_bayes(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold):
@@ -200,7 +200,7 @@ def knn(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold):
     axes[1].legend(loc='lower left')
     sns.lineplot(ax=axes[2], data=f1_weighted_scores, style='param_weights',x="param_n_neighbors", y="mean_fit_time", hue="param_weights")
     sns.lineplot(ax=axes[3], data=f1_weighted_scores, style='param_weights',x="param_n_neighbors", y="mean_score_time", hue="param_weights")
-    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_{name}_gridsearch.png", bbox_inches="tight")
+    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_v1_{name}_gridsearch.png", bbox_inches="tight")
 
     train_run(df_train, df_test, skf, "KNN", KNeighborsClassifier(**grid_search.best_params_))
 
@@ -230,11 +230,11 @@ def decision_trees(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: Stratifie
     print(f"{name} - Plotting results")
     plt.clf()
     sns.jointplot(data=f1_weighted_scores, x="param_min_impurity_decrease", y="param_min_samples_split", hue="f1_weighted")
-    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_{name}_gridsearch_f1_weighted.png", bbox_inches="tight")
+    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_v1_{name}_gridsearch_f1_weighted.png", bbox_inches="tight")
 
     plt.clf()
     sns.jointplot(data=f1_macro_scores, x="param_min_impurity_decrease", y="param_min_samples_split", hue="f1_macro")
-    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_{name}_gridsearch_f1_macro.png", bbox_inches="tight")
+    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_v1_{name}_gridsearch_f1_macro.png", bbox_inches="tight")
 
     return grid_search.best_params_
 
@@ -342,7 +342,7 @@ def svm(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold):
     sns.heatmap(cell_scores, square=True, annot=True, cmap='Blues', cbar=False, ax=axes[1, 2], fmt='.3g')
     axes[1, 2].set_title('RBF SVM macro scores')
 
-    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_{name}_gridsearch", bbox_inches="tight")
+    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_v1_{name}_gridsearch", bbox_inches="tight")
 
     return grid_search.best_params_
 

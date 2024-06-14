@@ -1324,56 +1324,22 @@ Para el caso de la media bytes por grupo activo, podemos ver en la Figura \ref{f
 A diferencia de los dos casos anteriores, podemos ver en la Figura \ref{fig:packet_pincer_active_group_byte_second_average} como la distribución de la cadencia de bytes media por grupo activo no es similar al caso general. Este valor nos puede llegar a aportar una mayor información, ya que representa la cantidad de información que se suele enviar cada vez que el flujo es activo.
 
 \color{blue} %TODO remove this when revised
-\subsection{Definición y evaluación de la tarea a realizar}
+\subsection{Definición de la tarea a realizar}
 
-Una vez hecho un análisis inicial de los datos, podemos ver que tenemos un conjunto de datos muy desbalanceado, tanto en etiquetas como en campos donde solo hay valores en ciertos casos. Como vimos en la Tabla \ref{table:packetpincerassignedlabels}, tenemos solo un 6\% de ejemplos de tráfico benigno y una serie de etiquetas con diferentes niveles de especificidad. Debido a esto, la tarea de \gls{ml} que realizaremos consistirá en clasificar un flujo determinado en benigno o maligno. 
+Una vez hecho un análisis inicial de los datos, podemos ver que tenemos un conjunto de datos muy desbalanceado, tanto en etiquetas como en campos donde solo hay valores en ciertos casos. Como vimos en la Tabla \ref{table:packetpincerassignedlabels}, tenemos solo un 6\% de ejemplos de tráfico benigno y una serie de etiquetas con diferentes niveles de especificidad, además de desbalanceadas entre ellas. 
 
-Debido al desbalance entre los benignos y no benignos, se ha de evitar hacer uso de la métrica de \textit{accuracy}. En todo caso, hemos de preferir utilizar la métrica de \textit{F-score} sobre esta, la cual combina \textit{recall} y \textit{precisión}, y permite evaluar de una mejor manera los conjuntos de datos de este estilo.
+La tarea de \gls{ml} que se realizará consistirá en tratar de clasificar las diferentes tipologías de DDoS. Tomaremos datos con etiquetas específicas de CIC-DDoS2019 y BoT-IoT, haremos un preprocesamiento. A continuación haremos un split 70/20/10 para entrenar los modelos, seleccionar el que tenga mejor rendimiento y testear su funcionamiento con datos que aún no ha visto. Finalmente, aplicaremos el modelo entrenado sobre las etiquetas genéricas de TON-IoT. % y trataremos de analizar las distribuciones de diferentes datos en relación con la etiqueta asignada
 
-\subsection{Preprocessamiento}
+En el preprocesamiento inicial filtraremos por etiquetas 'ddos' que indiquen el protocolo TCP o sean UDP y con una representación mayor al 0.1\%. A continuación realizaremos un muestreo para tener como máximo unos 100 mil registros y aplicaremos el logaritmo (sumando 1 para evitar infinitos). Finalmente, escalaremos todos los datos continuos para que estén en el rango $[0, 1]$. %Para escoger qué características analizaremos en relación con las etiquetas asignadas, haremos uso del algoritmo Boruta.
 
-Teniendo definida la tarea objetiva, pasamos a hacer un preprocesamiento de los datos. El script de Python utilizado para realizar la tarea es \texttt{packet\-\_pincer\-\_preprocess\-\_results\-.py} disponible en el anexo 1. En este, combinamos las etiquetas de los ataques en 'malign', hacemos un muestreo de los datos, omitimos características no relevantes, escalamos los datos y hacemos una selección de características con boruta.
+Debido al desbalance de los datos, se ha de evitar hacer uso de la métrica de \textit{accuracy}. En todo caso, hemos de preferir utilizar la métrica de \textit{F-score} sobre esta, la cual combina \textit{recall} y \textit{precision}, y permite evaluar de una mejor manera los conjuntos de datos de este estilo.
 
-Para evitar el tener que trabajar con casi 79 millones de registros, se ha decidido hacer un muestreo estratificado del 0.15\% de cada archivo CSV generado. Con esto, nos quedamos con aproximadamente 100 mil registros manteniendo la proporción entre flujos benignos y malignos. A continuación haremos un split 80-20 de los datos de entrenamiento y validación.
+%\subsection{Preprocessamiento}
 
-Para el paso de preprocesamiento, aparte de combinar las etiquetas malignas y descartar las columnas identificativas, aplicaremos el logaritmo (sumando 1 para evitar infinitos) a las características las que hemos mostrado gráficas con el eje x en formato logarítmico. Finalmente, escalaremos todos los datos continuos para que estén en el rango $[0, 1]$
+%Teniendo definida la tarea objetiva, pasamos a hacer un preprocesamiento de los datos. El script de Python utilizado para realizar la tarea es \texttt{packet\-\_pincer\-\_preprocess\-\_results\-.py} disponible en el anexo 1. En este, combinamos las etiquetas de los ataques en 'malign', hacemos un muestreo de los datos, omitimos características no relevantes, escalamos los datos y hacemos una selección de características con el algoritmo Boruta.
 
-Hemos ejecutado el algoritmo de selección de características Boruta implementado en Python \cite{borutapy}. Al ejecutarlo, nos ha descartado las características del recuento de paquetes con las flags CWR, ECC y URG en las cabeceras TCP. Esto es esperable, ya que la mayoría de estas eran 0 y las que no estaban concentradas en puntos muy definidos.
+%Para evitar el tener que trabajar con casi 79 millones de registros, se ha decidido hacer un muestreo estratificado del 0.15\% de cada archivo CSV generado. Con esto, nos quedamos con aproximadamente 100 mil registros manteniendo la proporción entre flujos benignos y malignos. A continuación haremos un split 80-20 de los datos de entrenamiento y validación.
 
-\subsection{Entrenamiento de modelos}
+%Para el paso de preprocesamiento, aparte de combinar las etiquetas malignas y descartar las columnas identificativas, aplicaremos el logaritmo (sumando 1 para evitar infinitos) a las características las que hemos mostrado gráficas con el eje x en formato logarítmico. Finalmente, escalaremos todos los datos continuos para que estén en el rango $[0, 1]$
 
-\subsubsection{Naive Bayes}
-
-por hacer
-
-\subsubsection{KNN}
-
-por hacer
-
-\subsubsection{Árboles de decisión}
-
-por hacer
-
-\subsubsection{Máquinas de vectores de soporte}
-
-por hacer
-
-\subsubsection{Votación por mayoría (metaaprendizaje)}
-
-por hacer
-
-\subsubsection{Embolsado (metaaprendizaje)}
-
-por hacer
-
-\subsubsection{Árboles aleatorios (metaaprendizaje)}
-
-por hacer
-
-\subsubsection{Adaboost (metaaprendizaje)}
-
-por hacer
-
-\subsection{Comparación de resultados}
-
-por hacer
+%Hemos ejecutado el algoritmo de selección de características Boruta implementado en Python \cite{borutapy}. Al ejecutarlo, nos ha descartado las características del recuento de paquetes con las flags CWR, ECC y URG en las cabeceras TCP. Esto es esperable, ya que la mayoría de estas eran 0 y las que no estaban concentradas en puntos muy definidos.
