@@ -23,6 +23,7 @@ import seaborn as sns
 
 TRAIN_CSV = Path("/workspaces/tfg/tmp/train.csv")
 TEST_CSV = Path("/workspaces/tfg/tmp/test.csv")
+VALIDATION_CSV = Path("/workspaces/tfg/tmp/validation.csv")
 SCALER = Path("/workspaces/tfg/tmp/scaler.joblib")
 KFOLD = Path("/workspaces/tfg/tmp/kfold.joblib")
 REPORT_MEDIA_FOLDER = Path("/workspaces/tfg/report/media/")
@@ -35,89 +36,20 @@ K_FOLD_SPLITS=5
 
 def read_files() -> Tuple[pd.DataFrame, pd.DataFrame, MinMaxScaler, StratifiedKFold]:
     df_train = pd.read_csv(TRAIN_CSV)
+    df_validation = pd.read_csv(VALIDATION_CSV)
     df_test = pd.read_csv(TEST_CSV)
     scaler = joblib.load(SCALER)
-    skf = joblib.load(KFOLD)
 
-    return (df_train, df_test, scaler, skf)
+    return (df_train, df_validation, df_test, scaler)
 
-def cross_validation_run(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold, name: str, model):
-    print(f"{name} - Cross validation run")
-
-    classification_reports = []
-    
-    x_train = df_train.loc[: , df_train.columns != PACKET_PINCER_LABEL]
-    y_train = df_train.loc[: , df_train.columns == PACKET_PINCER_LABEL]
-    
-    for i, (train_index, test_index) in enumerate(skf.split(x_train, y_train)):
-        print(f"{name} - Working in fold {i}")
-        
-        # Split
-        x_fold_train, X_fold_test = x_train.iloc[train_index], x_train.iloc[test_index]
-        y_fold_train, y_fold_test = y_train.iloc[train_index], y_train.iloc[test_index]
-
-        # Fit model
-        model.fit(x_fold_train, y_fold_train.values.ravel())
-
-        # Get predictions
-        y_fold_predicted = model.predict(X_fold_test)
-
-        # Evaluate results
-        clasification_report = metrics.classification_report(y_fold_test, y_fold_predicted, output_dict=True)
-        classification_reports.append(clasification_report)
-
-    # Reformat classification reports
-    print(f"{name} - Reformating kfold classification reports")
-    accuracy_list = []
-    precision_dict = dict()
-    recall_dict = dict()
-    f1_score_dict = dict()
-    support_dict = dict()
-    for cr in classification_reports:
-        for category,result in cr.items():
-            if category == "accuracy":
-                accuracy_list.append(result)
-            elif category in precision_dict:
-                precision_dict[category].append(result['precision'])
-                recall_dict[category].append(result['recall'])
-                f1_score_dict[category].append(result['f1-score'])
-                support_dict[category].append(result['support'])
-            else:
-                precision_dict[category] = [result['precision']]
-                recall_dict[category] = [result['recall']]
-                f1_score_dict[category] = [result['f1-score']]
-                support_dict[category] = [result['support']]
-    precision = pd.DataFrame(precision_dict)
-    recall = pd.DataFrame(recall_dict)
-    f1_score = pd.DataFrame(f1_score_dict)
-    support = pd.DataFrame(support_dict)
-
-    # Plot results
-    print(f"{name} - Plotting kfold classification reports")
-    plt.clf()
-    fig, axes = plt.subplots(nrows=3,ncols=1,figsize=(18,10))
-    sns.stripplot(precision, ax = axes[0], orient='h')
-    axes[0].set_xlim([-0.025, 1.025])
-    axes[0].set_title("Precision");
-    axes[0].grid(True, axis='y')
-    sns.stripplot(recall, ax = axes[1], orient='h')
-    axes[1].set_title("Recall");
-    axes[1].set_xlim([-0.025, 1.025])
-    axes[1].grid(True, axis='y')
-    sns.stripplot(f1_score, ax = axes[2], orient='h')
-    axes[2].set_title("F1 score");
-    axes[2].set_xlim([-0.025, 1.025])
-    axes[2].grid(True, axis='y')
-    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_v1_{name}_kfold.png", bbox_inches="tight")
-
-def grid_search_run(df_train: pd.DataFrame, skf: StratifiedKFold, name: str, model, params):
+def grid_search_run(df_train: pd.DataFrame, name: str, model, params):
     print(f"{name} - Grid search validation run")
 
     x_train = df_train.loc[: , df_train.columns != PACKET_PINCER_LABEL]
     y_train = df_train.loc[: , df_train.columns == PACKET_PINCER_LABEL]
 
     print(f"{name} - Preparing grid search")
-    knn_grid_search = GridSearchCV(model, param_grid=params, scoring=['f1_macro', 'f1_weighted'], refit='f1_macro', cv=skf, n_jobs=-1, verbose=1)
+    knn_grid_search = GridSearchCV(model, param_grid=params, scoring=['f1_macro', 'f1_weighted'], refit='f1_macro', n_jobs=-1, verbose=1, cv=StratifiedKFold())
 
     print(f"{name} - Executing search. Start time at {datetime.now()}")
     start_time = datetime.now()
@@ -130,14 +62,14 @@ def grid_search_run(df_train: pd.DataFrame, skf: StratifiedKFold, name: str, mod
 
     return knn_grid_search
 
-def train_run(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold, name: str, model):
+def train_run(df_train: pd.DataFrame, df_validation: pd.DataFrame, name: str, model):
     print(f"{name} - Full train run")
 
     x_train = df_train.loc[: , df_train.columns != PACKET_PINCER_LABEL]
     y_train = df_train.loc[: , df_train.columns == PACKET_PINCER_LABEL]
 
-    x_test = df_test.loc[: , df_train.columns != PACKET_PINCER_LABEL]
-    y_test = df_test.loc[: , df_train.columns == PACKET_PINCER_LABEL]
+    x_test = df_validation.loc[: , df_train.columns != PACKET_PINCER_LABEL]
+    y_test = df_validation.loc[: , df_train.columns == PACKET_PINCER_LABEL]
 
     print(f"{name} - Training full model. Start time at {datetime.now()}")
     start_time = datetime.now()
@@ -166,16 +98,16 @@ def train_run(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFol
     plt.xlabel('Predicted Labels')
     plt.ylabel('True Labels')
     plt.title('Confusion Matrix')
-    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_v1_{name}.png", bbox_inches="tight")
+    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_{name}.png", bbox_inches="tight")
     print(clasification_report)
 
-def naive_bayes(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold):
-    train_run(df_train, df_test, skf, "Naive bayes", GaussianNB())
+def naive_bayes(df_train: pd.DataFrame, df_validation: pd.DataFrame):
+    train_run(df_train, df_validation, "Naive bayes", GaussianNB())
 
-def knn(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold):
+def knn(df_train: pd.DataFrame, df_validation: pd.DataFrame):
     name="KNN"
 
-    grid_search = grid_search_run(df_train, skf, name, KNeighborsClassifier(), {
+    grid_search = grid_search_run(df_train, name, KNeighborsClassifier(), {
         'n_neighbors':list(range(1,30,2)), 
         'weights':('distance','uniform')
     })
@@ -200,22 +132,22 @@ def knn(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold):
     axes[1].legend(loc='lower left')
     sns.lineplot(ax=axes[2], data=f1_weighted_scores, style='param_weights',x="param_n_neighbors", y="mean_fit_time", hue="param_weights")
     sns.lineplot(ax=axes[3], data=f1_weighted_scores, style='param_weights',x="param_n_neighbors", y="mean_score_time", hue="param_weights")
-    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_v1_{name}_gridsearch.png", bbox_inches="tight")
+    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_{name}_gridsearch.png", bbox_inches="tight")
 
-    train_run(df_train, df_test, skf, "KNN", KNeighborsClassifier(**grid_search.best_params_))
+    train_run(df_train, df_validation, "KNN", KNeighborsClassifier(**grid_search.best_params_))
 
     return grid_search.best_params_
 
-def decision_trees(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold):
+def decision_trees(df_train: pd.DataFrame, df_validation: pd.DataFrame):
     name="decision_trees"
 
-    grid_search = grid_search_run(df_train, skf, name, DecisionTreeClassifier(), {
+    grid_search = grid_search_run(df_train, name, DecisionTreeClassifier(), {
         'criterion': ('gini', 'entropy', 'log_loss'),
         'min_impurity_decrease': list(np.linspace(0,0.5,21)),
         'min_samples_split': list(range(3,30,3)),
     })
 
-    train_run(df_train, df_test, skf, name, DecisionTreeClassifier(**grid_search.best_params_))
+    train_run(df_train, df_validation, name, DecisionTreeClassifier(**grid_search.best_params_))
 
     # Plot
     print(f"{name} - Reformating results")
@@ -230,18 +162,18 @@ def decision_trees(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: Stratifie
     print(f"{name} - Plotting results")
     plt.clf()
     sns.jointplot(data=f1_weighted_scores, x="param_min_impurity_decrease", y="param_min_samples_split", hue="f1_weighted")
-    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_v1_{name}_gridsearch_f1_weighted.png", bbox_inches="tight")
+    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_{name}_gridsearch_f1_weighted.png", bbox_inches="tight")
 
     plt.clf()
     sns.jointplot(data=f1_macro_scores, x="param_min_impurity_decrease", y="param_min_samples_split", hue="f1_macro")
-    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_v1_{name}_gridsearch_f1_macro.png", bbox_inches="tight")
+    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_{name}_gridsearch_f1_macro.png", bbox_inches="tight")
 
     return grid_search.best_params_
 
-def nn(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold):
+def nn(df_train: pd.DataFrame, df_validation: pd.DataFrame):
     name="nn"
 
-    grid_search = grid_search_run(df_train, skf, name, MLPClassifier(max_iter=1000), {
+    grid_search = grid_search_run(df_train, name, MLPClassifier(max_iter=1000), {
         'activation': ("relu", "tanh", "logistic"),
         'hidden_layer_sizes': ((70, 30, 5), (50, 50, 50), (70, 70, 70), (70, 70, 70, 15), (70, 70, 70, 1))
     })
@@ -260,20 +192,20 @@ def nn(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold):
     print(f1_weighted_scores)
     print(f1_macro_scores)
 
-    train_run(df_train, df_test, skf, name, MLPClassifier(max_iter=1000, **grid_search.best_params_))
+    train_run(df_train, df_validation, name, MLPClassifier(max_iter=1000, **grid_search.best_params_))
 
     return grid_search.best_params_
 
-def svm(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold):
+def svm(df_train: pd.DataFrame, df_validation: pd.DataFrame):
     name="svm"
 
-    grid_search = grid_search_run(df_train, skf, name, SVC(),  [
+    grid_search = grid_search_run(df_train, name, SVC(),  [
         {'kernel':['linear'], 'C':np.logspace(-1, 6, num=8, base=10.0)},
         {'kernel':['poly'], 'C':np.logspace(-1, 6, num=8, base=10.0), 'degree': (2,3)},
         {'kernel':['rbf'], 'C':np.logspace(-1, 6, num=8, base=10.0), 'gamma': np.logspace(-6, 1, num=8, base=10.0)},
     ])
 
-    train_run(df_train, df_test, skf, name, SVC(**grid_search.best_params_))
+    train_run(df_train, df_validation, name, SVC(**grid_search.best_params_))
 
     # Plot results
     results = pd.DataFrame(grid_search.cv_results_)
@@ -342,14 +274,14 @@ def svm(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold):
     sns.heatmap(cell_scores, square=True, annot=True, cmap='Blues', cbar=False, ax=axes[1, 2], fmt='.3g')
     axes[1, 2].set_title('RBF SVM macro scores')
 
-    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_v1_{name}_gridsearch", bbox_inches="tight")
+    plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_models_{name}_gridsearch", bbox_inches="tight")
 
     return grid_search.best_params_
 
-def voting_classifier(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold, knn_params, dt_params, nn_params): 
+def voting_classifier(df_train: pd.DataFrame, df_validation: pd.DataFrame, knn_params, dt_params, nn_params): 
     name = "voting_classifier"
 
-    grid_search = grid_search_run(df_train, skf, name,
+    grid_search = grid_search_run(df_train, name,
         VotingClassifier(estimators=[
             ('nb', GaussianNB()),
             ('knn', KNeighborsClassifier(**knn_params)),
@@ -361,17 +293,17 @@ def voting_classifier(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: Strati
         }
     )
 
-    train_run(df_train, df_test, skf, name, VotingClassifier(estimators=[
+    train_run(df_train, df_validation, name, VotingClassifier(estimators=[
             ('nb', GaussianNB()),
             ('knn', KNeighborsClassifier(**knn_params)),
             ('dt', DecisionTreeClassifier(**dt_params)),
             ('mlp',  MLPClassifier(max_iter=1000, **nn_params)),
     ], **grid_search.best_params_))
 
-def bagging(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold): 
+def bagging(df_train: pd.DataFrame, df_validation: pd.DataFrame): 
     name = "bagging"
 
-    grid_search = grid_search_run(df_train, skf, name,
+    grid_search = grid_search_run(df_train, name,
         BaggingClassifier(estimator=DecisionTreeClassifier()),                          
         {
             'n_estimators': [1,2,5,10,20,50,100,200],
@@ -379,55 +311,56 @@ def bagging(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold)
         }
     )
 
-    train_run(df_train, df_test, skf, name, BaggingClassifier(estimator=DecisionTreeClassifier(), **grid_search.best_params_))
+    train_run(df_train, df_validation, name, BaggingClassifier(estimator=DecisionTreeClassifier(), **grid_search.best_params_))
 
-def random_forest(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold): 
+def random_forest(df_train: pd.DataFrame, df_validation: pd.DataFrame,): 
     name = "random_forest"
 
-    grid_search = grid_search_run(df_train, skf, name,
+    grid_search = grid_search_run(df_train, name,
         RandomForestClassifier(),                          
         {
             'n_estimators': [1,2,5,10,20,50,100,200],
         }
     )
 
-    train_run(df_train, df_test, skf, name, RandomForestClassifier(**grid_search.best_params_))
+    train_run(df_train, df_validation, name, RandomForestClassifier(**grid_search.best_params_))
 
-def extra_trees(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold): 
+def extra_trees(df_train: pd.DataFrame, df_validation: pd.DataFrame): 
     name = "extra_trees"
 
-    grid_search = grid_search_run(df_train, skf, name,
+    grid_search = grid_search_run(df_train, name,
         ExtraTreesClassifier(),                          
         {
             'n_estimators': [1,2,5,10,20,50,100,200],
         }
     )
 
-    train_run(df_train, df_test, skf, name, RandomForestClassifier(**grid_search.best_params_))
+    train_run(df_train, df_validation, name, RandomForestClassifier(**grid_search.best_params_))
 
-def adaboost(df_train: pd.DataFrame, df_test: pd.DataFrame, skf: StratifiedKFold): 
+def adaboost(df_train: pd.DataFrame, df_validation: pd.DataFrame): 
     name = "adaboost"
 
-    grid_search = grid_search_run(df_train, skf, name,
+    grid_search = grid_search_run(df_train, name,
         AdaBoostClassifier(),                          
         {
             'n_estimators': [1,2,5,10,20,50,100,200],
         }
     )
 
-    train_run(df_train, df_test, skf, name, AdaBoostClassifier(**grid_search.best_params_))
+    train_run(df_train, df_validation, name, AdaBoostClassifier(**grid_search.best_params_))
+
 
 def main() -> None:
-    df_train, df_test, scaler, skf = read_files()
-    naive_bayes(df_train, df_test, skf)
-    knn_params = knn(df_train, df_test, skf)
-    dt_params = decision_trees(df_train, df_test, skf)
-    nn_params = nn(df_train, df_test, skf)
-    voting_classifier(df_train, df_test, skf, knn_params, dt_params, nn_params)
-    bagging(df_train, df_test, skf)
-    random_forest(df_train, df_test, skf)
-    extra_trees(df_train, df_test, skf)
-    adaboost(df_train, df_test, skf)
+    df_train, df_validation, df_validation, scaler = read_files()
+    naive_bayes(df_train, df_validation)
+    knn_params = knn(df_train, df_validation)
+    dt_params = decision_trees(df_train, df_validation)
+    nn_params = nn(df_train, df_validation)
+    voting_classifier(df_train, df_validation, knn_params, dt_params, nn_params)
+    bagging(df_train, df_validation)
+    random_forest(df_train, df_validation)
+    extra_trees(df_train, df_validation)
+    adaboost(df_train, df_validation)
 
 if __name__=="__main__":
     main()
