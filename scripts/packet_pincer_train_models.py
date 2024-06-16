@@ -306,7 +306,7 @@ def bagging(df_train: pd.DataFrame, df_validation: pd.DataFrame):
     grid_search = grid_search_run(df_train, name,
         BaggingClassifier(estimator=DecisionTreeClassifier()),                          
         {
-            'n_estimators': [1,2,5,10,20,50,100,200],
+            'n_estimators': [1,2,5,10,20,50,100,200,300],
             'max_features': [1, 0.35]
         }
     )
@@ -353,10 +353,10 @@ def adaboost(df_train: pd.DataFrame, df_validation: pd.DataFrame):
 def main() -> None:
     df_train, df_validation, df_validation, scaler = read_files()
     naive_bayes(df_train, df_validation)
-    knn_params = knn(df_train, df_validation)
-    dt_params = decision_trees(df_train, df_validation)
-    nn_params = nn(df_train, df_validation)
-    voting_classifier(df_train, df_validation, knn_params, dt_params, nn_params)
+    #knn_params = knn(df_train, df_validation)
+    #dt_params = decision_trees(df_train, df_validation)
+    #nn_params = nn(df_train, df_validation)
+    #voting_classifier(df_train, df_validation, knn_params, dt_params, nn_params)
     bagging(df_train, df_validation)
     random_forest(df_train, df_validation)
     extra_trees(df_train, df_validation)

@@ -99,14 +99,14 @@ def remap_labels(df: pd.DataFrame) -> pd.DataFrame:
 def combine(df: pd.DataFrame):
     # Determine groups of labels that can be merged
     df['group_within_ip_pair'] = df\
-        .groupby(by=['low_ip', 'high_ip', 'transport_protocol'])\
+        .groupby(by=['first_ip', 'second_ip', 'transport_protocol'])\
         .label\
         .transform(
             lambda x: (x != x.shift()).cumsum() - 1
         )
 
     # Group values and take the min/max timestamps
-    df = df.groupby(by=['low_ip', 'high_ip', 'transport_protocol', 'group_within_ip_pair']).agg(
+    df = df.groupby(by=['first_ip', 'second_ip', 'transport_protocol', 'group_within_ip_pair']).agg(
         timestamp_micro_start=('timestamp_micro_start', 'min'),
         timestamp_micro_end=('timestamp_micro_end', 'max'),
         label=('label', 'first'),
@@ -133,22 +133,22 @@ def force_remove_overlaps(df: pd.DataFrame) -> pd.DataFrame:
         last_had_changes = last_had_changes or (is_inverted.sum() != 0)
 
         # Delete contained with previous
-        is_contained_in_previous = (df.low_ip == df.low_ip.shift(shift_direction_for_previous)) & (df.high_ip == df.high_ip.shift(shift_direction_for_previous)) & (df.transport_protocol == df.transport_protocol.shift(shift_direction_for_previous)) & (df.timestamp_micro_start.shift(shift_direction_for_previous) < df.timestamp_micro_start) & (df.timestamp_micro_end < df.timestamp_micro_end.shift(shift_direction_for_previous))
+        is_contained_in_previous = (df.first_ip == df.first_ip.shift(shift_direction_for_previous)) & (df.second_ip == df.second_ip.shift(shift_direction_for_previous)) & (df.transport_protocol == df.transport_protocol.shift(shift_direction_for_previous)) & (df.timestamp_micro_start.shift(shift_direction_for_previous) < df.timestamp_micro_start) & (df.timestamp_micro_end < df.timestamp_micro_end.shift(shift_direction_for_previous))
         print(f"Discarding {is_contained_in_previous.sum()} values that are contained in previous")
         df = df[~is_contained_in_previous]
         gc.collect()
         last_had_changes = last_had_changes or (is_contained_in_previous.sum() != 0)
 
         # Delete contained with next
-        is_contained_in_next = (df.low_ip == df.low_ip.shift(shift_direction_for_next    )) & (df.high_ip == df.high_ip.shift(shift_direction_for_next    )) & (df.transport_protocol == df.transport_protocol.shift(shift_direction_for_next    ))  & (df.timestamp_micro_start.shift(shift_direction_for_next) < df.timestamp_micro_start) & (df.timestamp_micro_end < df.timestamp_micro_end.shift(shift_direction_for_next))
+        is_contained_in_next = (df.first_ip == df.first_ip.shift(shift_direction_for_next    )) & (df.second_ip == df.second_ip.shift(shift_direction_for_next    )) & (df.transport_protocol == df.transport_protocol.shift(shift_direction_for_next    ))  & (df.timestamp_micro_start.shift(shift_direction_for_next) < df.timestamp_micro_start) & (df.timestamp_micro_end < df.timestamp_micro_end.shift(shift_direction_for_next))
         print(f"Discarding {is_contained_in_next.sum()} values that are contained in next")
         df = df[~is_contained_in_next]
         gc.collect()
         last_had_changes = last_had_changes or (is_contained_in_next.sum() != 0)
 
         # Find overlapping consecutive rows
-        overlaps_with_previous = (df.low_ip == df.low_ip.shift(shift_direction_for_previous)) & (df.high_ip == df.high_ip.shift(shift_direction_for_previous)) & (df.transport_protocol == df.transport_protocol.shift(shift_direction_for_previous)) & (df.timestamp_micro_start <= df.timestamp_micro_end.shift(shift_direction_for_previous))
-        overlaps_with_next     = (df.low_ip == df.low_ip.shift(shift_direction_for_next    )) & (df.high_ip == df.high_ip.shift(shift_direction_for_next    )) & (df.transport_protocol == df.transport_protocol.shift(shift_direction_for_next    ))  & (df.timestamp_micro_end   >= df.timestamp_micro_start.shift(shift_direction_for_next)) 
+        overlaps_with_previous = (df.first_ip == df.first_ip.shift(shift_direction_for_previous)) & (df.second_ip == df.second_ip.shift(shift_direction_for_previous)) & (df.transport_protocol == df.transport_protocol.shift(shift_direction_for_previous)) & (df.timestamp_micro_start <= df.timestamp_micro_end.shift(shift_direction_for_previous))
+        overlaps_with_next     = (df.first_ip == df.first_ip.shift(shift_direction_for_next    )) & (df.second_ip == df.second_ip.shift(shift_direction_for_next    )) & (df.transport_protocol == df.transport_protocol.shift(shift_direction_for_next    ))  & (df.timestamp_micro_end   >= df.timestamp_micro_start.shift(shift_direction_for_next)) 
         last_had_changes = last_had_changes or (overlaps_with_previous.sum() != 0)
         last_had_changes = last_had_changes or (overlaps_with_next.sum() != 0)
     
@@ -188,10 +188,14 @@ def extract(name, get_dataframe, result_path):
     df['dest_ip'] = max_ip
 
     df = df.rename(columns={
-        "source_ip": "low_ip",
-        "dest_ip": "high_ip",
+        "source_ip": "first_ip",
+        "dest_ip": "second_ip",
     })
     gc.collect()
+
+    # Setting addesses with 0 as "::"
+    df.loc[df['first_ip']  == '0', ['first_ip']] = "::"
+    df.loc[df['second_ip'] == '0', ['second_ip']] = "::"
 
     # Sort 
     print(f"Sorting values")
@@ -199,9 +203,9 @@ def extract(name, get_dataframe, result_path):
     gc.collect()
 
     # Discard the benign tags
-    print(f"Discarding benign values")
-    df = df.drop(df[df.label == 'benign'].index).reset_index(drop=True)
-    gc.collect()
+    # print(f"Discarding benign values")
+    # df = df.drop(df[df.label == 'benign'].index).reset_index(drop=True)
+    # gc.collect()
 
     # Combine values
     print(f"Combining tags")

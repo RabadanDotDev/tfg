@@ -1,11 +1,11 @@
 import json
 
 # Load jsons
-with open('tmp/packet_pincer_cicddos_labels_count.json') as f:
+with open('/workspaces/tfg/tmp/packet_pincer_cicddos_labels_count.json') as f:
     cicddos_unsorted: dict = json.loads(f.read())
-with open('tmp/packet_pincer_botiot_labels_count.json') as f:
+with open('/workspaces/tfg/tmp/packet_pincer_botiot_labels_count.json') as f:
     botiot_unsorted: dict = json.loads(f.read())
-with open('tmp/packet_pincer_toniot_labels_count.json') as f:
+with open('/workspaces/tfg/tmp/packet_pincer_toniot_labels_count.json') as f:
     toniot_unsorted: dict = json.loads(f.read())
 
 # Get all labels

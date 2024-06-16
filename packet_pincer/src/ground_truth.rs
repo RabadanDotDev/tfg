@@ -16,8 +16,8 @@ use crate::TransportFlow;
 
 #[derive(Debug, Deserialize)]
 struct GroundTruthRecord {
-    low_ip: IpAddr,
-    high_ip: IpAddr,
+    first_ip: IpAddr,
+    second_ip: IpAddr,
     transport_protocol: u8,
     timestamp_micro_start: i64,
     timestamp_micro_end: i64,
@@ -39,7 +39,7 @@ impl GroundTruth {
         for result in reader.deserialize() {
             // Decode line
             let record: GroundTruthRecord = result?;
-            let host_pair = HostPair::from(record.low_ip, record.high_ip, record.transport_protocol.into());
+            let host_pair = HostPair::from(record.first_ip, record.second_ip, record.transport_protocol.into());
             let label = Label::from(
                 record.timestamp_micro_start,
                 record.timestamp_micro_end,
@@ -82,10 +82,10 @@ struct HostPair{
 }
 
 impl HostPair {
-    fn from(lower_ip: IpAddr, higher_ip: IpAddr, transport_protocol: IpNumber) -> HostPair {
+    fn from(first_ip: IpAddr, second_ip: IpAddr, transport_protocol: IpNumber) -> HostPair {
         HostPair{
-            lower_ip,
-            higher_ip, 
+            lower_ip:  if first_ip <= second_ip {first_ip } else {second_ip},
+            higher_ip: if first_ip <= second_ip {second_ip} else {first_ip },
             transport_protocol
         }
     }

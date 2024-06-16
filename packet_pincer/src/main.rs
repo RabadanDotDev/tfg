@@ -174,7 +174,7 @@ fn evaluate_packets(
         if let Some(ref ground_truth) = ground_truth {
             match ground_truth.find_label(flow) {
                 Some(label) => flow.set_label(label),
-                None => flow.set_label("benign".into()),
+                None => flow.set_label("unknown".into()),
             }
         }
     };
