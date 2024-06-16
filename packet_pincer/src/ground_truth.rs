@@ -9,6 +9,7 @@ use std::{
 };
 
 use chrono::{DateTime, TimeDelta, Utc};
+use etherparse::IpNumber;
 use serde::Deserialize;
 
 use crate::TransportFlow;
@@ -17,6 +18,7 @@ use crate::TransportFlow;
 struct GroundTruthRecord {
     low_ip: IpAddr,
     high_ip: IpAddr,
+    transport_protocol: u8,
     timestamp_micro_start: i64,
     timestamp_micro_end: i64,
     label: String,
@@ -37,7 +39,7 @@ impl GroundTruth {
         for result in reader.deserialize() {
             // Decode line
             let record: GroundTruthRecord = result?;
-            let host_pair = HostPair::from_ip_pair(record.low_ip, record.high_ip);
+            let host_pair = HostPair::from(record.low_ip, record.high_ip, record.transport_protocol.into());
             let label = Label::from(
                 record.timestamp_micro_start,
                 record.timestamp_micro_end,
@@ -58,9 +60,10 @@ impl GroundTruth {
 
     /// Try finding a given label that matches the flow
     pub fn find_label(&self, flow: &TransportFlow) -> Option<Rc<str>> {
-        match self.flows.get(&HostPair::from_ip_pair(
+        match self.flows.get(&HostPair::from(
             flow.identifier.source_ip,
             flow.identifier.dest_ip,
+            flow.identifier.transport_protocol
         )) {
             None => None,
             Some(list) => list.find_label(
@@ -72,14 +75,18 @@ impl GroundTruth {
 }
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy)]
-struct HostPair((IpAddr, IpAddr));
+struct HostPair{
+    lower_ip: IpAddr,
+    higher_ip: IpAddr,
+    transport_protocol: IpNumber,
+}
 
 impl HostPair {
-    fn from_ip_pair(source_ip: IpAddr, dest_ip: IpAddr) -> HostPair {
-        if source_ip <= dest_ip {
-            HostPair((source_ip, dest_ip))
-        } else {
-            HostPair((dest_ip, source_ip))
+    fn from(lower_ip: IpAddr, higher_ip: IpAddr, transport_protocol: IpNumber) -> HostPair {
+        HostPair{
+            lower_ip,
+            higher_ip, 
+            transport_protocol
         }
     }
 }

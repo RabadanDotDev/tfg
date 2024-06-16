@@ -360,7 +360,6 @@ def main() -> None:
     bagging(df_train, df_validation)
     random_forest(df_train, df_validation)
     extra_trees(df_train, df_validation)
-    adaboost(df_train, df_validation)
 
 if __name__=="__main__":
     main()

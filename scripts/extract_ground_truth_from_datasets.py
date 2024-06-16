@@ -1,3 +1,4 @@
+import gc
 from pathlib import Path
 from glob import glob
 from datetime import datetime
@@ -12,6 +13,16 @@ BOT_IOT_FEATURE_NAMES = Path("/Datasets/Bot-IoT/Dataset/Entire Dataset/UNSW_2018
 BOT_IOT_PATH_RES = Path("./tmp/BoT-IoT_gt.csv")
 TON_IOT_CSVS_PATH = Path('/Datasets/TON-IoT/Processed_datasets/Processed_Network_dataset/')
 TON_IOT_CSVS_PATH_RES = Path("./tmp/TON-IoT_gt.csv")
+
+PROTO_NAME_TO_NUMBER = {
+    "icmp" : 1,
+    "igmp" : 2,
+    "ipv6-icmp" : 2,
+    "tcp": 6,
+    "udp": 17,
+    "arp": 0,
+    "rarp": 0,
+}
 
 def test_combine_discard():
     df = pd.DataFrame({
@@ -88,38 +99,73 @@ def remap_labels(df: pd.DataFrame) -> pd.DataFrame:
 def combine(df: pd.DataFrame):
     # Determine groups of labels that can be merged
     df['group_within_ip_pair'] = df\
-        .groupby(by=['low_ip', 'high_ip'])\
+        .groupby(by=['low_ip', 'high_ip', 'transport_protocol'])\
         .label\
         .transform(
             lambda x: (x != x.shift()).cumsum() - 1
         )
 
     # Group values and take the min/max timestamps
-    df = df.groupby(by=['low_ip', 'high_ip', 'group_within_ip_pair']).agg(
+    df = df.groupby(by=['low_ip', 'high_ip', 'transport_protocol', 'group_within_ip_pair']).agg(
         timestamp_micro_start=('timestamp_micro_start', 'min'),
         timestamp_micro_end=('timestamp_micro_end', 'max'),
-        label=('label', 'first')
+        label=('label', 'first'),
+        count=('label', 'count')
     ).reset_index().drop(columns=["group_within_ip_pair"])
 
     return df
 
 def force_remove_overlaps(df: pd.DataFrame) -> pd.DataFrame:
-    # Find overlapping consecutive rows
-    overlaps_with_previous = (df.timestamp_micro_start <= df.timestamp_micro_end.shift(1)   ) & (df.low_ip == df.low_ip.shift( 1)) & (df.high_ip == df.high_ip.shift( 1))
-    overlaps_with_next     = (df.timestamp_micro_end   >= df.timestamp_micro_start.shift(-1)) & (df.low_ip == df.low_ip.shift(-1)) & (df.high_ip == df.high_ip.shift(-1))
+    iterations = 0
+    last_had_changes = True
+
+    while last_had_changes:
+        print(f"Force remove overlaps pass number {iterations}")
+        last_had_changes = False
+        shift_direction_for_previous = 1
+        shift_direction_for_next = -1
+
+        # Remove inverted
+        is_inverted = df.timestamp_micro_end < df.timestamp_micro_start
+        print(f"Discarding {is_inverted.sum()} values that had their timestamps inverted")
+        df = df[~is_inverted]
+        gc.collect()
+        last_had_changes = last_had_changes or (is_inverted.sum() != 0)
+
+        # Delete contained with previous
+        is_contained_in_previous = (df.low_ip == df.low_ip.shift(shift_direction_for_previous)) & (df.high_ip == df.high_ip.shift(shift_direction_for_previous)) & (df.transport_protocol == df.transport_protocol.shift(shift_direction_for_previous)) & (df.timestamp_micro_start.shift(shift_direction_for_previous) < df.timestamp_micro_start) & (df.timestamp_micro_end < df.timestamp_micro_end.shift(shift_direction_for_previous))
+        print(f"Discarding {is_contained_in_previous.sum()} values that are contained in previous")
+        df = df[~is_contained_in_previous]
+        gc.collect()
+        last_had_changes = last_had_changes or (is_contained_in_previous.sum() != 0)
+
+        # Delete contained with next
+        is_contained_in_next = (df.low_ip == df.low_ip.shift(shift_direction_for_next    )) & (df.high_ip == df.high_ip.shift(shift_direction_for_next    )) & (df.transport_protocol == df.transport_protocol.shift(shift_direction_for_next    ))  & (df.timestamp_micro_start.shift(shift_direction_for_next) < df.timestamp_micro_start) & (df.timestamp_micro_end < df.timestamp_micro_end.shift(shift_direction_for_next))
+        print(f"Discarding {is_contained_in_next.sum()} values that are contained in next")
+        df = df[~is_contained_in_next]
+        gc.collect()
+        last_had_changes = last_had_changes or (is_contained_in_next.sum() != 0)
+
+        # Find overlapping consecutive rows
+        overlaps_with_previous = (df.low_ip == df.low_ip.shift(shift_direction_for_previous)) & (df.high_ip == df.high_ip.shift(shift_direction_for_previous)) & (df.transport_protocol == df.transport_protocol.shift(shift_direction_for_previous)) & (df.timestamp_micro_start <= df.timestamp_micro_end.shift(shift_direction_for_previous))
+        overlaps_with_next     = (df.low_ip == df.low_ip.shift(shift_direction_for_next    )) & (df.high_ip == df.high_ip.shift(shift_direction_for_next    )) & (df.transport_protocol == df.transport_protocol.shift(shift_direction_for_next    ))  & (df.timestamp_micro_end   >= df.timestamp_micro_start.shift(shift_direction_for_next)) 
+        last_had_changes = last_had_changes or (overlaps_with_previous.sum() != 0)
+        last_had_changes = last_had_changes or (overlaps_with_next.sum() != 0)
     
-    # Set overlaps in the middle of the overlap
-    df['timestamp_micro_start_og'] = df['timestamp_micro_start']
-    df['timestamp_micro_end_og'] = df['timestamp_micro_end']
+        print(f"{(overlaps_with_previous & ~overlaps_with_next).sum()} overlap with previous")
+        print(f"{(~overlaps_with_previous & overlaps_with_next).sum()} overlap with next")
+        print(f"{(overlaps_with_previous & overlaps_with_next).sum()} overlap with both")
+        
+        # Set overlaps in the middle of the overlap
+        df['timestamp_micro_start_original'] = df['timestamp_micro_start']
+        df['timestamp_micro_end_original'] = df['timestamp_micro_end']
 
-    df.loc[overlaps_with_previous, 'timestamp_micro_start'] = ((df.timestamp_micro_start_og + df.timestamp_micro_end_og.shift(1)) // 2 + 1)[overlaps_with_previous]
-    df.loc[overlaps_with_next, 'timestamp_micro_end'] = ((df.timestamp_micro_end_og + df.timestamp_micro_start_og.shift(-1)) // 2)[overlaps_with_next]
+        df.loc[overlaps_with_previous, 'timestamp_micro_start'] = ((df.timestamp_micro_start_original + df.timestamp_micro_end_original.shift(1)) // 2 + 1)[overlaps_with_previous]
+        df.loc[overlaps_with_next, 'timestamp_micro_end'] = ((df.timestamp_micro_end_original + df.timestamp_micro_start_original.shift(-1)) // 2)[overlaps_with_next]
 
-    #del df['timestamp_micro_end_og']
-    #del df['timestamp_micro_end_og']
-
-    df['overlaps_with_previous'] = overlaps_with_previous
-    df['overlaps_with_next'] = overlaps_with_next
+        df['overlaps_with_previous'] = overlaps_with_previous
+        df['overlaps_with_next'] = overlaps_with_next
+        gc.collect()
 
     return df
 
@@ -131,6 +177,7 @@ def extract(name, get_dataframe, result_path):
     # Remap labels
     print(f"Remapping labels")
     df = remap_labels(df)
+    gc.collect()
 
     # Set order on src/dst IP addresses
     print(f"Reordering addresses")
@@ -144,22 +191,27 @@ def extract(name, get_dataframe, result_path):
         "source_ip": "low_ip",
         "dest_ip": "high_ip",
     })
+    gc.collect()
 
     # Sort 
     print(f"Sorting values")
     df = df.sort_values(by=['timestamp_micro_start', 'timestamp_micro_end'], ignore_index=True)
-
-    # Discard the benign tags
-    print(f"Discarding benign values")
-    df = df.drop(df[df.label == 'benign'].index).reset_index(drop=True)
+    gc.collect()
 
     # Combine values
-    print(f"Combining non benign values")
+    print(f"Combining tags")
     df = combine(df)
+    gc.collect()
 
     # Remove overlaps if there are any remaining
     print(f"Force removing overlaps")
     df = force_remove_overlaps(df)
+    gc.collect()
+
+    # Discard the benign tags
+    print(f"Discarding benign values")
+    df = df.drop(df[df.label == 'benign'].index).reset_index(drop=True)
+    gc.collect()
 
     # Store results
     df.to_csv(result_path, index=False)
@@ -175,15 +227,16 @@ def get_dataframes_cicddos_2019() -> pd.DataFrame:
         df = pd.read_csv(file, low_memory=False)
 
         # Keep only relevant columns
-        df = df[[" Source IP", " Destination IP", " Timestamp", " Flow Duration", " Label"]]
+        df = df[[" Source IP", " Destination IP", " Protocol", " Timestamp", " Flow Duration", " Label"]]
 
         # Rename columns
         df = df.rename(columns={\
-            ' Source IP': 'source_ip',\
-            ' Destination IP': 'dest_ip',\
-            ' Timestamp': 'timestamp_micro_start',\
-            ' Flow Duration': 'duration',\
-            ' Label': 'label',\
+            ' Source IP': 'source_ip',
+            ' Destination IP': 'dest_ip',
+            ' Protocol': 'transport_protocol',
+            ' Timestamp': 'timestamp_micro_start',
+            ' Flow Duration': 'duration',
+            ' Label': 'label',
         })
 
         # Convert timestamp to unix time
@@ -206,6 +259,9 @@ def get_dataframes_cicddos_2019() -> pd.DataFrame:
         # Obtain last packet time
         df['timestamp_micro_end'] = df['timestamp_micro_start'] + df['duration']
         del df['duration']
+
+        # Skip invalid protocol numbers
+        df = df[df['transport_protocol'] != 0 & ~df['transport_protocol'].isna()]
 
         # Append
         dataframes.append(df)
@@ -230,12 +286,13 @@ def get_dataframes_botiot() -> pd.DataFrame:
         df = pd.read_csv(file, low_memory=False, header=None, names=names)
 
         # Keep only relevant columns
-        df = df[["saddr", "daddr", 'stime', 'ltime', 'category', 'subcategory']]
+        df = df[["saddr", "daddr", 'proto', 'stime', 'ltime', 'category', 'subcategory']]
 
         # Rename columns
         df = df.rename(columns={\
             'saddr': 'source_ip',\
             'daddr': 'dest_ip',\
+            'proto': 'transport_protocol',
             'stime': 'timestamp_micro_start',\
             'ltime': 'timestamp_micro_end',\
             'category': 'label_1',\
@@ -253,6 +310,12 @@ def get_dataframes_botiot() -> pd.DataFrame:
         df["label"] = df["label_1"] + '_' + df["label_2"]
         del df["label_1"]
         del df["label_2"]
+
+        # Convert transport protocols to its numeric values
+        df['transport_protocol'] = df['transport_protocol'].map(PROTO_NAME_TO_NUMBER)
+
+        # Skip invalid protocol numbers
+        df = df[df['transport_protocol'] != 0 & ~df['transport_protocol'].isna()]
 
         # Append
         dataframes.append(df)
@@ -272,15 +335,16 @@ def get_dataframes_toniot() -> pd.DataFrame:
         df = pd.read_csv(file, low_memory=False)
 
         # Keep only relevant columns
-        df = df[["src_ip", "dst_ip", 'ts', 'duration', 'type']]
+        df = df[["src_ip", "dst_ip", 'proto', 'ts', 'duration', 'type']]
 
         # Rename columns
-        df = df.rename(columns={\
-            'src_ip': 'source_ip',\
-            'dst_ip': 'dest_ip',\
-            'ts': 'timestamp_micro_start',\
-            'duration': 'duration',\
-            'type': 'label'
+        df = df.rename(columns={
+            'src_ip': 'source_ip',
+            'dst_ip': 'dest_ip',
+            'proto': 'transport_protocol',
+            'ts': 'timestamp_micro_start',
+            'duration': 'duration',
+            'type': 'label',
         })
 
         # Convert timestamp to unix time
@@ -298,6 +362,12 @@ def get_dataframes_toniot() -> pd.DataFrame:
         # Obtain last packet time
         df['timestamp_micro_end'] = df['timestamp_micro_start'] + df['duration']
         del df['duration']
+
+        # Convert transport protocols to its numeric values
+        df['transport_protocol'] = df['transport_protocol'].map(PROTO_NAME_TO_NUMBER)
+
+        # Skip invalid protocol numbers
+        df = df[df['transport_protocol'] != 0 & ~df['transport_protocol'].isna()]
 
         # Append
         dataframes.append(df)

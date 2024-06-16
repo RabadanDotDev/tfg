@@ -2,7 +2,7 @@
 
 cd /workspaces/tfg/packet_pincer
 
-rm /workspaces/tfg/tmp/packet_pincer*.csv
+rm -f /workspaces/tfg/tmp/packet_pincer*.csv
 
 # Run for CICDDoS2019
 echo "CICDDoS2019"

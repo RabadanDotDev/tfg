@@ -236,7 +236,7 @@ fn evaluate_packets(
 
             // Close transport flows
             while let Some(mut flow) =
-                flows.pop_oldest_transport_flow_if_older_than(TimeDelta::seconds(300))
+                flows.pop_oldest_transport_flow_if_older_than(TimeDelta::seconds(120))
             {
                 execution_stats.flow_count += 1;
                 assign_flow_label(&mut flow);
@@ -245,7 +245,7 @@ fn evaluate_packets(
 
             // Close network flows
             while let Some(fragments) =
-                flows.pop_oldest_network_flow_if_older_than(TimeDelta::seconds(60))
+                flows.pop_oldest_network_flow_if_older_than(TimeDelta::seconds(30))
             {
                 execution_stats.discarded_fragments_no_reassembly_count += u64::from(fragments);
             }
