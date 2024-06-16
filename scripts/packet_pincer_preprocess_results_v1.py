@@ -98,6 +98,8 @@ def read_csvs_and_sample(files: List[str]) -> pd.DataFrame:
         df = sklearn.utils.resample(df, n_samples=int(len(df)*SAMPLING_PERCENTAGE), random_state=5, stratify=df[PACKET_PINCER_LABEL])
         print(f">({idx+1}/{len(files)}) Discarding id columns")
         df = df.drop(columns=PACKET_PINCER_IDENTIFICATION)
+        print(f">({idx+1}/{len(files)}) Dropping unknowns")
+        df = df[df['label'] != 'unknown']
         print(f">({idx+1}/{len(files)}) Reasigning labels")
         df = remap_labels(df)
         gc.collect()

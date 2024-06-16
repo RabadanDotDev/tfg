@@ -42,18 +42,61 @@ TRAIN_PERCENTAGE=70/100
 VALIDATION_PERCENTAGE=20/100
 TEST_PERCENTAGE=10/100
 
+mappings = {
+    "benign" : 'benign',
+    "ddos_dns" : 'malign',
+    "ddos_ldap" : 'malign',
+    "ddos_mssql" : 'malign',
+    "ddos_netbios" : 'malign',
+    "ddos_ntp" : 'malign',
+    "ddos_snmp" : 'malign',
+    "ddos_ssdp" : 'malign',
+    "ddos_udp" : 'malign',
+    "ddos_ldap" : 'malign',
+    "ddos_mssql" : 'malign',
+    "ddos_netbios" : 'malign',
+    "ddos_portmap" : 'malign',
+    "ddos_syn" : 'malign',
+    "ddos_tftp" : 'malign',
+    "ddos_udp" : 'malign',
+    "ddos_udp_lag" : 'malign',
+    "ddos_udp_lag" : 'malign',
+    "backdoor" : 'malign',
+    "ddos" : 'malign',
+    "dos" : 'malign',
+    "injection" : 'malign',
+    "mitm" : 'malign',
+    "password" : 'malign',
+    "ransomware" : 'malign',
+    "scanning" : 'malign',
+    "xss" : 'malign',
+    "ddos_http" : 'malign',
+    "ddos_tcp" : 'malign',
+    "ddos_udp" : 'malign',
+    "dos_http" : 'malign',
+    "dos_tcp" : 'malign',
+    "dos_udp" : 'malign',
+    "reconnaissance_os_fingerprint" : 'malign',
+    "reconnaissance_service_scan" : 'malign',
+    "theft_data_exfiltration" : 'malign',
+    "theft_keylogging" : 'malign',
+}
+
 def get_files(glob_pattern : str) -> List[str]:
     files = glob(glob_pattern)
     files = natsorted(files)
     return files
 
 def filter_label(df: pd.DataFrame) -> pd.DataFrame:
-    filter = df[PACKET_PINCER_LABEL].str.startswith(START_WITH_LABEL) & ~(df[PACKET_PINCER_LABEL].str.startswith('ddos_tcp'))
-    return df[filter]
+    #filter = df[PACKET_PINCER_LABEL].str.startswith(START_WITH_LABEL) & ~(df[PACKET_PINCER_LABEL].str.startswith('ddos_tcp'))
+    #return df[filter]
+    df = df[df['label'] != 'unknown']
+    df.loc[:, 'label'] = df['label'].replace(mappings)
+    return df
 
 def filter_rare_labels(df: pd.DataFrame) -> pd.DataFrame:
     counts = df[PACKET_PINCER_LABEL].value_counts()
-    df = df[df[PACKET_PINCER_LABEL].isin(list(counts.index[(MIN_EXAMPLES <= counts)]))]
+    #df = df[df[PACKET_PINCER_LABEL].isin(list(counts.index[(MIN_EXAMPLES <= counts)]))]
     return df
 
 def read_csvs_and_sample(files: List[str]) -> pd.DataFrame:
