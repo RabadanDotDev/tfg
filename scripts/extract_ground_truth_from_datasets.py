@@ -198,6 +198,11 @@ def extract(name, get_dataframe, result_path):
     df = df.sort_values(by=['timestamp_micro_start', 'timestamp_micro_end'], ignore_index=True)
     gc.collect()
 
+    # Discard the benign tags
+    print(f"Discarding benign values")
+    df = df.drop(df[df.label == 'benign'].index).reset_index(drop=True)
+    gc.collect()
+
     # Combine values
     print(f"Combining tags")
     df = combine(df)
@@ -206,11 +211,6 @@ def extract(name, get_dataframe, result_path):
     # Remove overlaps if there are any remaining
     print(f"Force removing overlaps")
     df = force_remove_overlaps(df)
-    gc.collect()
-
-    # Discard the benign tags
-    print(f"Discarding benign values")
-    df = df.drop(df[df.label == 'benign'].index).reset_index(drop=True)
     gc.collect()
 
     # Store results
