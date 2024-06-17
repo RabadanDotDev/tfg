@@ -347,16 +347,16 @@ def adaboost(df_train: pd.DataFrame, df_validation: pd.DataFrame):
 def main() -> None:
     df_train, df_validation = read_files()
     
-    bagging(df_train, df_validation)
-    random_forest(df_train, df_validation)
-    extra_trees(df_train, df_validation)
-    adaboost(df_train, df_validation)
-
     naive_bayes(df_train, df_validation)
     knn_params = knn(df_train, df_validation)
     dt_params = decision_trees(df_train, df_validation)
     nn_params = nn(df_train, df_validation)
     voting_classifier(df_train, df_validation, knn_params, dt_params, nn_params)
+    bagging(df_train, df_validation)
+    random_forest(df_train, df_validation)
+    extra_trees(df_train, df_validation)
+    adaboost(df_train, df_validation)
+
 
 if __name__=="__main__":
     main()
