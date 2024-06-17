@@ -100,7 +100,7 @@ Finalmente, en la tabla \ref{table:generatedfilesoffline} podemos ver la magnitu
 
 \subsection{Descripción de las características de los datos generados}
 
-Una vez procesadas las trazas de red en crudo y obtenido las estadísticas de los flujos, haremos un primer análisis superficial de los datos generados. Con esta información, decidiremos, en el siguiente punto, la tarea a realizar y a continuación cómo preprocesaremos los datos antes de aplicar los algoritmos de \gls{ml}. El script utilizado para extraer los datos y generar los gráficos es \texttt{packet\_pincer\_results\_plots.py},
+Una vez procesadas las trazas de red en crudo y obtenido las estadísticas de los flujos, haremos un primer análisis superficial de los datos generados. Con esta información, decidiremos, en el siguiente punto, la tarea a realizar y a continuación como preprocesaremos los datos antes de aplicar los algoritmos de \gls{ml}. El script utilizado para extraer los datos y generar los gráficos es \texttt{packet\_pincer\_results\_plots.py}. Para generar la Tabla \ref{table:packetpincerassignedlabels}, se ha utilizado un segundo script llamado \texttt{packet\_pincer\_results\_plots\_list.py}. Ambos scripts se encuentran disponibles en el anexo 1.
 
 \subsubsection{Etiquetas}
 
@@ -110,7 +110,9 @@ En la Tabla \ref{table:packetpincerassignedlabels} podemos observar las etiqueta
 
 CIC-DDoS2019 contiene etiquetas 'DDoS', con especificadores del protocolo de aplicación y benignos. A su vez, BoT-IoT tiene benignos, etiquetas 'DDoS' y 'DoS' con especificadores del protocolo de transporte y HTTP, además de dos de escaneo (sistema operativo y de servicios) y robo de datos (data y keylogging). Finalmente, Ton-IoT tiene los benignos, etiquetas 'DDoS' y 'DoS' sin concreción, diferentes tipos de intento de ataques específicos (injection, mitm, ransomware, xss, backdoor) y escaneo.
 
-Podemos observar también que el tipo principal de ataques es 'DDoS', el cual se encuentra alrededor del 68\%. Después tenemos un 17\% de flujos relacionados con el escaneo, un 6\% de flujos benignos y luego el resto de etiquetas en una posición más residual. Esto puede suponer un problema, ya que datos tan desbalanceados pueden dificultar el entrenar modelos útiles. Adicionalmente, es posible que estos datos no representen correctamente un entorno real y, por tanto, los modelos entrenados con estos no generalicen correctamente a otros entornos.
+Podemos observar también que el tipo principal de ataques es 'DDoS', el cual se encuentra alrededor del 72\%. Después tenemos un 17\% de flujos relacionados con el escaneo, un 0.845\% de flujos benignos y luego el resto de etiquetas en una posición más residual. Esto puede suponer un problema, ya que datos tan desbalanceados pueden dificultar el entrenar modelos útiles. Adicionalmente, es posible que estos datos no representen correctamente un entorno real y, por tanto, los modelos entrenados con estos no generalicen correctamente a otros entornos.
+
+Por otro lado, podemos ver cómo hay ciertos datos, los cuales son inconsistentes. Hay algunos flujos etiquetados con ataques relacionados con UDP los cuales utilizan el protocolo TCP, especialmente en el caso de CIC\-DDoS2019. Esto es causado principalmente por los datos de origen, pero afortunadamente no hay muchos registros que parezcan presentar estas inconsistencias.
 
 \subsubsection{Protocolo}
 
