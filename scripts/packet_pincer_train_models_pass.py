@@ -30,17 +30,11 @@ REPORT_MEDIA_FOLDER = Path("/workspaces/tfg/report/media/")
 PACKET_PINCER_LABEL = "label"
 TMP_FOLDER = Path("/workspaces/tfg/tmp")
 
-SAMPLING_PERCENTAGE=0.15/100
-TEST_PERCENTAGE=20/100
-K_FOLD_SPLITS=5
-
 def read_files() -> Tuple[pd.DataFrame, pd.DataFrame, MinMaxScaler, StratifiedKFold]:
     df_train = pd.read_csv(TRAIN_CSV)
     df_validation = pd.read_csv(VALIDATION_CSV)
-    df_test = pd.read_csv(TEST_CSV)
-    scaler = joblib.load(SCALER)
 
-    return (df_train, df_validation, df_test, scaler)
+    return (df_train, df_validation)
 
 def grid_search_run(df_train: pd.DataFrame, name: str, model, params):
     print(f"{name} - Grid search validation run")
@@ -108,7 +102,7 @@ def knn(df_train: pd.DataFrame, df_validation: pd.DataFrame):
     name="KNN"
 
     grid_search = grid_search_run(df_train, name, KNeighborsClassifier(), {
-        'n_neighbors':list(range(1,30,2)), 
+        'n_neighbors':list(range(1,30,6)), 
         'weights':('distance','uniform')
     })
 
@@ -335,7 +329,7 @@ def extra_trees(df_train: pd.DataFrame, df_validation: pd.DataFrame):
         }
     )
 
-    train_run(df_train, df_validation, name, RandomForestClassifier(**grid_search.best_params_))
+    train_run(df_train, df_validation, name, ExtraTreesClassifier(**grid_search.best_params_))
 
 def adaboost(df_train: pd.DataFrame, df_validation: pd.DataFrame): 
     name = "adaboost"
@@ -351,16 +345,18 @@ def adaboost(df_train: pd.DataFrame, df_validation: pd.DataFrame):
 
 
 def main() -> None:
-    df_train, df_validation, df_validation, scaler = read_files()
+    df_train, df_validation = read_files()
+    
+    bagging(df_train, df_validation)
+    random_forest(df_train, df_validation)
+    extra_trees(df_train, df_validation)
+    adaboost(df_train, df_validation)
+
     naive_bayes(df_train, df_validation)
     knn_params = knn(df_train, df_validation)
     dt_params = decision_trees(df_train, df_validation)
     nn_params = nn(df_train, df_validation)
     voting_classifier(df_train, df_validation, knn_params, dt_params, nn_params)
-    bagging(df_train, df_validation)
-    random_forest(df_train, df_validation)
-    extra_trees(df_train, df_validation)
-    adaboost(df_train, df_validation)
 
 if __name__=="__main__":
     main()
