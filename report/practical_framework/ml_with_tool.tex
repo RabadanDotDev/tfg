@@ -23,7 +23,7 @@ Con BoT-IoT, también leemos el par de direcciones IP ('saddr' y 'daddr'), el pr
 
 Finalmente, en TON-IoT tenemos un caso similar que con CIC-DDos2019. Tenemos el par de direcciones IP  ('src\_ip' y 'dst\_ip'), el protocolo ('proto'), la marca temporal inicial ('ts'), la duración del flujo ('duration') y la etiqueta ('type') de los registros. Sin embargo, la marca temporal está expresada en tiempo UNIX en segundos, con una parte decimal, y la duración en segundos. En este caso, también convertimos los protocolos de transporte a su representación numérica y descartamos los registros con protocolos inválidos.
 
-Después de poner el mismo formato numérico y semántico en los tres conjuntos de datos, podemos llegar a tener un número considerable de filas. Para hacerlo más fácilmente tratable, primero modificamos las columnas de las direcciones IP de origen y destino para tener una que sea lexicográficamente menor y otra mayor. Esto lo hacemos, ya que en la herramienta el orden del par de IP no es relevante, pero sí lo es para hacer la reducción. La reducción la hacemos a base de juntar intervalos de tiempo entre pares de IP con la misma etiqueta. Es decir, agrupamos todas las filas que tengan el mismo par de dirección IP de origen y destino, las ordenamos por tiempo y, si tenemos registros consecutivos que repiten etiqueta, las combinamos para tener un intervalo más grande que las agrupe. Una vez hecho esto, descartamos todas las filas que sean equivalentes a 'benign', ya que la herramienta pondrá esta etiqueta de todas formas si no hay un intervalo que corresponda.
+Después de poner el mismo formato numérico y semántico en los tres conjuntos de datos, podemos llegar a tener un número considerable de filas. Para hacerlo más fácilmente tratable, primero modificamos las columnas de las direcciones IP de origen y destino para tener una que sea lexicográficamente menor y otra mayor. Esto lo hacemos, ya que en la herramienta el orden del par de IP no es relevante, pero sí lo es para hacer la reducción. La reducción la hacemos a base de juntar intervalos de tiempo entre pares de IP con la misma etiqueta. Es decir, agrupamos todas las filas que tengan el mismo par de dirección IP de origen y destino, las ordenamos por tiempo y, si tenemos registros consecutivos que repiten etiqueta, las combinamos para tener un intervalo más grande que las agrupe.
 
 Después de la compresión, quedan algunos intervalos solapados con el mismo par de direcciones IP. Se ha decidido modificar los tiempos de inicio y final para que, en los casos que estén solapados, se modifiquen los tiempos al centro de los dos. Es decir, si tenemos un intervalo en los tiempos $[0, 20]$ y otro $[10, 30]$, pasarían a ser $[0, 15]$ y $[15, 30]$ respectivamente. De la manera que está diseñada la herramienta, esta es la operación que tiene más sentido, ya que permite que los flujos se etiqueten con la etiqueta del intervalo con la que corresponden más.
 
@@ -114,6 +114,8 @@ Podemos observar también que el tipo principal de ataques es 'DDoS', el cual se
 
 Por otro lado, podemos ver cómo hay ciertos datos, los cuales son inconsistentes. Hay algunos flujos etiquetados con ataques relacionados con UDP los cuales utilizan el protocolo TCP, especialmente en el caso de CIC\-DDoS2019. Esto es causado principalmente por los datos de origen, pero afortunadamente no hay muchos registros que parezcan presentar estas inconsistencias.
 
+Finalmente, podemos ver que alrededor del 5\% de los datos no han podido ser etiquetados correctamente. Para estos, no se ha podido obtener una etiqueta que corresponda con el flujo detectado. En el momento de utilizar los datos, ignoraremos los registros con etiqueta 'unknown', ya que no conocemos exactamente el significado de ellos.
+
 \subsubsection{Protocolo}
 
 Respecto a los protocolos utilizados, podemos ver en la Tabla \ref{table:packetpincerasprotocols} cómo en general los flujos con TCP y UDP estan relativamente balanceados, aunque en cada conjunto de datos el peso que tienen está más sesgado hacia un lado u otro.
@@ -135,23 +137,23 @@ Respecto a los protocolos utilizados, podemos ver en la Tabla \ref{table:packetp
 
 \subsubsection{Duración}
 
-La columna de duración contiene una cantidad considerable de flujos que duran 0 segundos, además de otros relativamente cortos, como podemos ver en la Figura \ref{fig:packet_pincer_duration}. Para tener gráficos útiles, hace falta aplicar una escala logarítmica tanto en la magnitud como en la cantidad de flujos. Para evitar infinitos al aplicar el logaritmo a los flujos con 0, sumamos 1 a todos los datos. La cantidad de ceros es el 2.73\% (12 89 300), 1.12\% (68 292) y 42.68\% (10 942 625) en CIC-DDoS2019, BoT-Iot y TON-IoT, respectivamente.
+La columna de duración contiene una cantidad considerable de flujos que duran 0 segundos, además de otros relativamente cortos, como podemos ver en la Figura \ref{fig:packet_pincer_duration}. Para tener gráficos útiles, hace falta aplicar una escala logarítmica tanto en la magnitud como en la cantidad de flujos. Para evitar infinitos, al aplicar el logaritmo a los flujos con 0, sumamos 1 a todos los datos. La cantidad de ceros es el 2.72\% (1 313 913), 1.14\% (69 537) y 40.66\% (10 979 533) en CIC-DDoS2019, BoT-Iot y TON-IoT, respectivamente.
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{0.26\textwidth}
         \centering
         \includegraphics[width=\textwidth]{media/packet_pincer_cicddos/duration_seconds_log_x_log_y.png}
         \caption{CIC-DDoS2019}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{0.26\textwidth}
         \centering
         \includegraphics[width=\linewidth]{media/packet_pincer_botiot/duration_seconds_log_x_log_y.png}
         \caption{BoT-IoT}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{0.26\textwidth}
         \centering
         \includegraphics[width=\linewidth]{media/packet_pincer_toniot/duration_seconds_log_x_log_y.png}
         \caption{TON-IoT}
@@ -201,7 +203,7 @@ La columna de duración contiene una cantidad considerable de flujos que duran 0
 
 Podemos observar en la Figura \ref{fig:packet_pincer_packet_count} que tenemos una situación parecida al caso de la duración con el recuento de paquetes. La mayoría de los flujos tienen una cantidad de paquetes intercambiados reducida. Adicionalmente, en la mayoría hay una caída clara a partir de un punto, aunque en otros es más progresivo. Para CIC-DDoS2019 (CD en la figura) y en ToN-IoT (TI en la figura), podemos observar cierta tendencia que predice la ley de Zipf.
 
-En este caso, para la columna del recuento de paquetes de regreso, tenemos que la cantidad de ceros es el 96.19\% (45 363 137), 44.38\% (2696542) y 43.73\% (11 211 906) en CIC-DDoS2019, BoT-Iot y TON-IoT, respectivamente.  Las otras dos no contienen ningún cero, debido a que si fuesen cero, el flujo no aparecería en los datos procesados.
+En este caso, para la columna del recuento de paquetes de regreso, tenemos que la cantidad de ceros es el 96.29\% (46 588 405), 44.39\% (2 697 786) y 41.71\% (11 264 084) en CIC-DDoS2019, BoT-Iot y TON-IoT, respectivamente. Las otras dos no contienen ningún cero, debido a que si fuesen cero, el flujo no aparecería en los datos procesados.
 
 \subsubsection{Cadencia de paquetes}
 
@@ -242,16 +244,16 @@ En este caso, para la columna del recuento de paquetes de regreso, tenemos que l
        \label{fig:packet_pincer_packet_second}
 \end{figure}
 
-La distribución de las diferentes cadencias de paquetes se puede observar en la Figura \ref{fig:packet_pincer_packet_second}. Podemos ver que la mayoría de los flujos tiene una cadencia baja, con algunos puntos con picos. En la Tabla \ref{table:packet_pincer_packet_second_zeroes} podemos ver que también hay gran cantidad de ceros en el dataset, especialmente en los IoT y en los casos de retorno. Es posible que esto haya sido debido a muchos paquetes que no hayan tenido respuesta.
+La distribución de las diferentes cadencias de paquetes se puede observar en la Figura \ref{fig:packet_pincer_packet_second}. Podemos ver que la mayoría de los flujos tiene una cadencia baja, con algunos puntos con picos. En la Tabla \ref{table:packet_pincer_packet_second_zeroes} podemos ver que también hay gran cantidad de ceros en el conjunto de datos, especialmente en los IoT y en los casos de retorno. Es posible que esto haya sido debido a muchos paquetes que no hayan tenido respuesta.
 
 \begin{table}[H]
     \centering
     \begin{tabular}{|c | c c c |}
         \hline
         \textbf{Conjunto de datos} & \textbf{Bidirectional} & \textbf{Forward} & \textbf{Backward} \\ \hline
-        CIC-DDoS2019               & 8,04\%                 & 8,06\%           & 96,47\% \\
-        Bot-IoT                    & 64,39\%                & 64,53\%          & 71,14\% \\
-        TON-IoT                    & 53,35\%                & 54,68\%          & 55,51\% \\
+        CIC-DDoS2019               & 6,97\%                 & 6,99\%           & 95,55\% \\
+        Bot-IoT                    & 64,38\%                & 64,53\%          & 71,14\% \\
+        TON-IoT                    & 53,10\%                & 54,44\%          & 55,27\% \\
         \hline
     \end{tabular}
     \caption{Protocolo de transporte utilizado por conjunto de datos}
