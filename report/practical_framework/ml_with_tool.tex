@@ -1290,11 +1290,9 @@ A diferencia de los dos casos anteriores, podemos ver en la Figura \ref{fig:pack
 \color{blue} %TODO remove this when revised
 \subsection{Definición de la tarea a realizar}
 
-Una vez hecho un análisis inicial de los datos, podemos ver que tenemos un conjunto de datos muy desbalanceado, tanto en etiquetas como en campos donde solo hay valores en ciertos casos. Como vimos en la Tabla \ref{table:packetpincerassignedlabels}, tenemos solo un 6\% de ejemplos de tráfico benigno y una serie de etiquetas con diferentes niveles de especificidad, además de desbalanceadas entre ellas. Sin embargo, tenemos muchos ejemplos de DDoS, con la mayoría teniendo una cantidad de datos comparables. 
+Una vez hecho un análisis inicial de los datos, podemos ver que tenemos un conjunto de datos muy desbalanceado, tanto en etiquetas como en campos donde solo hay valores en ciertos casos. Como vimos en la Tabla \ref{table:packetpincerassignedlabels}, tenemos solo un 0,846\% de ejemplos de tráfico benigno y una serie de etiquetas con diferentes niveles de especificidad. Concentradas mayoritariamente en ataques de denegación de servicio distribuido. 
 
-La tarea de \gls{ml} que se realizará consistirá en tratar de clasificar las diferentes tipologías de DDoS. Este tipo de ataques es uno de los más comunes que existen \cite{topciberattacks} y, dependiendo de la tipología, se puede escoger un tipo de mitigación u otra. Para realizarla, tomaremos datos con etiquetas específicas de CIC-DDoS2019 y BoT-IoT y haremos un preprocesamiento. A continuación haremos un split 70/20/10 para entrenar los modelos, seleccionar el que tenga mejor rendimiento y testear su funcionamiento con datos que aún no ha visto. Finalmente, aplicaremos el modelo entrenado sobre las etiquetas genéricas de TON-IoT.
-
-Debido al desbalance de los datos, se ha de evitar hacer uso de la métrica de \textit{accuracy}. En todo caso, hemos de preferir utilizar la métrica de \textit{F-score} sobre esta, la cual combina \textit{recall} y \textit{precision}, y permite evaluar de una mejor manera los conjuntos de datos de este estilo.
+La tarea de ML que realizaremos consistirá en clasificar un flujo determinado en benigno o maligno. Debido a que la mayoría de tráfico maligno es 'ddos', los modelos estarán posiblemente sesgados hacia este tipo en comparación a otros. Sin embargo, esto no supone un problema, ya que en entornos reales este tipo de ataques es uno de los más comunes que existen \cite{topciberattacks}.
 
 \subsection{Preprocesamiento}
 
