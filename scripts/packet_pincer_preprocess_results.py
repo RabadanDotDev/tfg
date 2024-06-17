@@ -88,8 +88,6 @@ def get_files(glob_pattern : str) -> List[str]:
     return files
 
 def filter_label(df: pd.DataFrame) -> pd.DataFrame:
-    #filter = df[PACKET_PINCER_LABEL].str.startswith(START_WITH_LABEL) & ~(df[PACKET_PINCER_LABEL].str.startswith('ddos_tcp'))
-    #return df[filter]
     df = df[df['label'] != 'unknown']
     df.loc[:, 'label'] = df['label'].replace(mappings)
     return df

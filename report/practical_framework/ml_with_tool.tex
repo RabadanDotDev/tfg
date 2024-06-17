@@ -1296,5 +1296,9 @@ La tarea de ML que realizaremos consistirá en clasificar un flujo determinado e
 
 \subsection{Preprocesamiento}
 
-En el preprocesamiento inicial filtramos por etiquetas 'ddos' que indiquen el protocolo TCP o sean UDP. Descartamos las etiquetas tcp genéricas. A continuación, realizamos un muestreo estratificado del 0.25\% para tener unos 120 mil registros y retiramos las etiquetas que tengan menos de 100 ejemplos. A continación aplicaremos el logaritmo sobre las características continuas sumando 1 para evitar infinitos. Finalmente, escalaremos todos los datos continuos para que estén en el rango $[0, 1]$.
+En el preprocesamiento inicial, se ha tomado cada archivo CSV generado por la herramienta y se leen todos los registros de flujos que hayan sido etiquetados correctamente. A continuación, se han remplazado todas las etiquetas de ataques específicos por 'malign', realizado un muestreo estratificado del 0.5\% de los datos y descartado las columnas identificativas. Con esto, de los 80 millones de filas, nos quedamos con 385 778, 382 334 de las cuales son muestras malignas y 3 444 benignas.
+
+Una vez tomado con una sección de los datos para hacerlos más tratables, se ha aplicado el logaritmo sobre las características continúas sumando 1 para evitar infinitos y a continuación escalado todos los datos continuos para que estén en el rango $[0, 1]$. Después del escalado, se ha ejecutado una implementación del algoritmo Boruta \cite{borutapy} para realizar una selección de características. Al ejecutarlo, nos ha descartado las características del recuento de paquetes con los flags CWR, ECC y URG en las cabeceras TCP. Esto es esperable, ya que la extensa mayoría de estas eran 0.
+
+Finalmente, se ha hecho un split 70/20/10 para entrenar los modelos, seleccionar el que tenga mejor rendimiento y testear su funcionamiento con datos que aún no ha visto. 
 
