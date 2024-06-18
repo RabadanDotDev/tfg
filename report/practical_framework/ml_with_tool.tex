@@ -1308,7 +1308,7 @@ En este subpunto se muestran los resultados de utilizar algoritmos de \gls{ml} c
 
 \subsubsection{Naive bayes}
 
-Naive Bayes, como se define en la documentación de sklearn \cite{sklearnnaivebayes}, son un conjunto de algoritmos basados en el teorema de Bayes con la suposición 'naive' o inocente de que todas las características son independientes. Esta suposición no es correcta en nuestros datos, pero aun no cumpliéndose el rendimiento del algoritmo es a veces efectivo. Adicionalmente, es un modelo muy rápido de entrenar, por lo cual nos puede servir como modelo básico de referencia para comparar con los otros modelos. 
+Naive Bayes, como se define en la documentación de scikit-learn \cite{sklearnnaivebayes}, son un conjunto de algoritmos basados en el teorema de Bayes con la suposición 'naive' o inocente de que todas las características son independientes. Esta suposición no es correcta en nuestros datos, pero aun no cumpliéndose el rendimiento del algoritmo es a veces efectivo. Adicionalmente, es un modelo muy rápido de entrenar, por lo cual nos puede servir como modelo básico de referencia para comparar con los otros modelos. 
 
 En las primeras pruebas, este modelo era el que mejor funcionaba, cosa que fue una indicación de que había algo incorrecto en los datos. Inicialmente, se había hecho una suposición de que los flujos que no habíamos podido etiquetar eran benignos y que tener en cuenta el protocolo para realizar el etiquetado no sería útil. Con esto, el modelo de Naive Bayes era capaz de diferenciar mejor a los benignos pese a ser una clase minoritaria. Cosa que provocó una revisión de cómo estaba diseñado el etiquetado.
 
@@ -1496,9 +1496,43 @@ Si observamos la matriz de confusión de la Figura \ref{fig:votingmatrix}, podem
     \caption{Matriz de confusión de las clasificaciones de la red neuronal sobre los datos de validación}\label{fig:votingmatrix}
 \end{figure}
 
-\subsubsection{Embolsado} % Bagging
+\subsubsection{Bagging} % Bagging
 
-por hacer
+Un clasificador 'Bagging', como se indica en la documentación de scikit-learn \cite{sklearnbagging}, se basa en combinar clasificadores del mismo tipo entrenados con diferentes partes de los datos originales y a continuación combinar sus resultados para generar una predicción. En nuestro caso, utilizaremos un árbol de decisión como estimador base.
+
+Aparte del estimador base, hay una serie de hiperparámetros configurables. Hemos probado a ejecutar la búsqueda en cuadrícula para ajustar el número de estimadores y el porcentaje máximo de características admitidas. El resultado ha sido la limitación al 35\% de las características por estimador y 50 estimadores.
+
+La selección de hiperparámetros ha requerido 4 minutos y 15 segundos, el entrenamiento final ha necesitado 34 segundos y se han requerido unas 1.5 décimas de segundo para generar predicciones. Es más lento que con un solo modelo, pero la penalización no es tan grande como con las redes neuronales.
+
+Podemos ver una ligera mejora de 0,001 en las puntuaciones F1 con este modelo si observamos Tabla \ref{table:baggingresults}. Sin embargo, la precisión de los malignos, la recuperación de los benignos y la exactitud general ha bajado ligeramente también.
+
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{|c | c c c | c |} 
+            \hline
+            & \textbf{Precisión} & \textbf{Recuperación} & \textbf{F1}  & \textbf{Soporte} \\
+            \hline
+            benign               & 0.981132 & 0.981132 & 0.981132  &   689 \\
+            malign               & 0.999830 & 0.999830 & 0.999830  & 76467 \\
+            \hline
+            exactitud            &          &          & 0.999663  & 77156 \\
+            media aritmética f1  & 0.990481 & 0.990481 & 0.990481  & 77156 \\
+            media ponderada f1   & 0.999663 & 0.999663 & 0.999663  & 77156 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados de clasificación del clasificador 'Bagging' sobre los datos de validación}
+    \label{table:baggingresults}
+\end{table}
+
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[width=0.55\linewidth]{media/packet_pincer_train_models_bagging.png}
+    \end{center}
+    \caption{Matriz de confusión de lasclasificador 'Bagging' sobre los datos de validación}\label{fig:baggingmatrix}
+\end{figure}
+
+La causa de la mejora de los valores F1, pero la reducción en otras medidas comparado con el árbol de decisión individual, la podemos observar con claridad en la matriz de confusión de la Figura \ref{fig:baggingmatrix}. Hay 11 flujos malignos menos clasificados como benignos, mientras que hay dos flujos benignos clasificados como benignos. Si se quiere mejorar la efectividad de la detección de malignos, con una pequeña penalización para los benignos y un poco más de tiempo de proceso, se podría tomar este modelo antes que el árbol individual.
 
 \subsubsection{Adaboost} % Adaboost
 
