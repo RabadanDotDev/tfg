@@ -1534,9 +1534,41 @@ Podemos ver una ligera mejora de 0,001 en las puntuaciones F1 con este modelo si
 
 La causa de la mejora de los valores F1, pero la reducción en otras medidas comparado con el árbol de decisión individual, la podemos observar con claridad en la matriz de confusión de la Figura \ref{fig:baggingmatrix}. Hay 11 flujos malignos menos clasificados como benignos, mientras que hay dos flujos benignos clasificados como benignos. Si se quiere mejorar la efectividad de la detección de malignos, con una pequeña penalización para los benignos y un poco más de tiempo de proceso, se podría tomar este modelo antes que el árbol individual.
 
-\subsubsection{Adaboost} % Adaboost
+\subsubsection{AdaBoost} % Adaboost
 
-por hacer
+Un clasificador 'AdaBoost', como se indica en la documentación de scikit-learn \cite{sklearnadaboost}, se basa en entrenar un clasificador y, en los errores de este, entrenar otro con los ejemplos mal clasificados con mayor prioridad. Este proceso se repite por cada estimador hasta que se entrenan todos los disponibles o se hace una clasificación completamente correcta. Para el estimador base, utilizamos los valores por defecto.
+
+En este caso, nos hemos focalizado también en ajustar el hiperparámetro del número de estimadores. Después de la búsqueda en cuadrícula, se ha determinado que el que mejor resultados generaba era utilizar 200 estimadores.
+
+La selección de hiperparámetros ha requerido 18 minutos y 3 segundos, el entrenamiento final ha necesitado 1 minuto y 23 segundos y se han requerido unas 7.9 décimas de segundo para generar predicciones. Es más lento que con el caso de 'Bagging' tanto para entrenar como para generar predicciones.
+
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{|c | c c c | c |} 
+            \hline
+            & \textbf{Precisión} & \textbf{Recuperación} & \textbf{F1}  & \textbf{Soporte} \\
+            \hline
+            benign               & 0.959881 & 0.937591 & 0.948605  &   689 \\
+            malign               & 0.999438 & 0.999647 & 0.999542  & 76467 \\
+            \hline
+            exactitud            &          &          & 0.999093  & 77156 \\
+            media aritmética f1  & 0.979659 & 0.968619 & 0.974074  & 77156 \\
+            media ponderada f1   & 0.999085 & 0.999093 & 0.999087  & 77156 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados de clasificación del clasificador 'AdaBoost' sobre los datos de validación}
+    \label{table:adaboostresults}
+\end{table}
+
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[width=0.55\linewidth]{media/packet_pincer_train_models_adaboost.png}
+    \end{center}
+    \caption{Matriz de confusión del clasificador 'AdaBoost' sobre los datos de validación}\label{fig:adaboostmatrix}
+\end{figure}
+
+Los resultados, como podemos ver en la Tabla \ref{table:adaboostresults}, son inferiores a los obtenidos con el clasificador 'Bagging'. Si miramos a la matriz de confusión de la Figura \ref{fig:adaboostmatrix}, podemos ver como se han clasificado incorrectamente 14 flujos malignos y 30 flujos benignos.
 
 \subsubsection{Bosques aleatorios} % Random forest
 
