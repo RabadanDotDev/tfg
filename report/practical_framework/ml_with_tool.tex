@@ -1572,7 +1572,41 @@ Los resultados, como podemos ver en la Tabla \ref{table:adaboostresults}, son in
 
 \subsubsection{Bosques aleatorios} % Random forest
 
-por hacer
+Los clasificadores basados en bosques aleatorios son similares al que hemos hecho en el punto de 'Bagging'. La diferencia principal que se utilizan ciertas técnicas para mejorar la precisión de las predicciones mientras se evita el sobreajuste \cite{sklearnrandomforest}.
+
+En este caso, hemos dejado también la mayoría de hiperparámetros con los valores por defecto, exceptuando el número de estimadores. Después de hacer la búsqueda por cuadrícula, se ha determinado que se obtenían los mejores resultados con 50 estimadores.
+
+La selección de hiperparámetros ha requerido 54 segundos, el entrenamiento final 10 segundos y se han requerido aproximadamente una décima de segundo para generar predicciones. No es tan rápido como utilizar un solo estimador, pero es de los más rápidos que hemos visto.
+
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{|c | c c c | c |} 
+            \hline
+            & \textbf{Precisión} & \textbf{Recuperación} & \textbf{F1}  & \textbf{Soporte} \\
+            \hline
+            benign               & 0.982583 & 0.982583 & 0.982583  &   689 \\
+            malign               & 0.999843 & 0.999843 & 0.999843  & 76467 \\
+            \hline
+            exactitud            &          &          & 0.999689  & 77156 \\
+            media aritmética f1  & 0.991213 & 0.991213 & 0.991213  & 77156 \\
+            media ponderada f1   & 0.999689 & 0.999689 & 0.999689  & 77156 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados de clasificación del modelo de bosque aleatorio sobre los datos de validación}
+    \label{table:randomforestresults}
+\end{table}
+
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[width=0.55\linewidth]{media/packet_pincer_train_models_random_forest.png}
+    \end{center}
+    \caption{Matriz de confusión del modelo de bosque aleatorio sobre los datos de validación}\label{fig:randomforestmatrix}
+\end{figure}
+
+Las métricas mostradas en la Tabla \ref{table:randomforestresults} son ligeramente mejores que en el caso de 'Bagging'. Esto es debido a que, como podemos ver en la Figura \ref{fig:randomforestmatrix}, hay un flujo benigno y un flujo maligno menos mal clasificados.
+
+
 
 \subsection{Entrenamiento modelo final}
 
