@@ -1377,14 +1377,48 @@ Podemos ver en la matriz de confusión de la Figura \ref{fig:decisiontreematrix}
 
 \begin{figure}[H]
     \begin{center}
-        \includegraphics[width=0.62\linewidth]{media/packet_pincer_train_models_decision_trees.png}
+        \includegraphics[width=0.55\linewidth]{media/packet_pincer_train_models_decision_trees.png}
     \end{center}
-    \caption{Flujo de la aplicación durante su ejecución}\label{fig:decisiontreematrix}
+    \caption{Matriz de confusión de las clasificaciones del árbol de decisión sobre los datos de validación}\label{fig:decisiontreematrix}
 \end{figure}
 
 \subsubsection{KNN}
 
-por hacer
+KNN (k vecinos cercanos, por las siglas en inglés) es un método de aprendizaje supervisado, el cual se basa en clasificar un punto según k puntos cercanos a este \cite{ibmknn}. Es uno de los modelos de clasificación más simples utilizados, ya que simplemente toma los datos de referencia y genera una predicción basada en qué categorías tiene cerca.
+
+En este caso, algunos de los hiperparámetros que podemos configurar son el número de nodos cercanos a considerar y qué importancia darle a cada uno. Hemos realizado otra búsqueda en cuadrícula y el resultado ha sido que, simplemente tomando el punto más cercano, ya ofrecía buenos resultados.
+
+La selección de hiperparámetros ha requerido 2 minutos y 27 segundos, el entrenamiento final 1.6 décimas de segundo y 5 segundos para generar predicciones. El entrenamiento de este modelo es bastante rápido, ya que lo único que se hace es estructurar los datos de entrenamiento en una estructura eficiente para realizar las predicciones. De todas maneras, estas son varios órdenes de magnitud más lentas que en el caso anterior.
+
+Como se puede ver en la Tabla \ref{table:knnresults}, los resultados son ligeramente peores que en el caso anterior, con todas las métricas habiendo bajado algunos puntos. Con esto y su mayor lentitud en las predicciones, se puede considerar que este modelo es inferior al anterior.
+
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{|c | c c c | c |} 
+            \hline
+            & \textbf{Precisión} & \textbf{Recuperación} & \textbf{F1}  & \textbf{Soporte} \\
+            \hline
+            benign               & 0.933726 & 0.920174 & 0.926901  &   689 \\
+            malign               & 0.999281 & 0.999412 & 0.999346  & 76467 \\
+            \hline
+            exactitud            &          &          & 0.998704  & 77156 \\
+            media aritmética f1  & 0.966503 & 0.959793 & 0.963123  & 77156 \\
+            media ponderada f1   & 0.998695 & 0.998704 & 0.998699  & 77156 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados de clasificación del modelo KNN sobre los datos de validación}
+    \label{table:knnresults}
+\end{table}
+
+Adicionalmente, se puede observar en la matriz de confusión de la figura \ref{fig:knnmatrix} como 45 malignos se han clasificado como benignos (21 más) y 55 benignos como malignos (44 más).
+
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[width=0.62\linewidth]{media/packet_pincer_train_models_KNN.png}
+    \end{center}
+    \caption{Matriz de confusión de las clasificaciones del modelo KNN sobre los datos de validación}\label{fig:knnmatrix}
+\end{figure}
 
 \subsubsection{Red neuronal}
 
