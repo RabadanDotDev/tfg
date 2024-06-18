@@ -1445,7 +1445,7 @@ Pese a ser un modelo más avanzado, podemos ver en la Tabla \ref{table:nnresults
             \hline
         \end{tabular}
     \end{center}
-    \caption{Resultados de clasificación del modelo KNN sobre los datos de validación}
+    \caption{Resultados de clasificación de la red neuronal sobre los datos de validación}
     \label{table:nnresults}
 \end{table}
 
@@ -1453,14 +1453,48 @@ Pese a ser un modelo más avanzado, podemos ver en la Tabla \ref{table:nnresults
     \begin{center}
         \includegraphics[width=0.55\linewidth]{media/packet_pincer_train_models_nn.png}
     \end{center}
-    \caption{Matriz de confusión de las clasificaciones del modelo KNN sobre los datos de validación}\label{fig:nnmatrix}
+    \caption{Matriz de confusión de las clasificaciones de la red neuronal sobre los datos de validación}\label{fig:nnmatrix}
 \end{figure}
 
 Podemos ver en la matriz de confusión de la Figura \ref{fig:nnmatrix}, cómo 38 flujos benignos se consideraron malignos por el modelo (27 más que el árbol de decisión y 27 menos que KNN) y 134 malignos como benignos (110 más que el árbol de decisión y 89 más que KNN). Pese a ser ligeramente mejor que KNN para el caso de los benignos, este modelo es peor que el árbol de decisión en ambos casos.
 
 \subsubsection{Combinación de modelos por votación}
 
-por hacer
+Los modelos anteriores han tenido diferentes resultados para realizar la clasificación de los flujos. Existen diversos métodos para combinar modelos para tratar de combinar sus fortalezas y reducir sus debilidades para mejorar los resultados. Una de las opciones es la votación, en la cual los modelos hacen votación por mayoría ('hard voting') o indican la probabilidad que consideran de cada etiqueta ('soft voting') \cite{sklearnvotingclassifier}.
+
+Se han tomado la mejor configuración de los cuatro modelos anteriores y comparado el rendimiento de las dos formas de votación. La forma de votación que mejor resultado ofrecía ha sido 'soft voting'.
+
+La selección del método de votación ha requerido 4 minutos y 3 segundos, el entrenamiento final 1 minuto con 38 segundos y unos seis segundos para generar predicciones. El entrenamiento de este modelo ha sido ligeramente más rápido que la red neuronal anterior, aun teniendo uno de los modelos internos teniendo la misma configuración. Es posible que esto haya sido debido a que el caché del ordenador ya tenía parte de los datos y código cargados en memoria del punto anterior.
+
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{|c | c c c | c |} 
+            \hline
+            & \textbf{Precisión} & \textbf{Recuperación} & \textbf{F1}  & \textbf{Soporte} \\
+            \hline
+            benign               & 0.934722 & 0.976778 & 0.955287  &   689 \\
+            malign               & 0.999791 & 0.999385 & 0.999588  & 76467 \\
+            \hline
+            exactitud            &          &          & 0.999183 & 77156 \\
+            media aritmética f1  & 0.967256 & 0.988082 & 0.977438 & 77156 \\
+            media ponderada f1   & 0.999210 & 0.999183 & 0.999192 & 77156 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados de clasificación del modelo de votación sobre los datos de validación}
+    \label{table:votingresults}
+\end{table}
+
+En la Tabla \ref{table:votingresults} podemos ver cómo los resultados son mejores en comparación con la red neuronal. Tenemos menos precisión en los benignos comparado a KNN y menor precisión y recuperación en los malignos para el caso del árbol de decisión. Se podría considerar que las mejoras ofrecidas no compensan el hecho de tener un tiempo de entrenamiento y predicción mayor a lo que teníamos al utilizar directamente un árbol de decisión.
+
+Si observamos la matriz de confusión de la Figura \ref{fig:votingmatrix}, podemos ver claramente que hay más flujos mal clasificados que en el caso del árbol de decisión. Indicando claramente que el rendimiento de esta combinación de modelos no justifica su mayor lentitud.
+
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[width=0.55\linewidth]{media/packet_pincer_train_models_voting_classifier.png}
+    \end{center}
+    \caption{Matriz de confusión de las clasificaciones de la red neuronal sobre los datos de validación}\label{fig:votingmatrix}
+\end{figure}
 
 \subsubsection{Embolsado} % Bagging
 
