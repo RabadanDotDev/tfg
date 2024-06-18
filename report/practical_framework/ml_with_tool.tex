@@ -1300,11 +1300,11 @@ En el preprocesamiento inicial, se ha tomado cada archivo CSV generado por la he
 
 Una vez tomado con una sección de los datos para hacerlos más tratables, se ha aplicado el logaritmo sobre las características continúas sumando 1 para evitar infinitos y a continuación escalado todos los datos continuos para que estén en el rango $[0, 1]$. Después del escalado, se ha ejecutado una implementación del algoritmo Boruta \cite{borutapy} para realizar una selección de características. Al ejecutarlo, nos ha descartado las características del recuento de paquetes con los flags CWR, ECC y URG en las cabeceras TCP. Esto es esperable, ya que la extensa mayoría de estas eran 0.
 
-Finalmente, se ha hecho un split 70/20/10 para entrenar los modelos, seleccionar el que tenga mejor rendimiento y testear su funcionamiento con datos que aún no ha visto. 
+Finalmente, se ha hecho un split 70/20/10 para entrenar los modelos, seleccionar el que tenga mejor rendimiento y comprobar la capacidad de generalización del modelo seleccionado con datos que aún no ha visto. 
 
 \subsection{Entrenamiento de modelos}
 
-por hacer
+En este subpunto se muestran los resultados de utilizar algoritmos de \gls{ml} con los datos que hemos preparado. En los casos que se puedan configurar hiperparámetros, se ha hecho una búsqueda en cuadrícula de diferentes valores y se han escogido los que presentan la mejor métrica de  'f-score macro' ofrecido por \texttt{scikit-learn}. Esta es una media aritmética entre los f-score de cada etiqueta que el modelo puede seleccionar, en nuestro caso 'benign' y 'malign'.
 
 \subsubsection{Naive bayes}
 
