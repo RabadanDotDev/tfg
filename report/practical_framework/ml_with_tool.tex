@@ -1606,8 +1606,36 @@ La selección de hiperparámetros ha requerido 54 segundos, el entrenamiento fin
 
 Las métricas mostradas en la Tabla \ref{table:randomforestresults} son ligeramente mejores que en el caso de 'Bagging'. Esto es debido a que, como podemos ver en la Figura \ref{fig:randomforestmatrix}, hay un flujo benigno y un flujo maligno menos mal clasificados.
 
-
-
 \subsection{Entrenamiento modelo final}
 
-por hacer
+Como hemos visto, el modelo que presenta mejor rendimiento es el de bosques aleatorios. Para comprobar si es capaz de generalizar a más datos, tomaremos el 90\% de datos utilizados para entrenar y generar las estadísticas del punto anterior y entrenaremos un nuevo modelo. Con este, generaremos nuevas estadísticas  con el 10\% restante y verificaremos si se mantiene su rendimiento.
+
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{|c | c c c | c |} 
+            \hline
+            & \textbf{Precisión} & \textbf{Recuperación} & \textbf{F1}  & \textbf{Soporte} \\
+            \hline
+            benign               & 0.988024 & 0.959302 & 0.973451  &   344 \\
+            malign               & 0.999634 & 0.999895 & 0.999765  & 38234 \\
+            \hline
+            exactitud            &          &          & 0.999533  & 38578 \\
+            media aritmética f1  & 0.993829 & 0.979599 & 0.986608  & 38578 \\
+            media ponderada f1   & 0.999530 & 0.999533 & 0.999530  & 38578 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados de clasificación del modelo final sobre los datos de test}
+    \label{table:selectedresults}
+\end{table}
+
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[width=0.55\linewidth]{media/packet_pincer_train_model_random_forest_selected.png}
+    \end{center}
+    \caption{Matriz de confusión del modelo final sobre los datos de test}\label{fig:selectedmatrix}
+\end{figure}
+
+El entrenamiento ha tardado 5.8 segundos y la predicción 2.2 centésimas de segundo. El modelo sigue siendo relativamente rápido. La puntuación F1 han disminuido ligeramente comparado con lo que teníamos antes si miramos la Tabla \ref{table:selectedresults}. De todas maneras, si miramos la matriz de confusión de la Figura \ref{fig:selectedmatrix}, podemos ver como tiene 8 flujos malignos mal clasificados menos y 2 flujos benignos mal clasificados más. 
+
+Con esto, podemos afirmar que el modelo seleccionado puede generalizar a datos nuevos, siempre que sigan la distribución y el formato de los datos con los que hemos trabajado. 
