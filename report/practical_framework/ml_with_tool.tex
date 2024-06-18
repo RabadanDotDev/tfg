@@ -1346,6 +1346,44 @@ Si observamos la matriz de confusión en la Figura \ref{fig:naivebayesmatrix}, p
 
 \subsubsection{Árbol de decisión}
 
+Los árboles de decisión son un método de aprendizaje supervisado, el cual puede ser utilizado para problemas de clasificación y regresión \cite{ibmdecisiontrees}. Para la clasificación, el método se basa principalmente en, a partir de una serie de preguntas en el nodo raíz y cada nodo interno, para llegar a un nodo hoja, el cual indica la categoría. Se ha de tener en cuenta que los árboles de decisión corren el riesgo de ser sobreajustados si no se limita su profundidad, ya que pueden generar una cantidad de nodos arbitrarios para separar todos los datos.
+
+La librería utilizada nos permite configurar diversos hiperparámetros, como el criterio de separación, el mínimo de impureza que se ha de disminuir por cada separación y el mínimo de muestras por nodo. Para seleccionarlos, hemos hecho una búsqueda en cuadrícula y, con cada configuración, realizado un k-fold estratificado con k=5. La búsqueda ha seleccionado utilizar el criterio 'log\_loss', sin decrecimiento de pureza mínima y limitando los nodos hoja a 3 ejemplos.
+
+La selección de hiperparámetros ha requerido 2 minutos y 29 segundos, el entrenamiento final 3 segundos y menos de una centésima para generar predicciones. El entrenamiento de este modelo es más lento que Naive Bayes, pero la generación de predicciones requiere la mitad del tiempo.
+
+En la Tabla \ref{table:decisiontreeresults} podemos ver que los resultados son sustancialmente mejores que con Naive Bayes. Tenemos un 99.95\% de muestras correctamente identificadas, con puntuaciones F1 del 0.9748, 0.9997 y 0.9873 para la los benignos, malignos y la media aritmética entre ellos, respectivamente. 
+
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{|c | c c c | c |} 
+            \hline
+            & \textbf{Precisión} & \textbf{Recuperación} & \textbf{F1}  & \textbf{Soporte} \\
+            \hline
+            benign               & 0.965812 & 0.984035 & 0.974838  &   689 \\
+            malign               & 0.999856 & 0.999686 & 0.999771  & 76467 \\
+            \hline
+            exactitud            &          &          & 0.999546  & 77156 \\
+            media aritmética f1  & 0.982834 & 0.991860 & 0.987305  & 77156 \\
+            media ponderada f1   & 0.999552 & 0.999546 & 0.999548  & 77156 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados de clasificación del árbol de decisión sobre los datos de validación}
+    \label{table:decisiontreeresults}
+\end{table}
+
+Podemos ver en la matriz de confusión de la Figura \ref{fig:decisiontreematrix} cómo solo 11 de 689 los flujos benignos se han clasificado como malignos y 24 de los 76467 malignos como benignos.
+
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[width=0.62\linewidth]{media/packet_pincer_train_models_decision_trees.png}
+    \end{center}
+    \caption{Flujo de la aplicación durante su ejecución}\label{fig:decisiontreematrix}
+\end{figure}
+
+\subsubsection{KNN}
+
 por hacer
 
 \subsubsection{Red neuronal}
