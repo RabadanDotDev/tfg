@@ -1411,7 +1411,7 @@ Como se puede ver en la Tabla \ref{table:knnresults}, los resultados son ligeram
     \label{table:knnresults}
 \end{table}
 
-Adicionalmente, se puede observar en la matriz de confusión de la figura \ref{fig:knnmatrix} como 45 malignos se han clasificado como benignos (21 más) y 55 benignos como malignos (44 más).
+Adicionalmente, se puede observar en la matriz de confusión de la Figura \ref{fig:knnmatrix} como 45 malignos se han clasificado como benignos (21 más) y 55 benignos como malignos (44 más).
 
 \begin{figure}[H]
     \begin{center}
@@ -1422,7 +1422,41 @@ Adicionalmente, se puede observar en la matriz de confusión de la figura \ref{f
 
 \subsubsection{Red neuronal}
 
-por hacer
+Una red neuronal es un modelo de \gls{ml} el que toma decisiones simulando un conjunto de neuronas. Las neuronas acumulan una serie de valores de entrada y aplican una función interna, emitiendo un resultado. Hemos hecho uso de una red densa, la cual tiene tres partes. Primero, una capa de 'entrada', donde cada neurona emite el valor de cada característica de entrada. Después hay una serie de capas de neuronas, llamadas capas ocultas, que están conectadas a todas las de la capa anterior y de la siguiente. Por último, hay una capa final, la que emite los resultados, en nuestro caso, si el flujo es benigno o no.
+
+Hay muchos hiperparámetros configurables, pero nos hemos focalizado en el de la función de activación y la forma de las capas ocultas. Después de ejecutar la búsqueda, la configuración que ha generado mejores resultados ha sido el uso de la tangente hiperbólica y tres capas ocultas con 70 neuronas cada una.
+
+La selección de hiperparámetros ha requerido 6 minutos y 45 segundos, el entrenamiento final es de 1 minuto con 50 segundos y se han requerido unas 8 centésimas de segundo para generar predicciones. El entrenamiento de este modelo es relativamente lento, en parte debido a que la librería utilizada no está optimizada para este tipo de entrenamiento.
+
+Pese a ser un modelo más avanzado, podemos ver en la Tabla \ref{table:nnresults} que los resultados no son mejores. Tanto las puntuaciones F1 como la exactitud disminuyen respecto a KNN. Podemos ver que el valor de recuperación de los benignos es mayor, aunque su precisión disminuye un 0,1 o 10 puntos porcentuales. Es un modelo que es más permisivo con los flujos que KNN, aceptando más benignos a costa de dejar pasar más malignos.
+
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{|c | c c c | c |} 
+            \hline
+            & \textbf{Precisión} & \textbf{Recuperación} & \textbf{F1}  & \textbf{Soporte} \\
+            \hline
+            benign               & 0.829299 & 0.944848 & 0.883311  &   689 \\
+            malign               & 0.999502 & 0.998248 & 0.998875  & 76467 \\
+            \hline
+            exactitud            &          &          & 0.997771  & 77156 \\
+            media aritmética f1  & 0.914401 & 0.971548 & 0.941093  & 77156 \\
+            media ponderada f1   & 0.997983 & 0.997771 & 0.997843  & 77156 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados de clasificación del modelo KNN sobre los datos de validación}
+    \label{table:nnresults}
+\end{table}
+
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[width=0.55\linewidth]{media/packet_pincer_train_models_nn.png}
+    \end{center}
+    \caption{Matriz de confusión de las clasificaciones del modelo KNN sobre los datos de validación}\label{fig:nnmatrix}
+\end{figure}
+
+Podemos ver en la matriz de confusión de la Figura \ref{fig:nnmatrix}, cómo 38 flujos benignos se consideraron malignos por el modelo (27 más que el árbol de decisión y 27 menos que KNN) y 134 malignos como benignos (110 más que el árbol de decisión y 89 más que KNN). Pese a ser ligeramente mejor que KNN para el caso de los benignos, este modelo es peor que el árbol de decisión en ambos casos.
 
 \subsubsection{Combinación de modelos por votación}
 
