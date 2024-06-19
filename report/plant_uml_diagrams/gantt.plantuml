@@ -1,0 +1,25 @@
+@startgantt
+Language ES
+
+Project starts 2024-02-14
+projectscale weekly
+
+[Análisis herramientas] starts 2024-02-14
+[Análisis herramientas] ends 2024-03-14
+
+[Análisis de los datos] starts 2024-03-14
+[Análisis de los datos] ends 2024-04-01
+
+[Desarollo de la herramienta  ] starts 2024-04-01
+[Desarollo de la herramienta  ] ends 2024-05-14
+
+[Documentación herramienta] starts 2024-05-14
+[Documentación herramienta] ends 2024-05-24
+
+[Tarea de ML con la herramienta] starts 2024-05-24
+[Tarea de ML con la herramienta] ends 2024-06-14
+
+[Finalización y revisión] starts 2024-06-14
+[Finalización y revisión] ends 2024-06-27
+
+@endgantt
