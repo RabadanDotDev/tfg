@@ -1298,7 +1298,7 @@ La tarea de ML que realizaremos consistirá en clasificar un flujo determinado e
 
 En el preprocesamiento inicial, se ha tomado cada archivo CSV generado por la herramienta y se leen todos los registros de flujos que hayan sido etiquetados correctamente. A continuación, se han remplazado todas las etiquetas de ataques específicos por 'malign', realizado un muestreo estratificado del 0.5\% de los datos y descartado las columnas identificativas. Con esto, de los 80 millones de filas, nos quedamos con 385 778, 382 334 de las cuales son muestras malignas y 3 444 benignas.
 
-Una vez tomado con una sección de los datos para hacerlos más tratables, se ha aplicado el logaritmo sobre las características continúas sumando 1 para evitar infinitos y a continuación escalado todos los datos continuos para que estén en el rango $[0, 1]$. Después del escalado, se ha ejecutado una implementación del algoritmo Boruta \cite{borutapy} para realizar una selección de características. Al ejecutarlo, nos ha descartado las características del recuento de paquetes con los flags CWR, ECC y URG en las cabeceras TCP. Esto es esperable, ya que la extensa mayoría de estas eran 0.
+Una vez tomada la muestra, se ha aplicado el logaritmo sobre las características continúas sumando 1 para evitar infinitos y a continuación se han escalado todos los datos continuos para que estén en el rango $[0, 1]$. Después del escalado, se ha ejecutado una implementación del algoritmo Boruta \cite{borutapy} para realizar una selección de características más representativas. Al ejecutarlo, nos ha descartado las características del recuento de paquetes con los flags CWR, ECC y URG en las cabeceras TCP. Esto es esperable, ya que la extensa mayoría de estas eran 0.
 
 Finalmente, se ha hecho un split 70/20/10 para entrenar los modelos, seleccionar el que tenga mejor rendimiento y comprobar la capacidad de generalización del modelo seleccionado con datos que aún no ha visto. 
 
@@ -1314,7 +1314,7 @@ En las primeras pruebas, este modelo era el que mejor funcionaba, cosa que fue u
 
 El paso de entrenamiento del algoritmo solo necesitó unas 2 décimas de segundo para generar el modelo entrenado y 2 centésimas para generar predicciones. Es muy rápido de entrenar, pero, como veremos ahora, los resultados no son muy buenos.
 
-En la Tabla \ref{table:naivebayesresults} podemos ver cómo el clasificador acierta alrededor del 71\% de los casos. La precisión del modelo cuando escoge malignos casos maligno es muy alta (99.87\%), mientras que en el caso maligno es pésima (2.7\%). Por el desbalance de los datos, es esperable que los malignos tuviesen alta precisión, aunque podemos ver cómo la recuperación es más baja en el caso maligno que en el benigno. Para el caso de los valores de F1 combinados, podemos ver que si tomamos la media aritmética entre las dos etiquetas, tenemos un resultado bastante bajo (0.44).
+En la Tabla \ref{table:naivebayesresults} podemos ver cómo el clasificador acierta alrededor del 71\% de los casos. La precisión del modelo cuando escoge malignos es muy alta (99.87\%), mientras que en el caso benigno es pésima (2.7\%). Por el desbalance de los datos, es esperable que los malignos tuviesen alta precisión, aunque podemos ver cómo la recuperación es más baja en el caso maligno que en el benigno. Para el caso de los valores de F1 combinados, podemos ver que si tomamos la media aritmética entre las dos etiquetas, tenemos un resultado bastante bajo (0.44).
 
 \begin{table}[H]
     \begin{center}
@@ -1346,9 +1346,9 @@ Si observamos la matriz de confusión en la Figura \ref{fig:naivebayesmatrix}, p
 
 \subsubsection{Árbol de decisión}
 
-Los árboles de decisión son un método de aprendizaje supervisado, el cual puede ser utilizado para problemas de clasificación y regresión \cite{ibmdecisiontrees}. Para la clasificación, el método se basa principalmente en, a partir de una serie de preguntas en el nodo raíz y cada nodo interno, para llegar a un nodo hoja, el cual indica la categoría. Se ha de tener en cuenta que los árboles de decisión corren el riesgo de ser sobreajustados si no se limita su profundidad, ya que pueden generar una cantidad de nodos arbitrarios para separar todos los datos.
+Los árboles de decisión son un método de aprendizaje supervisado, el cual puede ser utilizado para problemas de clasificación y regresión \cite{ibmdecisiontrees}. Para la clasificación, el método se basa principalmente en realizar una serie de preguntas en el nodo raíz y cada nodo interno, para llegar a un nodo hoja, el cual indica la categoría. Se ha de tener en cuenta que los árboles de decisión corren el riesgo de ser sobreajustados si no se limita su profundidad, ya que pueden generar una cantidad de nodos arbitrarios para separar todos los datos.
 
-La librería utilizada nos permite configurar diversos hiperparámetros, como el criterio de separación, el mínimo de impureza que se ha de disminuir por cada separación y el mínimo de muestras por nodo. Para seleccionarlos, hemos hecho una búsqueda en cuadrícula y, con cada configuración, realizado un k-fold estratificado con k=5. La búsqueda ha seleccionado utilizar el criterio 'log\_loss', sin decrecimiento de pureza mínima y limitando los nodos hoja a 3 ejemplos.
+La librería utilizada nos permite configurar diversos hiperparámetros, como el criterio de separación, el mínimo de impureza que se ha de disminuir por cada separación y el mínimo de muestras por nodo. Para seleccionarlos, hemos hecho una búsqueda en cuadrícula y, con cada configuración, hemos realizado un muestreo k-fold estratificado con k=5. La búsqueda ha seleccionado utilizar el criterio 'log\_loss', sin decrecimiento de pureza mínima y limitando los nodos hoja a 3 ejemplos.
 
 La selección de hiperparámetros ha requerido 2 minutos y 29 segundos, el entrenamiento final 3 segundos y menos de una centésima para generar predicciones. El entrenamiento de este modelo es más lento que Naive Bayes, pero la generación de predicciones requiere la mitad del tiempo.
 
@@ -1373,7 +1373,7 @@ En la Tabla \ref{table:decisiontreeresults} podemos ver que los resultados son s
     \label{table:decisiontreeresults}
 \end{table}
 
-Podemos ver en la matriz de confusión de la Figura \ref{fig:decisiontreematrix} cómo solo 11 de 689 los flujos benignos se han clasificado como malignos y 24 de los 76467 malignos como benignos.
+Podemos ver en la matriz de confusión de la Figura \ref{fig:decisiontreematrix} cómo solo 11 de 689 flujos benignos se han clasificado como malignos y 24 de los, 76467 malignos como benignos.
 
 \begin{figure}[H]
     \begin{center}
@@ -1388,7 +1388,7 @@ KNN (k vecinos cercanos, por las siglas en inglés) es un método de aprendizaje
 
 En este caso, algunos de los hiperparámetros que podemos configurar son el número de nodos cercanos a considerar y qué importancia darle a cada uno. Hemos realizado otra búsqueda en cuadrícula y el resultado ha sido que, simplemente tomando el punto más cercano, ya ofrecía buenos resultados.
 
-La selección de hiperparámetros ha requerido 2 minutos y 27 segundos, el entrenamiento final 1.6 décimas de segundo y 5 segundos para generar predicciones. El entrenamiento de este modelo es bastante rápido, ya que lo único que se hace es estructurar los datos de entrenamiento en una estructura eficiente para realizar las predicciones. De todas maneras, estas son varios órdenes de magnitud más lentas que en el caso anterior.
+La selección de hiperparámetros ha requerido 2 minutos y 27 segundos, el entrenamiento final 1.6 décimas de segundo y 5 segundos para generar predicciones. El entrenamiento de este modelo es bastante rápido, ya que lo único que se hace es estructurar los datos de entrenamiento en una estructura eficiente para realizar las predicciones. De todas maneras, las predicciones son varios órdenes de magnitud más lentas que en el caso anterior.
 
 Como se puede ver en la Tabla \ref{table:knnresults}, los resultados son ligeramente peores que en el caso anterior, con todas las métricas habiendo bajado algunos puntos. Con esto y su mayor lentitud en las predicciones, se puede considerar que este modelo es inferior al anterior.
 
@@ -1424,11 +1424,11 @@ Adicionalmente, se puede observar en la matriz de confusión de la Figura \ref{f
 
 Una red neuronal es un modelo de \gls{ml} el que toma decisiones simulando un conjunto de neuronas. Las neuronas acumulan una serie de valores de entrada y aplican una función interna, emitiendo un resultado. Hemos hecho uso de una red densa, la cual tiene tres partes. Primero, una capa de 'entrada', donde cada neurona emite el valor de cada característica de entrada. Después hay una serie de capas de neuronas, llamadas capas ocultas, que están conectadas a todas las de la capa anterior y de la siguiente. Por último, hay una capa final, la que emite los resultados, en nuestro caso, si el flujo es benigno o no.
 
-Hay muchos hiperparámetros configurables, pero nos hemos focalizado en el de la función de activación y la forma de las capas ocultas. Después de ejecutar la búsqueda, la configuración que ha generado mejores resultados ha sido el uso de la tangente hiperbólica y tres capas ocultas con 70 neuronas cada una.
+Hay muchos hiperparámetros configurables, pero nos hemos focalizado en el de la función de activación y la forma de las capas ocultas. Después de ejecutar la búsqueda, la configuración que ha generado mejores resultados ha sido el uso de la tangente hiperbólica, como función de activación, y el uso de tres capas ocultas con 70 neuronas cada una.
 
 La selección de hiperparámetros ha requerido 6 minutos y 45 segundos, el entrenamiento final es de 1 minuto con 50 segundos y se han requerido unas 8 centésimas de segundo para generar predicciones. El entrenamiento de este modelo es relativamente lento, en parte debido a que la librería utilizada no está optimizada para este tipo de entrenamiento.
 
-Pese a ser un modelo más avanzado, podemos ver en la Tabla \ref{table:nnresults} que los resultados no son mejores. Tanto las puntuaciones F1 como la exactitud disminuyen respecto a KNN. Podemos ver que el valor de recuperación de los benignos es mayor, aunque su precisión disminuye un 0,1 o 10 puntos porcentuales. Es un modelo que es más permisivo con los flujos que KNN, aceptando más benignos a costa de dejar pasar más malignos.
+Pese a ser un modelo más avanzado, podemos ver en la Tabla \ref{table:nnresults} que los resultados no son mejores. Tanto las puntuaciones F1 como la exactitud disminuyen respecto a KNN. Podemos ver que el valor de recuperación de los benignos es mayor, aunque su precisión disminuye un 0.1 o 10 puntos porcentuales. Es un modelo que es más permisivo con los flujos que KNN, aceptando más benignos a costa de dejar pasar más malignos.
 
 \begin{table}[H]
     \begin{center}
@@ -1464,7 +1464,7 @@ Los modelos anteriores han tenido diferentes resultados para realizar la clasifi
 
 Se han tomado la mejor configuración de los cuatro modelos anteriores y comparado el rendimiento de las dos formas de votación. La forma de votación que mejor resultado ofrecía ha sido 'soft voting'.
 
-La selección del método de votación ha requerido 4 minutos y 3 segundos, el entrenamiento final 1 minuto con 38 segundos y unos seis segundos para generar predicciones. El entrenamiento de este modelo ha sido ligeramente más rápido que la red neuronal anterior, aun teniendo uno de los modelos internos teniendo la misma configuración. Es posible que esto haya sido debido a que el caché del ordenador ya tenía parte de los datos y código cargados en memoria del punto anterior.
+La selección del método de votación ha requerido 4 minutos y 3 segundos, el entrenamiento final 1 minuto con 38 segundos y unos seis segundos para generar predicciones. El entrenamiento de este modelo ha sido ligeramente más rápido que la red neuronal anterior, aun teniendo una igual dentro del modelo recién entrenado. Es posible que esto haya sido debido a que el caché del ordenador ya tenía parte de los datos y código cargados en memoria del punto anterior.
 
 \begin{table}[H]
     \begin{center}
@@ -1504,7 +1504,7 @@ Aparte del estimador base, hay una serie de hiperparámetros configurables. Hemo
 
 La selección de hiperparámetros ha requerido 4 minutos y 15 segundos, el entrenamiento final ha necesitado 34 segundos y se han requerido unas 1.5 décimas de segundo para generar predicciones. Es más lento que con un solo modelo, pero la penalización no es tan grande como con las redes neuronales.
 
-Podemos ver una ligera mejora de 0,001 en las puntuaciones F1 con este modelo si observamos Tabla \ref{table:baggingresults}. Sin embargo, la precisión de los malignos, la recuperación de los benignos y la exactitud general ha bajado ligeramente también.
+Podemos ver una ligera mejora de 0.001 en las puntuaciones F1 con este modelo si observamos Tabla \ref{table:baggingresults}. Sin embargo, la precisión de los malignos, la recuperación de los benignos y la exactitud general han bajado ligeramente también.
 
 \begin{table}[H]
     \begin{center}
@@ -1536,7 +1536,7 @@ La causa de la mejora de los valores F1, pero la reducción en otras medidas com
 
 \subsubsection{AdaBoost} % Adaboost
 
-Un clasificador 'AdaBoost', como se indica en la documentación de scikit-learn \cite{sklearnadaboost}, se basa en entrenar un clasificador y, en los errores de este, entrenar otro con los ejemplos mal clasificados con mayor prioridad. Este proceso se repite por cada estimador hasta que se entrenan todos los disponibles o se hace una clasificación completamente correcta. Para el estimador base, utilizamos los valores por defecto.
+Un clasificador 'AdaBoost', como se indica en la documentación de scikit-learn \cite{sklearnadaboost}, se basa en entrenar un clasificador y a continuación entrenar otro con los ejemplos mal clasificados con mayor prioridad. Este proceso se repite por cada estimador, tomando los errores del anterior y priorizandolos en el siguiente, hasta que se entrenan todos los disponibles o se tiene un modelo sin errores. Para el estimador base, se ha utilizado los valores por defecto.
 
 En este caso, nos hemos focalizado también en ajustar el hiperparámetro del número de estimadores. Después de la búsqueda en cuadrícula, se ha determinado que el que mejor resultados generaba era utilizar 200 estimadores.
 
@@ -1572,7 +1572,7 @@ Los resultados, como podemos ver en la Tabla \ref{table:adaboostresults}, son in
 
 \subsubsection{Bosques aleatorios} % Random forest
 
-Los clasificadores basados en bosques aleatorios son similares al que hemos hecho en el punto de 'Bagging'. La diferencia principal que se utilizan ciertas técnicas para mejorar la precisión de las predicciones mientras se evita el sobreajuste \cite{sklearnrandomforest}.
+Los clasificadores basados en bosques aleatorios son similares al que hemos hecho en el punto de 'Bagging'. La diferencia principal es que se utilizan ciertas técnicas para mejorar la precisión de las predicciones mientras se evita el sobreajuste \cite{sklearnrandomforest}.
 
 En este caso, hemos dejado también la mayoría de hiperparámetros con los valores por defecto, exceptuando el número de estimadores. Después de hacer la búsqueda por cuadrícula, se ha determinado que se obtenían los mejores resultados con 50 estimadores.
 
