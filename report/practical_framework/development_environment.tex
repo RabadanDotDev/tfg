@@ -8,9 +8,13 @@ Primero de todo, se ha hecho uso de Visual Studio Code como editor general para 
     \item Indicar la distribución Debian como imagen base
     \item La característica 'latex', la cual nos añade la extensión 'LaTeX Workshop' en el editor, además del compilador LaTeX para compilar la memoria. Adicionalmente, permite indicar la lista de librerías que se han de instalar.
     \item La característica 'Python', la cual nos instala tanto el interpretador Python como extensiones para tener autocompletado y capacidad de depurar el código.
-    \item La característica 'apt-packages', la cual nos permite indicar paquetes a instalar de forma declarativa. Hemos indicado 'tshark' y 'libpcap-dev', ya que son los que se han utilizado para realizar el análisis de las trazas de red y capturar paquetes, respectivamente.
+    \color{blue} %TODO remove this when revised
+    \item La característica 'apt-packages', la cual nos permite indicar paquetes a instalar de forma declarativa. Primero hemos indicado 'tshark', 'libpcap-dev', ya que son los que se han utilizado para realizar el análisis de las trazas de red y capturar paquetes, respectivamente. Después, se ha añadido 'openjdk-17-jre' para poder ejecutar PlantUML localmente.
+    \color{black} %TODO remove this when revised
     \item La característica 'rust', la cual nos instala el compilador y el gestor de paquetes del lenguaje Rust además de extensiones para tener autocompletado, depuración, instalación de paquetes automática, entre otros.
-    \item Un script para instalar dependencias adicionales. Estas consisten en tipos de letras utilizadas en la memoria y un entorno virtual de Python con los paquetes relevantes. 
+    \color{blue} %TODO remove this when revised
+    \item Un script para instalar dependencias adicionales. Estas consisten en tipos de letras utilizadas en la memoria, un entorno virtual de Python con los paquetes relevantes y la descarga de PlantUML desde GitHub para tener una versión más reciente que la ofrecida en la distribución base.
+    \color{black} %TODO remove this when revised
     \item Dos directrices para incluir carpetas del host dentro del contenedor. Estos consisten en la carpeta de los datasets descargados (montada en /Datasets) y las credenciales SSH para firmar y subir cambios realizados en el sistema de control de versiones.
 \end{enumerate}
 
