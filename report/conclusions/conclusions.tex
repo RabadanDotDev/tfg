@@ -75,11 +75,17 @@ Cuando se realizó el uso de la herramienta para entrenar modelos, se pudieron d
 
 Personalmente, el trabajo me ha permitido probar a desarrollar por primera vez sobre Rust y ver cómo el resultado generado era útil. Considero que la decisión de utilizar este lenguaje, pese a no haber tenido experiencia anterior con él, ha sido correcta. Adicionalmente, ha sido interesante el tomar una herramienta, la cual había sido utilizada en el grupo de investigación para ciertos casos, analizarla y diseñar e implementar una nueva que mejore las carencias de la original.
 
-\color{black}
-
 \section{Trabajo futuro}
 
-por hacer
+Existen muchas posibles ramas de trabajo futuras como continuación de este proyecto. Por cada parte de la herramienta, es posible añadir nuevas características. Adicionalmente, se puede tratar de integrar en entornos más generales y hacer uso de esta bajo otros contextos.
+
+La herramienta solo tiene soporte para dos capas de enlace y dos protocolos de transporte. Se podría añadir soporte para analizar flujos de comunicación en diferentes capas de la pila OSI y más cantidad de protocolos aceptados. Ejemplos pueden ser comunicaciones transmitidas sobre Bluetooth o 5G e incluso analizar si las peticiones de la capa de aplicación son válidas. Otra opción es añadir soporte para correlacionar diferentes flujos, sea para mejorar la detección de ataques DDoS o incluir información sobre comunicaciones que se transmitan en flujos paralelos como en RTP/RSTP.
+
+Adicionalmente, hay partes de la herramienta donde se hacen copias de los datos o no se limita la capacidad máxima de las estructuras de datos. No se ha tenido en cuenta este punto en el desarrollo para poder tener un código más simple. Sin embargo, si se llegase a desplegar una herramienta y un atacante tratase de, por ejemplo, tomar ventaja de cómo reconstruimos paquetes IP fragmentados, sería posible provocar que se termine la memoria RAM disponible. Una posible solución simple para evitar esto es descartar cualquier paquete fragmentado y no tratar de reconstruirlo. 
+
+Otra categoría de posible trabajo futuro consiste en aplicar la herramienta sobre otros algoritmos de \gls{ml} o conjuntos de datos. Observar si los modelos son capaces de generalizar a otros entornos puede indicar con mayor certeza si la herramienta puede ser utilizada en cualquier tipo de contexto o si es más efectiva en zonas específicas de la infraestructura.
+
+\color{black}
 
 \section{Agradecimientos}
 
