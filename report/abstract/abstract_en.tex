@@ -11,23 +11,27 @@
 \begin{center}
     \setlength\fboxsep{0.05\textwidth}\fbox{
         \parbox[t][\textwidth]{0.8\textwidth}{
-            \par{
-                ?
-            }
+            \quad \quad This project contains the development of a network analysis tool, the showcase of its usage on network traces, and the employment of the results on Machine Learning algorithms.
+
+            \quad \quad Rust has been used for the development of the tool and Python for the data analysis process and Machine Learning. The development has been made in a containerized development environment. All the code from the tool, the scripts and the configuration of the environment are available to allow for reproducible results.
+            
+            \quad \quad The tool is capable of generating 72 continuous features with information about the TCP and UDP flows. In addition to the previous, it adds 2 discrete columns to indicate the used protocol and 7 values to be able to identify each detected flow. Additionally, the tool allows the user to provide a CSV file in order to perform automatic tagging. This file should contain, for each record, the pair of IP addresses, the used transport protocol, and the starting and ending timestamps.
+            
+            \quad \quad With the source datasets, the developed tool and a model based on random forests, a precision value of 99.95\% and an average F1 macro score of 98.66\% were obtained.
+            
+            \quad \quad The tool can be used as a component in an intrusion detection system and has the possibility to be extended with more functionalities in the future.
         }
     }
 \end{center}
 
 \vspace{0.3cm}
-\textbf{Keywords (10 maximum):}
+\textbf{Keywords:}
 \begin{center}
     \renewcommand{\arraystretch}{1.5}\begin{tabular}{|m{0.2\textwidth}|m{0.2\textwidth}|m{0.2\textwidth}|m{0.2\textwidth}|}
         \hline
-            \centering\arraybackslash{?} & \centering\arraybackslash{?} & \centering\arraybackslash{?} & \centering\arraybackslash{?} \\
+            \centering\arraybackslash{Network analysis} & \centering\arraybackslash{Machine Learning} & \centering\arraybackslash{Cybersecurity} & \centering\arraybackslash{Development} \\
         \hline
-        \centering\arraybackslash{?} & \centering\arraybackslash{?} & \centering\arraybackslash{?} & \centering\arraybackslash{?} \\
-        \hline
-        \centering\arraybackslash{?} & \centering\arraybackslash{?} \\
-        \cline{1-2}
+        \centering\arraybackslash{Python} & \centering\arraybackslash{Rust} & \centering\arraybackslash{Docker} \\
+        \cline{1-3}
     \end{tabular}
 \end{center}
