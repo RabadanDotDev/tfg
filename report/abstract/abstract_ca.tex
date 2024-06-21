@@ -11,23 +11,26 @@
 \begin{center}
     \setlength\fboxsep{0.05\textwidth}\fbox{
         \parbox[t][\textwidth]{0.8\textwidth}{
-            \par{
-                Amb una extensió màxima de 50 línies, i amb una llista de màxim 10 paraules clau, el resum és un text informatiu que permet decidir sobre la utilitat de llegir el document complet; ha de definir l’objectiu, els mètodes, els resultats i les conclusions presentats en el cos del document, en aquest ordre o destacant inicialment els resultats i les conclusions; ha de ser un text complet perquè sigui intel·ligible sense necessitat de referir-se a la memòria; ha de contenir la informació bàsica i el caràcter del document original. Com en tots els documents cal vetllar per la correcció d’estil, cal també emprar una nomenclatura normalitzada, i definir els termes no familiars les abreviacions i els símbols, quan apareguin per primera vegada en el resum. És la pàgina número 1 del document.
-            }
+            \quad \quad En aquest treball es fa el desenvolupament d'una eina d'anàlisis de xarxa i es mostra el seu funcionament per mitjà d'analitzar traces de tràfic de xarxa i el seu ús en algoritmes d'aprenentatge automàtic
+
+            \quad \quad Pel desenvolupament de l'eina s'ha fet ús de Rust i en les tasques d'aprenentatge automàtic i anàlisis de dates s'ha treballat en Python. El desenvolupament s'ha realitzat en un entorn de desenvolupament dins d'un contenidor Docker. Tot el codi de l'eina, els scripts i la configuració de l'entorn s'ofereixen per permetre resultats tan reproduïbles com sigui possible.
+            
+            \quad \quad L'eina és capaç de generar 72 característiques contínues sobre fluxos TCP i UDP, a més de 2 discretes indicant el protocol de transport i una identificació de cada flux composta per 7 valors. Addicionalment, l'eina permet realitzar un etiquetatge automàtic a partir d'un arxiu CSV on s'indica per cada fila el parell d'adreces IP, el protocol de transport utilitzat i el temps d'inici i final.
+            
+            \quad \quad A partir del conjunt de dades utilitzades, l'eina desenvolupada i un model basat en boscs aleatoris, s'ha obtingut un valor de precisió del 99.95\% i una puntuació F1 mitja del 98.66\%.
+            
+            \quad \quad L'eina desenvolupada pot ser utilitzada com a component en sistemes de detecció d'intrusions i té el potencial per ser estès amb més funcionalitats en el futur.
         }
     }
-\end{center}
 
 \vspace{0.3cm}
-\textbf{Paraules clau (màxim 10):}
+\textbf{Paraules clau:}
 \begin{center}
     \renewcommand{\arraystretch}{1.5}\begin{tabular}{|m{0.2\textwidth}|m{0.2\textwidth}|m{0.2\textwidth}|m{0.2\textwidth}|}
         \hline
-            \centering\arraybackslash{?} & \centering\arraybackslash{?} & \centering\arraybackslash{?} & \centering\arraybackslash{?} \\
+            \centering\arraybackslash{Anàlisis de xarxa} & \centering\arraybackslash{Aprenentatge automàtic} & \centering\arraybackslash{Ciberseguretat} & \centering\arraybackslash{Desenvolupament} \\
         \hline
-        \centering\arraybackslash{?} & \centering\arraybackslash{?} & \centering\arraybackslash{?} & \centering\arraybackslash{?} \\
-        \hline
-        \centering\arraybackslash{?} & \centering\arraybackslash{?} \\
-        \cline{1-2}
+        \centering\arraybackslash{Python} & \centering\arraybackslash{Rust} & \centering\arraybackslash{Docker} \\
+        \cline{1-3}
     \end{tabular}
 \end{center}
