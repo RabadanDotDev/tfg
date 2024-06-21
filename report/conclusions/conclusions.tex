@@ -83,10 +83,16 @@ La herramienta solo tiene soporte para dos capas de enlace y dos protocolos de t
 
 Adicionalmente, hay partes de la herramienta donde se hacen copias de los datos o no se limita la capacidad máxima de las estructuras de datos. No se ha tenido en cuenta este punto en el desarrollo para poder tener un código más simple. Sin embargo, si se llegase a desplegar una herramienta y un atacante tratase de, por ejemplo, tomar ventaja de cómo reconstruimos paquetes IP fragmentados, sería posible provocar que se termine la memoria RAM disponible. Una posible solución simple para evitar esto es descartar cualquier paquete fragmentado y no tratar de reconstruirlo. 
 
-Otra categoría de posible trabajo futuro consiste en aplicar la herramienta sobre otros algoritmos de \gls{ml} o conjuntos de datos. Observar si los modelos son capaces de generalizar a otros entornos puede indicar con mayor certeza si la herramienta puede ser utilizada en cualquier tipo de contexto o si es más efectiva en zonas específicas de la infraestructura.
+Otro punto de posible mejora consiste en la creación de mayores tests del código para asegurar su buen funcionamiento incluso en casos inesperados. Con herramientas de cobertura de código se podrían detectar flujos de ejecución, los cuales no tienen tests asociados y podrían tener errores lógicos ocultos.
 
-\color{black}
+Otra categoría de posible trabajo futuro consiste en aplicar la herramienta sobre otros algoritmos de \gls{ml} o conjuntos de datos. Observar si los modelos son capaces de generalizar a otros entornos puede indicar con mayor certeza si la herramienta puede ser utilizada en cualquier tipo de contexto o si es más efectiva en zonas específicas de la infraestructura.
 
 \section{Agradecimientos}
 
-por hacer
+Primero de todo, quiero agradecer a mis padres por el apoyo y palabras de aliento que he recibido durante el transcurso de mis estudios y de esta fase final del grado. Sin este, no hubiese sido posible haber llegado hasta este punto ni haber tenido la capacidad o la perseverancia para el desarrollo del trabajo.
+
+A continuación, agradezco al profesorado, el cual me ha permitido descubrir y consolidar conceptos que de otra manera hubiese sido mucho más difícil obtener. Con especialidad a Ester Simo, la directora del proyecto, que ha ayudado a tener un control del progreso del proyecto, la detección de mejoras en la redacción y el desbloqueo para saber por dónde continuar en los momentos en que los resultados obtenidos eran muy inferiores a lo esperado.
+
+Finalmente, quiero mostrar mis agradecimientos a la Escola Politécnica Superior d'Enginyeria de Vilanova i la Geltrú y al Centre de Recerca d'Arquitectures Avançades de Xarxes (CRAAX), por ofrecerme la oportunidad de realizar mis estudios, prácticas y trabajo final de grado con ellos. 
+
+\color{black}
