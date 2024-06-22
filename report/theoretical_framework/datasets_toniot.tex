@@ -1,4 +1,4 @@
-\subsection{ToN-IoT}
+\subsection{ToN-IoT}\label{toniotdatasetdescription}
 
 \subsubsection{Descripción}
 
@@ -12,21 +12,21 @@ En la capa Fog tenemos diferentes máquinas virtualizadas, incluyendo dispositiv
   \item Máquina virtual ofreciendo DVWA, una aplicación web vulnerable (192.168.1.192)
   \item Máquina virtual con Metasploitable3, una distribución Linux específicamente diseñada para ser vulnerable contra la cual hacer pruebas. (192.168.1.194)
   \item Máquina virtual con OWASP Security Shepherd, una plataforma conteniendo aplicaciones vulnerables sobre las cuales hacer pruebas (192.168.1.184)
-  \item Servidor Ubuntu ofreciendo diferentes servicios con FTP, HTTPS, etc. (192.168.1.190)
+  \item Servidor Ubuntu ofreciendo diferentes servicios con \acrshort{ftp}, \acrshort{http}, etc. (192.168.1.190)
   \item Un servidor para registrar registros de red de todos los servicios activos (192.168.1.180)
   \item Máquina virtual con Windows 7 (192.168.1.193)
   \item Máquina virtual con Windows 10 (192.168.1.195)
 \end{enumerate}
 
-La capa Cloud contiene varios servicios como un broker MQTT, una web vulnerable en PHP, entre servicios cloud para gestionar los mensajes. Esta capa recibe los datos de los dispositivos IoT para ser procesados.
+La capa Cloud contiene varios servicios como un broker MQTT, una web vulnerable en PHP, entre servicios cloud para gestionar los mensajes. Esta capa recibe los datos de los dispositivos \acrshort{iot} para ser procesados.
 
-Los dispositivos IoT utilizados consisten en una nevera inteligente, una puerta de garaje remotamente controlada, un objeto con GPS, luces activadas por movimiento, un servicio Modbus con el que se comunican diferentes valores de registros, un termostato inteligente y un sistema de monitorización del clima.
+Los dispositivos  utilizados consisten en una nevera inteligente, una puerta de garaje remotamente controlada, un objeto con GPS, luces activadas por movimiento, un servicio Modbus con el que se comunican diferentes valores de registros, un termostato inteligente y un sistema de monitorización del clima.
 
 Aparte del tráfico benigno, hay 8 ataques, los cuales se han realizado en el momento de generar datos. Estos consisten en:
 \begin{enumerate}
-  \item \textbf{Escaneo}: ataque basado en el escaneo de puertos para descubrir vectores de ataque potenciales. Se han utilizado nmap y nesus para escanear los puertos disponibles en los dispositivos IoT víctima en el rango 192.\-168.\-1.\-0/24 y en el broker MQTT. Las IP de los atacantes consisten en 192.\-168.\-1.\-30, 192.\-168.\-1.\-31, 192.\-168.\-1.\-32, 192.168.1.\-33 y 192.168.1.\-38
-  \item \textbf{Denegación de servicio}: ataque basado en saturar los recursos de un dispositivo para denegar el servicio legítimo. A través de scripts de Python y UFONet se ha tratado de generar ataques de denegación de servicio (dsitribuidos y no distribuidos). Las IP de los atacantes en los ataques no distribuidos son 192.\-168.\-1.\-30, 192.\-168.\-1.\-31 y 192.\-168.1.\-39. Los distribuidos se han realizado desde 192.\-168.\-1.\-30, 192.\-168.\-1.\-31 y 192.\-168.\-1.\-(34-38)
-  \item \textbf{Ransomware}: ataque basado en encriptar el sistema de ficheros y vender las claves de descifrado por un precio, 'secuestrando' el sistema. El ataque se ha realizado a través del sistema con Metasploitable3 y las IP de los atacantes son 192.168.1.33 y 192.168.1.37.
+  \item \textbf{Escaneo}: ataque basado en el escaneo de puertos para descubrir vectores de ataque potenciales. Se han utilizado nmap y nesus para escanear los puertos disponibles en los dispositivos \acrshort{iot} víctima en el rango 192.\-168.\-1.\-0/24 y en el broker MQTT. Las \acrshort{ip} de los atacantes consisten en 192.\-168.\-1.\-30, 192.\-168.\-1.\-31, 192.\-168.\-1.\-32, 192.168.1.\-33 y 192.168.1.\-38
+  \item \textbf{Denegación de servicio}: ataque basado en saturar los recursos de un dispositivo para denegar el servicio legítimo. A través de scripts de Python y UFONet se ha tratado de generar ataques de denegación de servicio (dsitribuidos y no distribuidos). Las \acrshort{ip} de los atacantes en los ataques no distribuidos son 192.\-168.\-1.\-30, 192.\-168.\-1.\-31 y 192.\-168.1.\-39. Los distribuidos se han realizado desde 192.\-168.\-1.\-30, 192.\-168.\-1.\-31 y 192.\-168.\-1.\-(34-38)
+  \item \textbf{Ransomware}: ataque basado en encriptar el sistema de ficheros y vender las claves de descifrado por un precio, 'secuestrando' el sistema. El ataque se ha realizado a través del sistema con Metasploitable3 y las \acrshort{ip} de los atacantes son 192.168.1.33 y 192.168.1.37.
   \item \textbf{Puertas traseras}: ataque basado en generar en un sistema la capacidad de obtener acceso remoto no autorizado. Se ha utilizado Metasplotaible3 y los ataques se han generado desde 192.168.33 y 192.168.1.37
   \item \textbf{Inyección}: ataque basado en inyectar datos maliciosos para manipular comandos de control e interrumpir el funcionamiento normal del sistema. Se han utilizado scripts en Bash para realizar la inyección y han participado los sistemas 192.168.1(30, 31, 33, 35, 36, 38).
   \item \textbf{Cross-Site Scripting}: ataque basado en provocar la ejecución de código arbitrario en el navegador saltándose las barreras de seguridad entre dos páginas web. Se han utilizado scripts en Bash y la herramienta XSSer para generarlo desde 192.168.1.(32, 35, 36, 39).
@@ -36,9 +36,9 @@ Aparte del tráfico benigno, hay 8 ataques, los cuales se han realizado en el mo
 
 \subsubsection{Contenidos CSVs}
 
-En el dataset se ofrecen los datos en una variedad de formatos. Los datos procesados incluyen el historial de valores emitidos por los dispositivos IoT, las estadísticas del estado de los sistemas operativos y las características de los flujos. Todas las filas se encuentran etiquetadas, indicando si se trata de datos bajo condiciones normales o bajo un ataque. También se ofrecen los datos en crudo, teniendo los logs de Zeek en formato .log y en formato .csv. Finalmente, hay un grupo de registros 'SecurityEvents' o 'Ground Truth' indicando el momento y los dispositivos atacados en cada momento con su etiqueta respectiva. Los scripts utilizados para extraer y representar los datos son \texttt{extract\_info\_toniot\_csvs.py} y \texttt{plot\_info\_toniot\_csvs.py} disponibles en el anexo 1. Para realizar el análisis de los flujos de red, nos hemos basado en los resultados procesados.
+En el dataset se ofrecen los datos en una variedad de formatos. Los datos procesados incluyen el historial de valores emitidos por los dispositivos \acrshort{iot}, las estadísticas del estado de los sistemas operativos y las características de los flujos. Todas las filas se encuentran etiquetadas, indicando si se trata de datos bajo condiciones normales o bajo un ataque. También se ofrecen los datos en crudo, teniendo los logs de Zeek en formato .log y en formato .csv. Finalmente, hay un grupo de registros 'SecurityEvents' o 'Ground Truth' indicando el momento y los dispositivos atacados en cada momento con su etiqueta respectiva. Los scripts utilizados para extraer y representar los datos son \texttt{extract\_info\_toniot\_csvs.py} y \texttt{plot\_info\_toniot\_csvs.py} disponibles en el anexo 1. Para realizar el análisis de los flujos de red, nos hemos basado en los resultados procesados.
 
-No hay ningún tipo de solapamiento en las tipologías de cada ataque tanto en los archivos 'Ground Truth' como en el conjunto procesado. En la figura \ref{fig:toniot_results} podemos ver cómo los principales flujos son escaneos y ataques de denegación de servicio, viniendo después ataques que tratan de realizar descifrado de contraseñas y cross-site scripting. El tráfico normal no se encuentra tan infrarepresentado como en otros casos, pero sigue siendo una porción menor del tráfico. Podemos ver también que los flujos respectivos a ataques MiTM son poco frecuentes en el dataset comparado al resto.
+No hay ningún tipo de solapamiento en las tipologías de cada ataque tanto en los archivos 'Ground Truth' como en el conjunto procesado. En la figura \ref{fig:toniot_results} podemos ver cómo los principales flujos son escaneos y ataques de denegación de servicio, viniendo después ataques que tratan de realizar descifrado de contraseñas y cross-site scripting. El tráfico normal no se encuentra tan infrarepresentado como en otros casos, pero sigue siendo una porción menor del tráfico. Podemos ver también que los flujos respectivos a ataques \acrshort{mitm} son poco frecuentes en el dataset comparado al resto.
 
 \begin{figure}[H]
   \begin{center}
@@ -62,57 +62,57 @@ En total, hay 46 características disponibles en el dataset y explicadas en el c
 
 \begin{enumerate}
   \item \textbf{ts}: Tiempo de inicio del flujo expresado en tiempo Unix con segundos.
-  \item \textbf{src\_ip}: Dirección IP de origen.
-  \item \textbf{src\_port}: Puerto IP de origen.
-  \item \textbf{dst\_ip}: Dirección IP de destino.
-  \item \textbf{dst\_proto}: Puerto IP de destino.
+  \item \textbf{src\_ip}: Dirección \acrshort{ip} de origen.
+  \item \textbf{src\_port}: Puerto \acrshort{ip} de origen.
+  \item \textbf{dst\_ip}: Dirección \acrshort{ip} de destino.
+  \item \textbf{dst\_proto}: Puerto \acrshort{ip} de destino.
   \item \textbf{proto}: Nombre del protocolo transporte utilizado.
-  \item \textbf{service}: Protocolos de aplicación detectados, como DNS, HTTP y SSL.
+  \item \textbf{service}: Protocolos de aplicación detectados, como \acrshort{dns}, \acrshort{http} y \acrshort{ssl}.
   \item \textbf{duration}: Duración del flujo, calculado a partir de substraer el tiempo del último paquete detectado del primero.
-  \item \textbf{src\_bytes}: Bytes enviados por el emisor inicial como datos sobre TCP, si aplica.
-  \item \textbf{dst\_bytes}: Bytes enviados por el receptor inicial como datos sobre TCP, si aplica.
+  \item \textbf{src\_bytes}: Bytes enviados por el emisor inicial como datos sobre \acrshort{tcp}, si aplica.
+  \item \textbf{dst\_bytes}: Bytes enviados por el receptor inicial como datos sobre \acrshort{tcp}, si aplica.
   \item \textbf{conn\_state}: Estado de la conexión, expresado como S0 (intento de conexión sin respuesta), S1 (conexión establecida) y REJ (conexión rechazada).
-  \item \textbf{missed\_byttes}: Bytes perdidos detectados en la conexión TCP.
+  \item \textbf{missed\_byttes}: Bytes perdidos detectados en la conexión \acrshort{tcp}.
   \item \textbf{src\_pkts}: Número de paquetes enviados por el emisor inicial.
-  \item \textbf{src\_ip\_bytes}: Número de bytes enviados sobre IP por el emisor inicial.
+  \item \textbf{src\_ip\_bytes}: Número de bytes enviados sobre \acrshort{ip} por el emisor inicial.
   \item \textbf{dst\_pkts}: Número de paquetes enviados por el receptor inicial.
-  \item \textbf{dst\_ip\_bytes}: Número de bytes enviados sobre IP por el receptor inicial.
-  \item \textbf{dns\_query}: Nombres pedidos en la petición DNS, si aplica.
-  \item \textbf{dns\_qclass}: Entero indicando las clases de la petición DNS realizada, si aplica.
-  \item \textbf{dns\_qtype}: Entero indicando los tipos de petición DNS realizada, si aplica.
-  \item \textbf{dns\_rcode}: Entero indicando el código de respuesta del DNS, si aplica.
-  \item \textbf{dns\_AA}: Indicador booleano si la respuesta del DNS es autoritativa, si aplica.
-  \item \textbf{dns\_RD}: Indicador booleano si la petición DNS pide recursividad, si aplica.
-  \item \textbf{dns\_RA}: Indicador booleano si el servidor DNS soporta recursividad, si aplica.
-  \item \textbf{dns\_rejected}: Indicador booleano si el servidor DNS ha rechazado la petición, si aplica.
-  \item \textbf{ssl\_version}: La versión SSL ofrecida por el servidor, si aplica
-  \item \textbf{ssl\_cipher}: El conjunto de cifrados SSL escogido por el servidor, si aplica.
-  \item \textbf{ssl\_resumed}: Indicador booleano indicando que la sesión SSL puede ser utilizada para generar conexiones, si aplica.
-  \item \textbf{ssl\_established}: Indicador booleano indicando si existe una sesión SSL establecida, si aplica.
-  \item \textbf{ssl\_subject}: Nombre del propietario del certificado SSL, si aplica.
-  \item \textbf{ssl\_issuer}: Emisor del certificado SSL y autoridad, si aplica.
-  \item \textbf{http\_trans\_depth}: Profundidad de la transferencia HTPP, si aplica.
-  \item \textbf{http\_method}: Método HTTP utilizado, si aplica.
-  \item \textbf{http\_uri}: URI utilizadas en la petición HTTP, si aplica.
-  \item \textbf{http\_version}: Versión HTTP utilizada, si aplica.
-  \item \textbf{http\_request\_body\_len}: Longitud de la petición HTTP, si aplica.
-  \item \textbf{http\_response\_body\_len}: Longitud de la respuesta HTTP, si aplica.
-  \item \textbf{http\_status\_code}: Codigo de respuesta de la petición HTTP, si aplica.
-  \item \textbf{http\_user\_agent}: Valores del agente de usuario en la petición HTTP, si aplica.
-  \item \textbf{http\_orig\_mime\_types}: Tipos de recursos pedidos en la petición HTTP, si aplica.
-  \item \textbf{http\_resp\_mime\_types}: Tipos de recursos devueltos en la petición HTTP, si aplica.
+  \item \textbf{dst\_ip\_bytes}: Número de bytes enviados sobre \acrshort{ip} por el receptor inicial.
+  \item \textbf{dns\_query}: Nombres pedidos en la petición \acrshort{dns}, si aplica.
+  \item \textbf{dns\_qclass}: Entero indicando las clases de la petición \acrshort{dns} realizada, si aplica.
+  \item \textbf{dns\_qtype}: Entero indicando los tipos de petición \acrshort{dns} realizada, si aplica.
+  \item \textbf{dns\_rcode}: Entero indicando el código de respuesta del \acrshort{dns}, si aplica.
+  \item \textbf{dns\_AA}: Indicador booleano si la respuesta del \acrshort{dns} es autoritativa, si aplica.
+  \item \textbf{dns\_RD}: Indicador booleano si la petición \acrshort{dns} pide recursividad, si aplica.
+  \item \textbf{dns\_RA}: Indicador booleano si el servidor \acrshort{dns} soporta recursividad, si aplica.
+  \item \textbf{dns\_rejected}: Indicador booleano si el servidor \acrshort{dns} ha rechazado la petición, si aplica.
+  \item \textbf{ssl\_version}: La versión \acrshort{ssl} ofrecida por el servidor, si aplica
+  \item \textbf{ssl\_cipher}: El conjunto de cifrados \acrshort{ssl} escogido por el servidor, si aplica.
+  \item \textbf{ssl\_resumed}: Indicador booleano indicando que la sesión \acrshort{ssl} puede ser utilizada para generar conexiones, si aplica.
+  \item \textbf{ssl\_established}: Indicador booleano indicando si existe una sesión \acrshort{ssl} establecida, si aplica.
+  \item \textbf{ssl\_subject}: Nombre del propietario del certificado \acrshort{ssl}, si aplica.
+  \item \textbf{ssl\_issuer}: Emisor del certificado \acrshort{ssl} y autoridad, si aplica.
+  \item \textbf{http\_trans\_depth}: Profundidad de la transferencia \acrshort{http}, si aplica.
+  \item \textbf{http\_method}: Método \acrshort{http} utilizado, si aplica.
+  \item \textbf{http\_uri}: URI utilizadas en la petición \acrshort{http}, si aplica.
+  \item \textbf{http\_version}: Versión \acrshort{http} utilizada, si aplica.
+  \item \textbf{http\_request\_body\_len}: Longitud de la petición \acrshort{http}, si aplica.
+  \item \textbf{http\_response\_body\_len}: Longitud de la respuesta \acrshort{http}, si aplica.
+  \item \textbf{http\_status\_code}: Codigo de respuesta de la petición \acrshort{http}, si aplica.
+  \item \textbf{http\_user\_agent}: Valores del agente de usuario en la petición \acrshort{http}, si aplica.
+  \item \textbf{http\_orig\_mime\_types}: Tipos de recursos pedidos en la petición \acrshort{http}, si aplica.
+  \item \textbf{http\_resp\_mime\_types}: Tipos de recursos devueltos en la petición \acrshort{http}, si aplica.
   \item \textbf{weird\_name}: Nombres de las anomalías relacionadas con los protocolos ocurridos.
   \item \textbf{weird\_addl}: Información adicional asociada a las anomalías.
   \item \textbf{weird\_notice}: Indica si la anomalía se ha convertido en una notificación.
   \item \textbf{label}: Indicador si el flujo es normal (0) o un ataque (1)
-  \item \textbf{type}: Nombre del tipo de flujo, siendo este normal o DoS, DDoS, etc.
+  \item \textbf{type}: Nombre del tipo de flujo, siendo este normal o \acrshort{dos}, \acrshort{ddos}, etc.
 \end{enumerate}
 
 \subsubsection{Contenidos PCAPs}
 
 El dataset TON-IoT ofrece 64 archivos (48.1 GiB) de trazas de red con tráfico normal y tráfico de  ataques entremezclados con tráfico normal. El tráfico sin ataques es alrededor de 15.6 GiB, un 32.43\% del total y el resto se encuentra repartido por cada tipo de ataque. El script utilizado para la extracción es \texttt{extract\_info\_toniot\_pcaps\_tshark.sh} y el utilizado para la representación de estos es \texttt{evaluate\_info\_toniot\_pcaps\_tshark.py} disponible en el anexo 1.
 
-En los PCAP, aparecen un total de 29 270 direcciones IP únicas, una cantidad mucho mayor que la que tenemos en los otros dos datasets. Aparte de las direcciones IP mencionadas explícitamente en el paper original, aparecen una dirección IP del posible router, la dirección IP de broadcast y 13 direcciones IP adicionales. Estas últimas son posiblemente los otros dispositivos IoT y dispositivos de usuarios, los cuales sus direcciones han sido asignadas por DHCP. Adicionalmente, hay 9 archivos, los cuales tshark ha notificado que tenían un corte en los datos.
+En los PCAP, aparecen un total de 29 270 direcciones \acrshort{ip} únicas, una cantidad mucho mayor que la que tenemos en los otros dos datasets. Aparte de las direcciones \acrshort{ip} mencionadas explícitamente en el paper original, aparecen una dirección \acrshort{ip} del posible router, la dirección \acrshort{ip} de broadcast y 13 direcciones \acrshort{ip} adicionales. Estas últimas son posiblemente los otros dispositivos \acrshort{iot} y dispositivos de usuarios, los cuales sus direcciones han sido asignadas por \acrshort{dhcp}. Adicionalmente, hay 9 archivos, los cuales tshark ha notificado que tenían un corte en los datos.
 
 % archivos pcap cortados 
 %"/Datasets/TON-IoT/Raw_datasets/network_data/Network_dataset_pcaps/normal_attack_pcaps/Injection_normal/injection_normal1.pcap"
@@ -148,25 +148,25 @@ Para este dataset, también se han generado diferentes histogramas para asegurar
   \endminipage\hfill
 \end{figure}
 
-En la tabla \ref{table:toniotprotocolsip} podemos ver el resultado del análisis con tshark sobre la repartición de los diferentes protocolos de transporte sobre IPv4. A diferencia de los otros casos, la mayoría de tramas en este dataset van sobre TCP (90.154\%) y tiene cierto tráfico que se puede considerar residual en UDP (5.982\%) y no identificado (3.864\%).
+En la tabla \ref{table:toniotprotocolsip} podemos ver el resultado del análisis con tshark sobre la repartición de los diferentes protocolos de transporte sobre \acrshort{ipv4}. A diferencia de los otros casos, la mayoría de tramas en este dataset van sobre \acrshort{tcp} (90.154\%) y tiene cierto tráfico que se puede considerar residual en \acrshort{udp} (5.982\%) y no identificado (3.864\%).
 
 \input{theoretical_framework/datasets_toniot_protosip.tex}
 
-La tabla \ref{table:botiotprotocols}, que contiene las tres primeras capas de protocolos identificados en BoT-IoT, es de mayor tamaño que en los casos anteriores. Esto es debido a que aparece el uso de "sll" (no confundir con SSL) aparte del tráfico sobre Ethernet. Si abrimos los ficheros con WireShark, podemos observar que este consiste en el tipo "Linux cooked capture", el cual puede contener paquetes IP como en la figura \ref{fig:toniot_pcap_ssl_ip_packet} o paquetes Ethernet como en la figura \ref{fig:toniot_pcap_ssl_eth_packet}. Se puede observar en esta última que WireShark no es capaz de reconocer los contenidos de la siguiente capa. Esta capa de enlace no es una capa de enlace real, sino que es una especial para guardar trazas de red de forma más flexible. 
+La tabla \ref{table:botiotprotocols}, que contiene las tres primeras capas de protocolos identificados en BoT-IoT, es de mayor tamaño que en los casos anteriores. Esto es debido a que aparece el uso de "sll" (no confundir con \acrshort{ssl}) aparte del tráfico sobre Ethernet. Si abrimos los ficheros con WireShark, podemos observar que este consiste en el tipo "Linux cooked capture", el cual puede contener paquetes \acrshort{ip} como en la Figura \ref{fig:toniot_pcap_ssl_ip_packet} o paquetes Ethernet como en la Figura \ref{fig:toniot_pcap_ssl_eth_packet}. Se puede observar en esta última que WireShark no es capaz de reconocer los contenidos de la siguiente capa. Esta capa de enlace no es una capa de enlace real, sino que es una especial para guardar trazas de red de forma más flexible. 
 
 \begin{figure}[H]
   \minipage{0.49\textwidth}
   \includegraphics[width=\linewidth]{media/toniot_pcap_ssl_ip_packet.png}
   \captionsetup{justification=centering}
-  \caption{Paquete SLL sin ETHII en TON-IOT}\label{fig:toniot_pcap_ssl_ip_packet}
+  \caption{Paquete \acrshort{sll} sin ETHII en TON-IOT}\label{fig:toniot_pcap_ssl_ip_packet}
   \endminipage\hfill
   \minipage{0.49\textwidth}
     \includegraphics[width=\linewidth]{media/toniot_pcap_ssl_eth_packet.png}
     \captionsetup{justification=centering}
-    \caption{Paquete SLL con EthII en TIN-IOT}\label{fig:toniot_pcap_ssl_eth_packet}
+    \caption{Paquete \acrshort{sll} con EthII en TIN-IOT}\label{fig:toniot_pcap_ssl_eth_packet}
   \endminipage\hfill
 \end{figure}
 
-Podemos ver que la mayoría de los datos expresados en la tabla \ref{table:toniotprotocols} están encapsulados en SLL (34.4 GiB) y no se incluyen las cabeceras Ethernet originales, sino que aparece la capa IP directamente (22.8 GiB) y a continuación TCP (21.7 GiB). De todas maneras, hay una cantidad considerable de tramas (11.3 GiB), las cuales sí que incluyen la capa Ethernet. Adicionalmente, parte de los datos no utilizan SLL como encapsulación, sino que hacen uso de Ethernet como en los otros datasets (8.4 GiB). 
+Podemos ver que la mayoría de los datos expresados en la tabla \ref{table:toniotprotocols} están encapsulados en \acrshort{sll} (34.4 GiB) y no se incluyen las cabeceras Ethernet originales, sino que aparece la capa \acrshort{ip} directamente (22.8 GiB) y a continuación \acrshort{tcp} (21.7 GiB). De todas maneras, hay una cantidad considerable de tramas (11.3 GiB), las cuales sí que incluyen la capa Ethernet. Adicionalmente, parte de los datos no utilizan \acrshort{sll} como encapsulación, sino que hacen uso de Ethernet como en los otros datasets (8.4 GiB). 
 
 \input{theoretical_framework/datasets_toniot_protos.tex}

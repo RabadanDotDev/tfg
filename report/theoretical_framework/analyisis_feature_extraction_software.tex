@@ -4,103 +4,104 @@ En esta sección analizaremos diversas herramientas que pueden ser utilizadas pa
 
 \subsection{CICFlowmeter}
 
-CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost} \cite{icissp17} \cite{cicflowrepo}. Permite obtener información sobre flujos bidireccionales sobre IP a partir de trazas de red en archivos con el formato pcap. Adicionalmente, los protocolos de transporte que soporta son TCP y UDP. Por cada flujo, genera seis columnas identificativas y añade cierta información del flujo. 
+CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost} \cite{icissp17} \cite{cicflowrepo}. Permite obtener información sobre flujos bidireccionales sobre \acrshort{ip} a partir de trazas de red en archivos con el formato pcap. Adicionalmente, los protocolos de transporte que soporta son \acrshort{udp} y \acrshort{tcp}. Por cada flujo, genera seis columnas identificativas y añade cierta información del flujo. 
 
 \subsubsection{Features generadas} \label{cicflowfeatures}
 
 En el Readme del código fuente ofrecido, podemos encontrar las siguientes características generadas. Hay algunas que representan lo mismo, pero se obtienen de manera distinta como 'Fwd Packet Length Mean' con respecto a 'Fwd Segment Size Avg'.
 
 \begin{enumerate}
-    \item \textbf{Flow ID}: Combinación de las otras columnas separadas por guiones
-    \item \textbf{Src IP}: La dirección IP del remitente desde la cual se ha iniciado el flujo
-    \item \textbf{Src Port}: La dirección IP del destinatario hacia la cual se ha dirigido el flujo
-    \item \textbf{Dst IP}: El puerto origen o de retorno del remitente
-    \item \textbf{Dst Port}: El puerto destino del destinatario
-    \item \textbf{Protocol}: Identificador del protocolo sobre IP según definido por IANA \cite{ipprotocolnumbers}
-    \item \textbf{Timestamp}: Momento del inicio del flujo, expresado en dd/MM/yyyy hh:mm:ss de la zona horaria local.
-    \item \textbf{Flow Duration}: Duracion del flujo, expresado en microsegundos
-    \item \textbf{Total Fwd Packet}: Número total de paquetes hacia el destinatario
-    \item \textbf{Total Bwd packets}: Número total de paquetes hacia el receptor
-    \item \textbf{Total Length of Fwd Packet}: Número completo de bytes transmitidos hacia el destinatario
-    \item \textbf{Total Length of Bwd Packet}: Número completo de bytes recibidos desde el destinatario
-    \item \textbf{Fwd Packet Length Max}: Tamaño en bytes del paquete más grande enviado hacia el destinatario
-    \item \textbf{Fwd Packet Length Min}: Tamaño en bytes del paquete más pequeño enviado hacia el destinatario
-    \item \textbf{Fwd Packet Length Mean}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el destinatario. Es extraído de un objeto "SummaryStatistics" en el código
-    \item \textbf{Fwd Packet Length Std}: Desviación estándar del tamaño en bytes de los paquetes enviados hacia el destinatario
-    \item \textbf{Bwd Packet Length Max}: Tamaño en bytes del paquete más grande enviado hacia el emisor
-    \item \textbf{Bwd Packet Length Min}: Tamaño en bytes del paquete más pequeño enviado hacia el emisor
-    \item \textbf{Bwd Packet Length Mean}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el emisor
-    \item \textbf{Bwd Packet Length Std}: Desviación estándar del tamaño en bytes de los paquetes enviados hacia el emisor
-    \item \textbf{Flow Bytes s}: Bytes por segundo del flujo
-    \item \textbf{Flow Packets s}: Paquetes por segundo del flujo
-    \item \textbf{Flow IAT Mean}: Media aritmética del tiempo de llegada entre paquetes
-    \item \textbf{Flow IAT Std}: Desviación estándar del tiempo de llegada entre paquetes
-    \item \textbf{Flow IAT Max}: Tiempo máximo de llegada entre paquetes
-    \item \textbf{Flow IAT Min}: Tiempo mínimo de llegada entre paquetes
-    \item \textbf{Fwd IAT Total}: Tiempo total entre la llegada de dos paquetes hacia el receptor
-    \item \textbf{Fwd IAT Mean}: Media aritmética del tiempo de llegada entre paquetes hacia el receptor
-    \item \textbf{Fwd IAT Std}: Desviación estándar del tiempo de llegada entre paquetes hacia el receptor
-    \item \textbf{Fwd IAT Max}: Tiempo máximo de llegada entre paquetes hacia el receptor
-    \item \textbf{Fwd IAT Min}: Tiempo mínimo de llegada entre paquetes hacia el receptor
-    \item \textbf{Bwd IAT Total}: Tiempo total entre la llegada de dos paquetes hacia el emisor
-    \item \textbf{Bwd IAT Mean}: Media aritmética del tiempo de llegada entre paquetes hacia el emisor
-    \item \textbf{Bwd IAT Std}: Desviación estándar del tiempo de llegada entre paquetes hacia el emisor
-    \item \textbf{Bwd IAT Max}: Tiempo máximo de llegada entre paquetes hacia el emisor
-    \item \textbf{Bwd IAT Min}: Tiempo mínimo de llegada entre paquetes hacia el emisor
-    \item \textbf{Fwd PSH Flags}: Número de paquetes con el flag PSH activado en la cabecera TCP hacia el emisor
-    \item \textbf{Bwd PSH Flags}: Número de paquetes con el flag PSH activado en la cabecera TCP hacia el receptor
-    \item \textbf{Fwd URG Flags}: Número de paquetes con el flag URG activado en la cabecera TCP hacia el emisor
-    \item \textbf{Bwd URG Flags}: Número de paquetes con el flag URG activado en la cabecera TCP hacia el receptor
-    \item \textbf{Fwd Header Length}: Número de paquetes con el flag PSH activado en la cabecera TCP hacia el emisor
-    \item \textbf{Bwd Header Length}: Número de paquetes con el flag PSH activado en la cabecera TCP hacia el receptor
-    \item \textbf{Fwd Packets s}: Paquetes por segundo hacia el receptor
-    \item \textbf{Bwd Packets s}: Paquetes por segundo hacia el emisor
-    \item \textbf{Packet Length Min}: Longitud en bytes del paquete más pequeño del flujo
-    \item \textbf{Packet Length Max}: Longitud en bytes del paquete más grande del flujo
-    \item \textbf{Packet Length Mean}: Media aritmética del tamaño de los paquetes en bytes
-    \item \textbf{Packet Length Std}: Desviación estándar del tamaño de los paquetes en bytes
-    \item \textbf{Packet Length Variance}: Varianza del tamaño de los paquetes en bytes
-    \item \textbf{FIN Flag Count}: Número total de paquetes con el flag FIN activado en la cabecera TCP
-    \item \textbf{SYN Flag Count}: Número total de paquetes con el flag SYN activado en la cabecera TCP
-    \item \textbf{RST Flag Count}: Número total de paquetes con el flag RST activado en la cabecera TCP
-    \item \textbf{PSH Flag Count}: Número total de paquetes con el flag PSH activado en la cabecera TCP
-    \item \textbf{ACK Flag Count}: Número total de paquetes con el flag ACK activado en la cabecera TCP
-    \item \textbf{URG Flag Count}: Número total de paquetes con el flag URG activado en la cabecera TCP
-    \item \textbf{CWR Flag Count}: Número total de paquetes con el flag CWR activado en la cabecera TCP
-    \item \textbf{ECE Flag Count}: Número total de paquetes con el flag ECE activado en la cabecera TCP
-    \item \textbf{Down Up Ratio}: Ratio entre la descarga y la carga
-    \item \textbf{Average Packet Size}: Media aritmética del tamaño de los paquetes
+    \itemsep0em 
+    \item \textbf{Flow ID}: Combinación de las otras columnas separadas por guiones.
+    \item \textbf{Src IP}: La dirección \acrshort{ip} del remitente desde la cual se ha iniciado el flujo.
+    \item \textbf{Src Port}: La dirección \acrshort{ip} del destinatario hacia la cual se ha dirigido el flujo.
+    \item \textbf{Dst IP}: El puerto origen o de retorno del remitente.
+    \item \textbf{Dst Port}: El puerto destino del destinatario.
+    \item \textbf{Protocol}: Identificador del protocolo sobre \acrshort{ip} según definido por la \acrshort{iana} \cite{ipprotocolnumbers}.
+    \item \textbf{Timestamp}: Momento del inicio del flujo, expresado en dd/MM/yyyy hh:mm:ss de la zona horaria local..
+    \item \textbf{Flow Duration}: Duracion del flujo, expresado en microsegundos.
+    \item \textbf{Total Fwd Packet}: Número total de paquetes hacia el destinatario.
+    \item \textbf{Total Bwd packets}: Número total de paquetes hacia el receptor.
+    \item \textbf{Total Length of Fwd Packet}: Número completo de bytes transmitidos hacia el destinatario.
+    \item \textbf{Total Length of Bwd Packet}: Número completo de bytes recibidos desde el destinatario.
+    \item \textbf{Fwd Packet Length Max}: Tamaño en bytes del paquete más grande enviado hacia el destinatario.
+    \item \textbf{Fwd Packet Length Min}: Tamaño en bytes del paquete más pequeño enviado hacia el destinatario.
+    \item \textbf{Fwd Packet Length Mean}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el destinatario. Es extraído de un objeto 'SummaryStatistics' en el código.
+    \item \textbf{Fwd Packet Length Std}: Desviación estándar del tamaño en bytes de los paquetes enviados hacia el destinatario.
+    \item \textbf{Bwd Packet Length Max}: Tamaño en bytes del paquete más grande enviado hacia el emisor.
+    \item \textbf{Bwd Packet Length Min}: Tamaño en bytes del paquete más pequeño enviado hacia el emisor.
+    \item \textbf{Bwd Packet Length Mean}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el emisor.
+    \item \textbf{Bwd Packet Length Std}: Desviación estándar del tamaño en bytes de los paquetes enviados hacia el emisor.
+    \item \textbf{Flow Bytes s}: Bytes por segundo del flujo.
+    \item \textbf{Flow Packets s}: Paquetes por segundo del flujo.
+    \item \textbf{Flow IAT Mean}: Media aritmética del tiempo de llegada entre paquetes.
+    \item \textbf{Flow IAT Std}: Desviación estándar del tiempo de llegada entre paquetes.
+    \item \textbf{Flow IAT Max}: Tiempo máximo de llegada entre paquetes.
+    \item \textbf{Flow IAT Min}: Tiempo mínimo de llegada entre paquetes.
+    \item \textbf{Fwd IAT Total}: Tiempo total entre la llegada de dos paquetes hacia el receptor.
+    \item \textbf{Fwd IAT Mean}: Media aritmética del tiempo de llegada entre paquetes hacia el receptor.
+    \item \textbf{Fwd IAT Std}: Desviación estándar del tiempo de llegada entre paquetes hacia el receptor.
+    \item \textbf{Fwd IAT Max}: Tiempo máximo de llegada entre paquetes hacia el receptor.
+    \item \textbf{Fwd IAT Min}: Tiempo mínimo de llegada entre paquetes hacia el receptor.
+    \item \textbf{Bwd IAT Total}: Tiempo total entre la llegada de dos paquetes hacia el emisor.
+    \item \textbf{Bwd IAT Mean}: Media aritmética del tiempo de llegada entre paquetes hacia el emisor.
+    \item \textbf{Bwd IAT Std}: Desviación estándar del tiempo de llegada entre paquetes hacia el emisor.
+    \item \textbf{Bwd IAT Max}: Tiempo máximo de llegada entre paquetes hacia el emisor.
+    \item \textbf{Bwd IAT Min}: Tiempo mínimo de llegada entre paquetes hacia el emisor.
+    \item \textbf{Fwd PSH Flags}: Número de paquetes con el flag PSH activado en la cabecera \acrshort{tcp} hacia el emisor.
+    \item \textbf{Bwd PSH Flags}: Número de paquetes con el flag PSH activado en la cabecera \acrshort{tcp} hacia el receptor.
+    \item \textbf{Fwd URG Flags}: Número de paquetes con el flag URG activado en la cabecera \acrshort{tcp} hacia el emisor.
+    \item \textbf{Bwd URG Flags}: Número de paquetes con el flag URG activado en la cabecera \acrshort{tcp} hacia el receptor.
+    \item \textbf{Fwd Header Length}: Número de paquetes con el flag PSH activado en la cabecera \acrshort{tcp} hacia el emisor.
+    \item \textbf{Bwd Header Length}: Número de paquetes con el flag PSH activado en la cabecera \acrshort{tcp} hacia el receptor.
+    \item \textbf{Fwd Packets s}: Paquetes por segundo hacia el receptor.
+    \item \textbf{Bwd Packets s}: Paquetes por segundo hacia el emisor.
+    \item \textbf{Packet Length Min}: Longitud en bytes del paquete más pequeño del flujo.
+    \item \textbf{Packet Length Max}: Longitud en bytes del paquete más grande del flujo.
+    \item \textbf{Packet Length Mean}: Media aritmética del tamaño de los paquetes en bytes.
+    \item \textbf{Packet Length Std}: Desviación estándar del tamaño de los paquetes en bytes.
+    \item \textbf{Packet Length Variance}: Varianza del tamaño de los paquetes en bytes.
+    \item \textbf{FIN Flag Count}: Número total de paquetes con el flag FIN activado en la cabecera \acrshort{tcp}.
+    \item \textbf{SYN Flag Count}: Número total de paquetes con el flag SYN activado en la cabecera \acrshort{tcp}.
+    \item \textbf{RST Flag Count}: Número total de paquetes con el flag RST activado en la cabecera \acrshort{tcp}.
+    \item \textbf{PSH Flag Count}: Número total de paquetes con el flag PSH activado en la cabecera \acrshort{tcp}.
+    \item \textbf{ACK Flag Count}: Número total de paquetes con el flag ACK activado en la cabecera \acrshort{tcp}.
+    \item \textbf{URG Flag Count}: Número total de paquetes con el flag URG activado en la cabecera \acrshort{tcp}.
+    \item \textbf{CWR Flag Count}: Número total de paquetes con el flag CWR activado en la cabecera \acrshort{tcp}.
+    \item \textbf{ECE Flag Count}: Número total de paquetes con el flag ECE activado en la cabecera \acrshort{tcp}.
+    \item \textbf{Down Up Ratio}: Ratio entre la descarga y la carga.
+    \item \textbf{Average Packet Size}: Media aritmética del tamaño de los paquetes.
     \item \textbf{Fwd Segment Size Avg}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el destinatario. Es calculado haciendo la división de la suma de los tamaños total en SummaryStatistics con el número de veces que se han acumulado valores en SummaryStatistics.
     \item \textbf{Bwd Segment Size Avg}: Media aritmética del tamaño en bytes de los paquetes enviados hacia el emisor. Es calculado haciendo la división de la suma de los tamaños total en SummaryStatistics con el número de veces que se han acumulado valores en SummaryStatistics.
-    \item \textbf{Fwd Bytes Bulk Avg}: Media aritmética del número de bytes en un grupo de paquetes sin tiempo de inactividad hacia el receptor
-    \item \textbf{Fwd Packet Bulk Avg}: Media aritmética del número de paquetes en un grupo de paquetes sin tiempo de inactividad hacia el receptor
-    \item \textbf{Fwd Bulk Rate Avg}: Ratio de número de bytes por segundo en un grupo de paquetes sin tiempo de inactividad hacia el receptor
-    \item \textbf{Bwd Bytes Bulk Avg}: Media aritmética del número de bytes en un grupo de paquetes sin tiempo de inactividad hacia el emisor
-    \item \textbf{Bwd Packet Bulk Avg}: Media aritmética del número de paquetes en un grupo de paquetes sin tiempo de inactividad hacia el emisor
-    \item \textbf{Bwd Bulk Rate Avg}: Ratio de número de bytes por segundo en un grupo de paquetes sin tiempo de inactividad hacia el emisor
-    \item \textbf{Subflow Fwd Packets}: Número de paquetes dividido por el número de "subflujos" (espacios de más de un segundo sin paquetes) hacia el receptor
-    \item \textbf{Subflow Fwd Bytes}: Número de bytes divididos por el número de "subflujos" (espacios de más de un segundo sin paquetes) hacia el receptor
-    \item \textbf{Subflow Bwd Packets}: Número de bytes dividido por el número de "subflujos" (espacios de más de un segundo sin paquetes) hacia el emisor
-    \item \textbf{Subflow Bwd Bytes}: Número de bytes dividido por el número de "subflujos" (espacios de más de un segundo sin paquetes) hacia el emisor
-    \item \textbf{FWD Init Win Bytes}: El número total de bytes enviados en la ventana TCP inicial hacia el receptor
-    \item \textbf{Bwd Init Win Bytes}: El número total de bytes enviados en la ventana TCP inicial hacia el emisor
-    \item \textbf{Fwd Act Data Pkts}: El número de paquetes con al menos un byte en el campo de datos de TCP hacia el receptor
-    \item \textbf{Fwd Seg Size Min}: El tamaño de segmento en bytes en la cabecera más pequeño observado hacia el receptor
-    \item \textbf{Active Mean}: La media aritmética del tiempo que el flujo se ha mantenido activo antes de pasar a estar inactivo
-    \item \textbf{Active Std}: La desviación estándar de tiempo que el flujo se ha mantenido activo antes de pasar a estar inactivo
-    \item \textbf{Active Max}: El tiempo máximo que el flujo se ha mantenido activo antes de pasar a estar inactivo
-    \item \textbf{Active Min}: El tiempo mínimo que el flujo se ha mantenido activo antes de pasar a estar inactivo
-    \item \textbf{Idle Mean}: La media aritmética del tiempo que el flujo se ha mantenido inactivo antes de pasar a estar activo
-    \item \textbf{Idle Std}: La desviación estándar de tiempo que el flujo se ha mantenido inactivo antes de pasar a estar activo
-    \item \textbf{Idle Max}: El tiempo máximo que el flujo se ha mantenido inactivo antes de pasar a estar activo
-    \item \textbf{Idle Min}: El tiempo mínimo que el flujo se ha mantenido inactivo antes de pasar a estar activo
+    \item \textbf{Fwd Bytes Bulk Avg}: Media aritmética del número de bytes en un grupo de paquetes sin tiempo de inactividad hacia el receptor.
+    \item \textbf{Fwd Packet Bulk Avg}: Media aritmética del número de paquetes en un grupo de paquetes sin tiempo de inactividad hacia el receptor.
+    \item \textbf{Fwd Bulk Rate Avg}: Ratio de número de bytes por segundo en un grupo de paquetes sin tiempo de inactividad hacia el receptor.
+    \item \textbf{Bwd Bytes Bulk Avg}: Media aritmética del número de bytes en un grupo de paquetes sin tiempo de inactividad hacia el emisor.
+    \item \textbf{Bwd Packet Bulk Avg}: Media aritmética del número de paquetes en un grupo de paquetes sin tiempo de inactividad hacia el emisor.
+    \item \textbf{Bwd Bulk Rate Avg}: Ratio de número de bytes por segundo en un grupo de paquetes sin tiempo de inactividad hacia el emisor.
+    \item \textbf{Subflow Fwd Packets}: Número de paquetes dividido por el número de "subflujos" (espacios de más de un segundo sin paquetes) hacia el receptor.
+    \item \textbf{Subflow Fwd Bytes}: Número de bytes divididos por el número de "subflujos" (espacios de más de un segundo sin paquetes) hacia el receptor.
+    \item \textbf{Subflow Bwd Packets}: Número de bytes dividido por el número de "subflujos" (espacios de más de un segundo sin paquetes) hacia el emisor.
+    \item \textbf{Subflow Bwd Bytes}: Número de bytes dividido por el número de "subflujos" (espacios de más de un segundo sin paquetes) hacia el emisor.
+    \item \textbf{FWD Init Win Bytes}: El número total de bytes enviados en la ventana \acrshort{tcp} inicial hacia el receptor.
+    \item \textbf{Bwd Init Win Bytes}: El número total de bytes enviados en la ventana \acrshort{tcp} inicial hacia el emisor.
+    \item \textbf{Fwd Act Data Pkts}: El número de paquetes con al menos un byte en el campo de datos de \acrshort{tcp} hacia el receptor.
+    \item \textbf{Fwd Seg Size Min}: El tamaño de segmento en bytes en la cabecera más pequeño observado hacia el receptor.
+    \item \textbf{Active Mean}: La media aritmética del tiempo que el flujo se ha mantenido activo antes de pasar a estar inactivo.
+    \item \textbf{Active Std}: La desviación estándar de tiempo que el flujo se ha mantenido activo antes de pasar a estar inactivo.
+    \item \textbf{Active Max}: El tiempo máximo que el flujo se ha mantenido activo antes de pasar a estar inactivo.
+    \item \textbf{Active Min}: El tiempo mínimo que el flujo se ha mantenido activo antes de pasar a estar inactivo.
+    \item \textbf{Idle Mean}: La media aritmética del tiempo que el flujo se ha mantenido inactivo antes de pasar a estar activo.
+    \item \textbf{Idle Std}: La desviación estándar de tiempo que el flujo se ha mantenido inactivo antes de pasar a estar activo.
+    \item \textbf{Idle Max}: El tiempo máximo que el flujo se ha mantenido inactivo antes de pasar a estar activo.
+    \item \textbf{Idle Min}: El tiempo mínimo que el flujo se ha mantenido inactivo antes de pasar a estar activo.
 \end{enumerate}
 
 \subsubsection{Soporte de formatos}
 
-CICFlowMeter no soporta todos los posibles formatos que se pueden encontrar en un pcap. En caso de encontrar contenidos no soportados, estos son ignorados. Si accedemos al módulo que realiza la lectura de los paquetes (cic.cs.unb.ca.jnetpcap.PacketReader) podemos ver que hace uso de la librería jnetpcap. Para la capa de acceso a la red en la pila TCP/IP utiliza Ethernet, para la capa de red utiliza IP4 e IP6, para la de transporte utiliza TCP y UDP y finalmente añade un módulo de la capa de aplicación para poder entender datos de VPN. 
+CICFlowMeter no soporta todos los posibles formatos que se pueden encontrar en un archivo pcap. En caso de encontrar contenidos no soportados, estos son ignorados. Si accedemos al módulo que realiza la lectura de los paquetes (cic.cs.unb.ca.jnetpcap.PacketReader) podemos ver que hace uso de la librería jnetpcap. Para la capa de acceso a la red en la pila TCP/IP utiliza Ethernet, para la capa de red utiliza \acrshort{ipv4} e \acrshort{ipv6}, para la de transporte utiliza \acrshort{tcp} y \acrshort{udp} y finalmente añade un módulo de la capa de aplicación para poder entender datos de VPN.
 
-Como veremos en INTRODUCIR REFERENCIA DATASET, necesitaríamos que tuviese soporte adicionalmente para DLT\_LINUX\_SLL. Este es un tipo especial de cabecera de nivel de acceso a la red para cuando se generan trazas de diferentes orígenes o se quiere descartar información.
+Como veremos en \ref{toniotdatasetdescription}, necesitaríamos que tuviese soporte adicionalmente para DLT\_LINUX\_SLL. Este es un tipo especial de cabecera de nivel de acceso a la red para cuando se generan trazas de diferentes orígenes o se quiere descartar información.
 
 \subsubsection{Limitantes i mejoras}
 
@@ -108,7 +109,7 @@ Se han observado tres puntos de mejora que la herramienta presenta, aparte de la
 
 El primero consiste en que, en el momento de realizar extracción de características a partir de trazas de red, se ha observado una segunda cabecera en partes impredecibles de los archivos csv. Después de revisar el código, la causa es debido a que en el módulo cic.cs.unb.ca.jnetpcap.FlowGenerator, en la función dumpLabeledFlowBasedFeatures, se escribe la cabecera dos veces, una después de generar el archivo y otra después de escribir todos los flujos completos. No hay ninguna indicación de por qué se ha realizado de esta manera, y la línea 282 del módulo, la cual escribe la cabecera por segunda vez, tiene una indentación de dos cuando el código alrededor tiene tres. La razón más probable es que sea un error no intencional.
 
-El segundo trata sobre la documentación del código y su calidad. La mayor parte de funciones, clases y módulos se encuentran sin documentación, hay bloques de código comentados (puestos en forma de comentario para que sean ignorados en el momento de ejecución), en muchas ocasiones la indentación es confusa y el estilo no parece ser uniforme. 
+El segundo trata sobre el formato del código. Hay bloques de código comentados (puestos en forma de comentario para que sean ignorados en el momento de ejecución), en muchas ocasiones la indentación es confusa, hay flujos lógicos que se podrían simplificar y el estilo no parece ser uniforme. Para solucionar esto, se podría hacer uso de un \textit{linter}, el cual haría el estilo más uniforme.
 
 El último se basa en el lenguaje utilizado. Como podemos ver en la Tabla \ref{table:languagebench}, en muchos entornos Java no es el lenguaje más óptimo en tareas que requieran cómputo. Los programas creados en java son entre 2 y 5 veces más lentos que los creados en nim, rust, d o zig. Además de también llegar a utilizar alrededor más de diez veces la cantidad de memoria.
 
@@ -164,83 +165,83 @@ El último se basa en el lenguaje utilizado. Como podemos ver en la Tabla \ref{t
 TShark es un analizador de protocolos de red \cite{tsharkmanual}. Permite capturar datos de la red o leer paquetes de un archivo de captura. Así como Wireshark \cite{wsharkmanual}, es capaz de leer una gran cantidad de formatos y protocolos. Además, a partir de una captura finalizada, puede calcular estadísticas sobre el tráfico capturado a través del parámetro -z. Hay muchas opciones de generación de estadísticas, algunas que podrían ser relevantes son:
 
 \begin{enumerate} 
-    \item \textbf{-z conv,type[,filter]}: Genera una tabla que lista todas las conversaciones que se han detectado en la captura. 'type' indica el tipo de conversación, la cual puede ser tanto por direcciones de acceso a la red (Bluetooth, Ethernet, ...) como de red o transporte (ip, tcp, udp, ...). Cada conversación es mostrada en una fila de la tabla, la cual muestra, en número de tramas/bytes transmitidos en cada dirección, en número total, el tiempo relativo de inicio y la duración.
-    \item \textbf{-z dests,tree[,filter]}: Genera estadísticas por direcciones ipv4, transporte tcp/udp y/o puerto asociado. Da información del número de transmisiones por cada uno y la cadencia
+    \item \textbf{-z conv,type[,filter]}: Genera una tabla que lista todas las conversaciones que se han detectado en la captura. 'type' indica el tipo de conversación, la cual puede ser tanto por direcciones de acceso a la red (Bluetooth, Ethernet, ...) como de red o transporte (IP, \acrshort{tcp}, \acrshort{udp}, ...). Cada conversación es mostrada en una fila de la tabla, la cual muestra, en número de tramas/bytes transmitidos en cada dirección, en número total, el tiempo relativo de inicio y la duración.
+    \item \textbf{-z dests,tree[,filter]}: Genera estadísticas por direcciones \acrshort{ipv4}, transporte \acrshort{tcp}/\acrshort{udp} y/o puerto asociado. Da información del número de transmisiones por cada uno y la cadencia
     \item \textbf{-z endpoints,type[,filter]}: Genera una tabla por cada dirección del tipo seleccionado con información sobre el número de paquetes y bytes totales, recibidos y enviados.
-    \item \textbf{-z flow,name,mode[,filter]}: Muestra un diagrama de los flujos de datos en ASCII
-    \item \textbf{-z icmp,srt[,filter]}: Muestra información sobre peticiones, respuestas, perdidas y latencias de peticiones ICMP eco
+    \item \textbf{-z flow,name,mode[,filter]}: Muestra un diagrama de los flujos de datos en formato textual
+    \item \textbf{-z icmp,srt[,filter]}: Muestra información sobre peticiones, respuestas, perdidas y latencias de peticiones echo en \acrshort{icmp}
     \item \textbf{-z io,phs[,filter]}: Muestra un árbol con los protocolos utilizados y la cantidad respectiva de tramas/bytes que los lleva.
     \item \textbf{-z io,stat,interval[,filter][,filter][,filter]…​}: Muestra, por cada incremento del intervalo especificado, el número de tramas y bytes. 
-    \item \textbf{-z io,stat,interval,"COUNT|SUM|MIN|MAX|AVG|LOAD(field)filter"}: Permite generar el número, suma, mínimo, máximo, media o proporción de cada campo en el intervalo especificado. Adicionalmente, se puede pedir el número de tramas y bytes como en la opción anterior con "FRAMES()" o "BYTES()"
-    \item \textbf{-z ip\_hosts,tree[,filter]}: Genera información como con dests, pero solo de direcciones IPv4.
-    \item \textbf{-z ip\_srcdst,tree[,filter]}: Genera información como con ip\_hosts, pero diferenciando direcciones IP de origen y de destino.
+    \item \textbf{-z io,stat,interval,'COUNT|SUM|MIN|MAX|AVG|LOAD(field)filter'}: Permite generar el número, suma, mínimo, máximo, media o proporción de cada campo en el intervalo especificado. Adicionalmente, se puede pedir el número de tramas y bytes como en la opción anterior con 'FRAMES()' o 'BYTES()'
+    \item \textbf{-z ip\_hosts,tree[,filter]}: Genera información como con dests, pero solo de direcciones \acrshort{ipv4}.
+    \item \textbf{-z ip\_srcdst,tree[,filter]}: Genera información como con ip\_hosts, pero diferenciando direcciones \acrshort{ip} de origen y de destino.
     \item \textbf{-z plen,tree[,filter]}: Genera estadísticas sobre los tamaños de los paquetes. Por cada grupo, se indica el número, el tamaño medio, el valor mínimo, el valor máximo y la cadencia
     \item \textbf{-z proto,colinfo,filter,field}: Utilizado para mostrar por el canal estándard información adicional sobre los campos de cada paquete
-    \item \textbf{-z ptype,tree[,filter]}: Genera estadísticas sobre los protocolos utilizados en paquetes IPv4
+    \item \textbf{-z ptype,tree[,filter]}: Genera estadísticas sobre los protocolos utilizados en paquetes \acrshort{ipv4}
 \end{enumerate}
 
 Pese a esto, el programa no está diseñado para la generación de estadísticas en tiempo real. Su principal objetivo es el de permitir a un operador de una red o desarrolladores de aplicaciones ver lo que está ocurriendo en la red con facilidad. La documentación del programa es útil para poder tener mayor información de lo que está ocurriendo en un momento dado de la red, pero el programa no está pensado para el propósito de generar estadísticas de los flujos en tiempo real \cite{wiresharkrealtimestats}. Lo podemos ver en el hecho de que las estadísticas se proporcionen al final, como resumen, y no se generen en cuanto los datos se encuentran disponibles.
 
 \subsection{Zeek}
 
-Zeek es un analizador de tráfico de red pasivo, de código abierto \cite{zeek_documentation}. Según la documentación, muchos operadores utilizan Zeek como herramienta de monitorización de la seguridad de la red. Es capaz de generar información comprensiva de todas las conexiones detectadas y de incluir metadatos de la actividad de la capa de aplicación. Ejemplos mostrados consisten en peticiones relativas a sesiones HTTP, DNS, entre otros. Además, Zeek es capaz de exportar estos datos a archivos JSON o tabulares para el postproceso de software externo o incluso escribir a bases de datos directamente. 
+Zeek es un analizador de tráfico de red pasivo, de código abierto \cite{zeek_documentation}. Según la documentación, muchos operadores utilizan Zeek como herramienta de monitorización de la seguridad de la red. Es capaz de generar información comprensiva de todas las conexiones detectadas y de incluir metadatos de la actividad de la capa de aplicación. Ejemplos mostrados consisten en peticiones relativas a sesiones \acrshort{dns}, \acrshort{http}, entre otros. Además, Zeek es capaz de exportar estos datos a archivos \acrshort{json} o tabulares para el postproceso de software externo o incluso escribir a bases de datos directamente. 
 
 Otras ventajas de Zeek consisten en su capacidad de ser fácilmente escalable para tratar tráfico de alto ancho de banda y la posibilidad de personalizar su funcionamiento a través de un lenguaje específico desarrollado para este. De esta manera, Zeek aparte de soportar la detección de intrusiones a través de firmas, es capaz de ofrecer detección de anomalías y análisis de comportamiento.
 
 Adicionalmente, existe un proyecto llamado Zeek FlowMeter el cual generara las mismas características que CICFlowMeter, pero a través de un script en Zeek \cite{zeek_flowmeter}. El código es interpretado, pero una de las mejoras propuestas en el repositorio es compilar parte de este para acelerar el proceso. Otro punto relevante es la mención de que Zeek, al ejecutar por defecto en un hilo del procesador, no hace uso extensivo de la capacidad del sistema. La mejora propuesta es hacer un Zeek Cluster \cite{zeek_documentation_cluster} para poder utilizar la capacidad de procesamiento disponible. Sin embargo, esto puede llegar a introducir una mayor complejidad al sistema.
 
-Según la investigación realizada, no parece existir una manera oficial para utilizar Zeek como una librería dentro de otro programa o hacer uso de memoria compartida. El software está diseñado para ser ejecutado de manera independiente y compartir información con otros a través de diferentes tipos de archivos de registros \cite{zeek_documentation_logging} y conexiones utilizando la red \cite{zeek_documentation_logwriters}. De esta manera, para hacer uso de los registros generados en algoritmos de \gls{ml}, es necesario pasar por varias capas de traducción en vez de generar directamente los datos en el formato necesario.
+Según la investigación realizada, no parece existir una manera oficial para utilizar Zeek como una librería dentro de otro programa o hacer uso de memoria compartida. El software está diseñado para ser ejecutado de manera independiente y compartir información con otros a través de diferentes tipos de archivos de registros \cite{zeek_documentation_logging} y conexiones utilizando la red \cite{zeek_documentation_logwriters}. De esta manera, para hacer uso de los registros generados en algoritmos de \acrshort{ml}, es necesario pasar por varias capas de traducción en vez de generar directamente los datos en el formato necesario.
 
 \subsection{nProbe}
 
 nProbe es un analizador de tráfico de red capaz de generar y recolectar flujos NetFlow y exportarlos a otros sistemas que agrupan estadísticas de estos como ntopng \cite{nprobe_documentation}. Según la documentación, es capaz de analizar redes de varios gigabits sin provocar pérdidas o pérdidas muy moderadas en ciertos casos. A diferencia del resto de herramientas, el código fuente de nProbe no se encuentra públicamente disponible. Esto es debido a que, según los autores, hubo personas que hicieron un mal uso de este. 
 
-La cantidad de características que nProbe es capaz generar sin necesidad de plug-ins adicionales es relativamente extensa. Existen una propuesta de hacer uso de unas características específicas de forma estándar para poder comparar diferentes algoritmos de \gls{ml} \cite{DBLP:journals/corr/abs-2101-11315}. Las características por cada flujo en cuestión son:
+La cantidad de características que nProbe es capaz generar sin necesidad de plug-ins adicionales es relativamente extensa. Existen una propuesta de hacer uso de unas características específicas de forma estándar para poder comparar diferentes algoritmos de \acrshort{ml} \cite{DBLP:journals/corr/abs-2101-11315}. Las características por cada flujo en cuestión son:
 
 \begin{enumerate}
-    \item \textbf{IPV4\_SRC\_ADDR}: La dirección IPv4 de origen
-    \item \textbf{IPV4\_DST\_ADDR}: La dirección IPv4 de destino
-    \item \textbf{L4\_SRC\_PORT}: El puerto IPv4 de origen
-    \item \textbf{L4\_DST\_PORT}: El puerto IPv4 de destino
-    \item \textbf{PROTOCOL}: El identificador de protocolo IP según IANA \cite{ipprotocolnumbers}
-    \item \textbf{L7\_PROTO}: El protocolo de aplicación expresado en el formato AAA.BBB, siendo AAA el identificador del principal y BBB el del secundario. Los números vienen definidos según la documentación de nProbe \cite{nprobe_documentation_proto_app}
-    \item \textbf{IN\_BYTES}: El número de bytes enviados hacia el receptor
-    \item \textbf{OUT\_BYTES}: El número de bytes enviados hacia el emisor
-    \item \textbf{IN\_PKTS}: El número de paquetes enviados hacia el receptor
-    \item \textbf{OUT\_PKTS}: El número de paquetes enviados hacia el emisor
-    \item \textbf{FLOW\_DURATION\_MILLISECONDS}: La duración del flujo en milisegundos
-    \item \textbf{TCP\_FLAGS}: Los indicadores (ACK, PSH, etc.) vistos en la cabecera de todos los paquetes en el flujo TCP en ambas direcciones expresadas como un mapa de bits. Si en la representación binaria del valor hay un 1 en la posición respectiva, se ha visto. En caso contrario, no se ha detectado un paquete con el indicador activo.
-    \item \textbf{CLIENT\_TCP\_FLAGS}: TCP\_FLAGS, pero solo en la dirección del receptor
-    \item \textbf{SERVER\_TCP\_FLAGS}: TCP\_FLAGS, pero solo en la dirección del emisor
-    \item \textbf{DURATION\_IN}: Duración del flujo hacia el receptor en milisegundos
-    \item \textbf{DURATION\_OUT}: Duración del flujo hacia el emisor en milisegundos
-    \item \textbf{MIN\_TTL}: TTL máximo observado en cabeceras IP en el flujo
-    \item \textbf{MAX\_TTL}: TTL mínimo observado en cabeceras IP en el flujo
-    \item \textbf{LONGEST\_FLOW\_PKT}: Tamaño en bytes del paquete más grande del flujo
-    \item \textbf{SHORTEST\_FLOW\_PKT}: Tamaño en bytes del paquete más pequeño del flujo
-    \item \textbf{MIN\_IP\_PKT\_LEN}: Indicador de longitud más pequeño observado en la cabecera IPdel flujo
-    \item \textbf{MAX\_IP\_PKT\_LEN}: Indicador de longitud más grande observado en la cabecera IP del flujo
-    \item \textbf{SRC\_TO\_DST\_SECOND\_BYTES}: Bytes por segundo transmitidos desde el emisor al receptor
-    \item \textbf{DST\_TO\_SRC\_SECOND\_BYTES}: Bytes por segundo transmitidos desde el receptor al emisor
-    \item \textbf{RETRANSMITTED\_IN\_BYTES}: Bytes retransmitidos hacia el receptor
-    \item \textbf{RETRANSMITTED\_IN\_PKTS}: Paquetes retransmitidos hacia el emisor
-    \item \textbf{RETRANSMITTED\_OUT\_BYTES}: Bytes retransmitidos hacia el receptor
-    \item \textbf{RETRANSMITTED\_OUT\_PKTS}: Paquetes retransmitidos hacia el emisor
-    \item \textbf{SRC\_TO\_DST\_AVG\_THROUGHPUT}: Bits por segundo transmitidos desde el emisor al receptor
-    \item \textbf{DST\_TO\_SRC\_AVG\_THROUGHPUT}: Bits por segundo transmitidos desde el receptor al emisor
-    \item \textbf{NUM\_PKTS\_UP\_TO\_128\_BYTES}: Número de paquetes los cuales el tamaño a nivel IP es inferior o igual a 128 del flujo
-    \item \textbf{NUM\_PKTS\_128\_TO\_256\_BYTES}: Número de paquetes los cuales el tamaño a nivel IP es superior a 128 e inferior o igual a 256 del flujo
-    \item \textbf{NUM\_PKTS\_256\_TO\_512\_BYTES}: Número de paquetes los cuales el tamaño a nivel IP es superior a 256 e inferior o igual a 512 del flujo
-    \item \textbf{NUM\_PKTS\_512\_TO\_1024\_BYTES}: Número de paquetes los cuales el tamaño a nivel IP es superior a 512 e inferior o igual a 1024 del flujo
-    \item \textbf{NUM\_PKTS\_1024\_TO\_1514\_BYTES}: Número de paquetes los cuales el tamaño a nivel IP es superior a 1024 e inferior o igual a 1514 del flujo
-    \item \textbf{TCP\_WIN\_MAX\_IN}: Ventana máxima TCP observada del emisor al receptor
-    \item \textbf{TCP\_WIN\_MAX\_OUT}: Ventana máxima TCP observada del receptor al emisor
-    \item \textbf{ICMP\_TYPE}: Representación numérica del tipo ICMP * 256 + representación numerica del codigo ICMP, si aplica
-    \item \textbf{ICMP\_IPV4\_TYPE}: Representación numérica del tipo ICMP, si aplica.
-    \item \textbf{DNS\_QUERY\_ID}: Identificador numérico de la transacción de la petición DNS, si aplica
-    \item \textbf{DNS\_QUERY\_TYPE}: Representación numérica del tipo de la petición DNS, si aplica
-    \item \textbf{DNS\_TTL\_ANSWER}: TTL del primer registro A de la respuesta del DNS, si aplica
-    \item \textbf{FTP\_COMMAND\_RET\_CODE}: Código de respuesta del comando FTP, si aplica
+    \item \textbf{IPV4\_SRC\_ADDR}: La dirección \acrshort{ipv4} de origen.
+    \item \textbf{IPV4\_DST\_ADDR}: La dirección \acrshort{ipv4} de destino.
+    \item \textbf{L4\_SRC\_PORT}: El puerto \acrshort{ipv4} de origen.
+    \item \textbf{L4\_DST\_PORT}: El puerto \acrshort{ipv4} de destino.
+    \item \textbf{PROTOCOL}: El identificador de protocolo \acrshort{ip} según \acrshort{iana} \cite{ipprotocolnumbers}.
+    \item \textbf{L7\_PROTO}: El protocolo de aplicación expresado en el formato AAA.BBB, siendo AAA el identificador del principal y BBB el del secundario. Los números vienen definidos según la documentación de nProbe \cite{nprobe_documentation_proto_app}.
+    \item \textbf{IN\_BYTES}: El número de bytes enviados hacia el receptor.
+    \item \textbf{OUT\_BYTES}: El número de bytes enviados hacia el emisor.
+    \item \textbf{IN\_PKTS}: El número de paquetes enviados hacia el receptor.
+    \item \textbf{OUT\_PKTS}: El número de paquetes enviados hacia el emisor.
+    \item \textbf{FLOW\_DURATION\_MILLISECONDS}: La duración del flujo en milisegundos.
+    \item \textbf{TCP\_FLAGS}: Los indicadores (ACK, PSH, etc.) vistos en la cabecera de todos los paquetes en el flujo \acrshort{tcp} en ambas direcciones expresadas como un mapa de bits. Si en la representación binaria del valor hay un 1 en la posición respectiva, se ha visto. En caso contrario, no se ha detectado un paquete con el indicador activo.
+    \item \textbf{CLIENT\_TCP\_FLAGS}: TCP\_FLAGS, pero solo en la dirección del receptor.
+    \item \textbf{SERVER\_TCP\_FLAGS}: TCP\_FLAGS, pero solo en la dirección del emisor.
+    \item \textbf{DURATION\_IN}: Duración del flujo hacia el receptor en milisegundos.
+    \item \textbf{DURATION\_OUT}: Duración del flujo hacia el emisor en milisegundos.
+    \item \textbf{MIN\_TTL}: \acrshort{ttl} máximo observado en cabeceras \acrshort{ip} en el flujo.
+    \item \textbf{MAX\_TTL}: \acrshort{ttl} mínimo observado en cabeceras \acrshort{ip} en el flujo.
+    \item \textbf{LONGEST\_FLOW\_PKT}: Tamaño en bytes del paquete más grande del flujo.
+    \item \textbf{SHORTEST\_FLOW\_PKT}: Tamaño en bytes del paquete más pequeño del flujo.
+    \item \textbf{MIN\_IP\_PKT\_LEN}: Indicador de longitud más pequeño observado en la cabecera \acrshort{ip} del flujo.
+    \item \textbf{MAX\_IP\_PKT\_LEN}: Indicador de longitud más grande observado en la cabecera \acrshort{ip} del flujo.
+    \item \textbf{SRC\_TO\_DST\_SECOND\_BYTES}: Bytes por segundo transmitidos desde el emisor al receptor.
+    \item \textbf{DST\_TO\_SRC\_SECOND\_BYTES}: Bytes por segundo transmitidos desde el receptor al emisor.
+    \item \textbf{RETRANSMITTED\_IN\_BYTES}: Bytes retransmitidos hacia el receptor.
+    \item \textbf{RETRANSMITTED\_IN\_PKTS}: Paquetes retransmitidos hacia el emisor.
+    \item \textbf{RETRANSMITTED\_OUT\_BYTES}: Bytes retransmitidos hacia el receptor.
+    \item \textbf{RETRANSMITTED\_OUT\_PKTS}: Paquetes retransmitidos hacia el emisor.
+    \item \textbf{SRC\_TO\_DST\_AVG\_THROUGHPUT}: Bits por segundo transmitidos desde el emisor al receptor.
+    \item \textbf{DST\_TO\_SRC\_AVG\_THROUGHPUT}: Bits por segundo transmitidos desde el receptor al emisor.
+    \item \textbf{NUM\_PKTS\_UP\_TO\_128\_BYTES}: Número de paquetes los cuales el tamaño a nivel \acrshort{ip} es inferior o igual a 128 del flujo.
+    \item \textbf{NUM\_PKTS\_128\_TO\_256\_BYTES}: Número de paquetes los cuales el tamaño a nivel \acrshort{ip} es superior a 128 e inferior o igual a 256 del flujo.
+    \item \textbf{NUM\_PKTS\_256\_TO\_512\_BYTES}: Número de paquetes los cuales el tamaño a nivel \acrshort{ip} es superior a 256 e inferior o igual a 512 del flujo.
+    \item \textbf{NUM\_PKTS\_512\_TO\_1024\_BYTES}: Número de paquetes los cuales el tamaño a nivel \acrshort{ip} es superior a 512 e inferior o igual a 1024 del flujo.
+    \item \textbf{NUM\_PKTS\_1024\_TO\_1514\_BYTES}: Número de paquetes los cuales el tamaño a nivel \acrshort{ip} es superior a 1024 e inferior o igual a 1514 del flujo.
+    \item \textbf{TCP\_WIN\_MAX\_IN}: Ventana máxima \acrshort{tcp} observada del emisor al receptor.
+    \item \textbf{TCP\_WIN\_MAX\_OUT}: Ventana máxima \acrshort{tcp} observada del receptor al emisor.
+    \item \textbf{ICMP\_TYPE}: Representación numérica del tipo \acrshort{icmp} multiplicado por 256 mas representación numerica del codigo  \acrshort{icmp}, si aplica.
+    \item \textbf{ICMP\_IPV4\_TYPE}: Representación numérica del tipo \acrshort{icmp}, si aplica.
+    \item \textbf{DNS\_QUERY\_ID}: Identificador numérico de la transacción de la petición \acrshort{dns}, si aplica
+    \item \textbf{DNS\_QUERY\_TYPE}: Representación numérica del tipo de la petición \acrshort{dns}, si aplica
+    \item \textbf{DNS\_TTL\_ANSWER}: TTL del primer registro A de la respuesta del \acrshort{dns}, si aplica
+    \item \textbf{FTP\_COMMAND\_RET\_CODE}: Código de respuesta del comando \acrshort{ftp}, si aplica
 \end{enumerate}
 
 Como podemos ver, algunas características propuestas no son independientes, algunas están expresadas en diferentes unidades, pero son en esencia el mismo valor e incluso algunas son potencialmente iguales. El motivo específico por el cual se han escogido estas y no otras no está explicado en la fuente.
