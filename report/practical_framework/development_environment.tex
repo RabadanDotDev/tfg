@@ -15,10 +15,9 @@ Primero de todo, se ha hecho uso de Visual Studio Code como editor general para 
     \color{blue} %TODO remove this when revised
     \item Un script para instalar dependencias adicionales. Estas consisten en tipos de letras utilizadas en la memoria, un entorno virtual de Python con los paquetes relevantes y la descarga de PlantUML desde GitHub para tener una versión más reciente que la ofrecida en la distribución base.
     \color{black} %TODO remove this when revised
-    \item Dos directrices para incluir carpetas del host dentro del contenedor. Estos consisten en la carpeta de los datasets descargados (montada en /Datasets) y las credenciales SSH para firmar y subir cambios realizados en el sistema de control de versiones.
+    \item Dos directrices para incluir carpetas del host dentro del contenedor. Estos consisten en la carpeta de los datasets descargados (montada en /Datasets) y las credenciales \acrshort{ssh} para firmar y subir cambios realizados en el sistema de control de versiones.
 \end{enumerate}
 
 Dentro del contenedor, los archivos se han estructurado de forma que tenemos una carpeta para el código fuente de la herramienta, una carpeta para la memoria y otra para todos los scripts de análisis y extracción de datos. Adicionalmente, hay carpetas y archivos de configuración para el editor, contenedor, dependencias Python y control de versiones.
 
 Finalmente, todos los archivos relevantes están bajo el control de versiones git. Para prevenir la posibilidad de perder los datos si el dispositivo en el que se encuentran guardados dejará de funcionar, se ha configurado un repositorio en GitHub para mantener una copia. Este se encuentra en \url{https://github.com/RabadanDotDev/tfg} y será hecho público una vez se haya realizado el depósito del trabajo.
-
