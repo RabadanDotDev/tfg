@@ -11,15 +11,15 @@
 \begin{center}
     \setlength\fboxsep{0.05\textwidth}\fbox{
         \parbox[t][\textwidth]{0.8\textwidth}{
-            \quad \quad En este trabajo se hace el desarrollo de una herramienta de análisis de red y se demuestra su funcionamiento a partir de analizar trazas de tráfico de red y su uso en algoritmos de Machine Learning.
+            \quad En este Trabajo de Final de Grado (TFG) se hace el desarrollo de una herramienta de análisis de red y se demuestra su funcionamiento a partir de analizar trazas de tráfico de red y el uso de los datos resultantes para entrenar modelos con Machine Learning.
             
-            \quad \quad Para el desarrollo de la herramienta se ha hecho uso de Rust y en las tareas de Machine Learning y análisis de datos se ha trabajado con Python. El desarrollo se ha realizado bajo un entorno de desarrollo en un contenedor Docker. Todo el código de la herramienta, los scripts y la configuración del entorno se ofrecen para permitir resultados lo más reproducibles posibles.
+            \quad Para el desarrollo de la herramienta se ha hecho uso de Rust y en las tareas de Machine Learning y análisis de datos se ha trabajado con Python. El desarrollo se ha realizado bajo un entorno de desarrollo en Docker. Todo el código de la herramienta, los scripts y la configuración del entorno se ofrecen para permitir resultados lo más reproducibles posible.
             
-            \quad \quad La herramienta es capaz de generar 72 características continuas con información de flujos TCP y UDP, además de 2 discretas indicando el protocolo de transporte y una identificación de cada flujo compuesta por 7 valores. Adicionalmente, la herramienta permite realizar un etiquetado automático a partir de un fichero \acrshort{csv} en el cual se indica por cada fila el par de direcciones IP, el protocolo de transporte utilizado y el tiempo de inicio y final.
+            \quad La herramienta es capaz de generar 72 características continuas con información de flujos TCP y UDP, además de 2 discretas indicando el protocolo de transporte y una identificación de cada flujo compuesta por 7 valores. Adicionalmente, la herramienta permite realizar un etiquetado automático a partir de un fichero \acrshort{csv} en el cual se indica por cada fila el par de direcciones IP, el protocolo de transporte y el tiempo de inicio y final.
             
-            \quad \quad A partir de los conjuntos de datos utilizados, la herramienta desarrollada y un modelo basado en bosques aleatorios, se ha obtenido un valor de precisión del 99.95\% y una puntuación F1 media del 98.66\%
+            \quad Se ha utilizado la herramienta desarrollada para analizar el tráfico de red de un conjunto datos públicos y con los datos resultantes se ha entrenado un modelo utilizando el algoritmo Random Forest, obteniéndose un valor de precisión del 99.95\% y una puntuación F1 media del 98.66\%
             
-            \quad \quad La herramienta desarrollada puede ser utilizada como componente en sistemas  de detección de intrusiones y tiene el potencial para ser extendida con más funcionalidades en el futuro.
+            \quad La herramienta desarrollada puede ser utilizada como componente en sistemas  de detección de intrusiones y tiene el potencial para ser extendida con más funcionalidades en el futuro.
         }
     }
 \end{center}

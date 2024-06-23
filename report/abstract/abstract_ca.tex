@@ -11,15 +11,15 @@
 \begin{center}
     \setlength\fboxsep{0.05\textwidth}\fbox{
         \parbox[t][\textwidth]{0.8\textwidth}{
-            \quad \quad En aquest treball es fa el desenvolupament d'una eina d'anàlisis de xarxa i es mostra el seu funcionament per mitjà d'analitzar traces de tràfic de xarxa i el seu ús en algoritmes d'aprenentatge automàtic
+            \quad En aquest Treball de Final de Grau (TFG) es fa el desenvolupament d'una eina d'anàlisis de xarxa i es mostra el seu funcionament per mitjà d'analitzar traces de tràfic de xarxa i l'ús de les dades resultants per entrenar models amb Machine Learning.
 
-            \quad \quad Pel desenvolupament de l'eina s'ha fet ús de Rust i en les tasques d'aprenentatge automàtic i anàlisis de dates s'ha treballat en Python. El desenvolupament s'ha realitzat en un entorn de desenvolupament dins d'un contenidor Docker. Tot el codi de l'eina, els scripts i la configuració de l'entorn s'ofereixen per permetre resultats tan reproduïbles com sigui possible.
+            \quad Pel desenvolupament de l'eina s'ha fet ús de Rust i en les tasques de Machine Learning i anàlisis de dates s'ha treballat en Python. El desenvolupament s'ha realitzat en un entorn de desenvolupament dins d'un contenidor Docker. Tot el codi de l'eina, els scripts i la configuració de l'entorn s'ofereixen per permetre resultats tan reproduïbles com sigui possible.
             
-            \quad \quad L'eina és capaç de generar 72 característiques contínues sobre fluxos TCP i UDP, a més de 2 discretes indicant el protocol de transport i una identificació de cada flux composta per 7 valors. Addicionalment, l'eina permet realitzar un etiquetatge automàtic a partir d'un arxiu \acrshort{csv} on s'indica per cada fila el parell d'adreces IP, el protocol de transport utilitzat i el temps d'inici i final.
+            \quad L'eina és capaç de generar 72 característiques contínues sobre fluxos TCP i UDP, a més de 2 discretes indicant el protocol de transport i una identificació de cada flux composta per 7 valors. Addicionalment, l'eina permet realitzar un etiquetatge automàtic a partir d'un arxiu \acrshort{csv} on s'indica per cada fila el parell d'adreces IP, el protocol de transport utilitzat i el temps d'inici i final.
             
-            \quad \quad A partir del conjunt de dades utilitzades, l'eina desenvolupada i un model basat en boscs aleatoris, s'ha obtingut un valor de precisió del 99.95\% i una puntuació F1 mitja del 98.66\%.
+            \quad S'ha utilitzat l'eina desenvolupada per analitzar el tràfic de xarxa d'un conjunt de dades públic i amb les dades resultants s'ha entrenat un model fent ús de l'algoritme de Random Forest. S'ha obtingut un valor de precisió del 99.95\% i una puntuació F1 mitja del 98.66\%.
             
-            \quad \quad L'eina desenvolupada pot ser utilitzada com a component en sistemes de detecció d'intrusions i té el potencial per ser estès amb més funcionalitats en el futur.
+            \quad L'eina desenvolupada pot ser utilitzada com a component en sistemes de detecció d'intrusions i té el potencial per ser estès amb més funcionalitats en el futur.
         }
     }
 \end{center}

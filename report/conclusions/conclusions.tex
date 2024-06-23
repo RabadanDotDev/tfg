@@ -1,8 +1,6 @@
 \newpage
 \pagestyle{plain}
 
-\color{blue} %TODO remove this when revised
-
 \chapter{CONCLUSIONES}
 
 Como recapitulación del trabajo, primero haremos un recuento aproximado de los posibles costes que se hubiesen incurrido en caso de haber sido un proyecto empresarial. Después de esto, se hará un análisis de los resultados generales obtenidos y continuaremos con indicaciones sobre posible trabajo futuro. Finalmente, concluiremos con los agradecimientos.
@@ -43,7 +41,7 @@ Como recapitulación del trabajo, primero haremos un recuento aproximado de los 
   \label{table:horasdedicadas}
 \end{table}
 
-En la Tabla \ref{table:horasdedicadas} se puede observar un desglose aproximado de las horas utilizadas para el desarrollo del proyecto. Debido a que se estaban cursando asignaturas y colaborando con el grupo de Investigación CRAAX al mismo tiempo, es posible que haya habido interferencias y el número real sea inferior o superior. 
+En la Tabla \ref{table:horasdedicadas} se puede observar un desglose aproximado de las horas utilizadas para el desarrollo del proyecto.
 
 Respecto al coste por horas, podemos ver en la Tabla \ref{table:salarios} un posible coste de la realización del trabajo, tomando como referencia diferentes salarios medios según la tarea realizada. El total asciende a 13 447.47, aunque los tiempos requeridos y los salarios podrían haber sido distintos en un entrono empresarial.
 
@@ -71,9 +69,9 @@ Si hacemos la suma total, el coste total sería de unos 16 000 €. Cabe notar q
 
 Durante el transcurso del proyecto, se han analizado diferentes conjuntos de datos y herramientas disponibles. Con esto, hemos detectado que había otras herramientas que podían ofrecer una funcionalidad similar a CICFlowMeter, pero que no existía una herramienta que nos ofreciese el etiquetado automático de flujos sin tener que realizar pasos extras. Adicionalmente, muchas herramientas analizadas asumían una instalación más general o la interfaz por consola no era tan directa. Esta información ha permitido desarrollar un programa, el cual puede rellenar este caso de uso específico. Es decir, el poder generar estadísticas de flujos con etiquetas asociadas tanto en tiempo real como con trazas de red para entrenar modelos directamente de estas. Una vez realizado esto, el despliegue de esta herramienta no requiere de una gran complejidad, ya que es un programa compilado, el cual requiere una cantidad limitada de librerías dinámicas.
 
-Cuando se realizó el uso de la herramienta para entrenar modelos, se pudieron descubrir problemas en la implementación. Se vio que el asumir que los flujos que no tenían etiqueta disponible eran benignos y no tener en cuenta el protocolo de transporte empeoraba sustancialmente la capacidad de los modelos para poder obtener un buen rendimiento. La mayoría de modelos entrenados tienen muy buen rendimiento, indicando que los datos generados por la herramienta permiten identificar el comportamiento de los flujos. Sin embargo, es posible que solo funcionen correctamente sobre los entornos sintéticos originales donde se generaron los datos y que en una situación real los resultados varían.
+Cuando se utilizó la herramienta para entrenar modelos, se pudieron descubrir problemas en la implementación. Se vio que el asumir que los flujos que no tenían etiqueta disponible eran benignos y no tener en cuenta el protocolo de transporte empeoraba sustancialmente la capacidad de los modelos para poder obtener un buen rendimiento. La mayoría de modelos entrenados tienen muy buen rendimiento, indicando que los datos generados por la herramienta permiten identificar el comportamiento de los flujos. Sin embargo, es posible que solo funcionen correctamente sobre los entornos sintéticos originales donde se generaron los datos y que en una situación real los resultados varían.
 
-Personalmente, el trabajo me ha permitido probar a desarrollar por primera vez sobre Rust y ver cómo el resultado generado era útil. Considero que la decisión de utilizar este lenguaje, pese a no haber tenido experiencia anterior con él, ha sido correcta. Adicionalmente, ha sido interesante el tomar una herramienta, la cual había sido utilizada en el grupo de investigación para ciertos casos, analizarla y diseñar e implementar una nueva que mejore las carencias de la original.
+Personalmente, el trabajo me ha permitido hacer uso por primera vez del lenguaje de programación Rust y ver cómo el resultado generado era útil. Considero que la decisión de utilizar este lenguaje, pese a no haber tenido experiencia anterior con él, ha sido correcta. Adicionalmente, ha sido interesante el tomar una herramienta, la cual había sido utilizada en el grupo de investigación CRAAX para ciertos casos, analizarla y diseñar e implementar una nueva que mejore las carencias de la original.
 
 \section{Trabajo futuro}
 
@@ -93,6 +91,4 @@ Primero de todo, quiero agradecer a mis padres por el apoyo y palabras de alient
 
 A continuación, agradezco al profesorado, el cual me ha permitido descubrir y consolidar conceptos que de otra manera hubiese sido mucho más difícil obtener. Con especialidad a Ester Simo, la directora del proyecto, que ha ayudado a tener un control del progreso del proyecto, la detección de mejoras en la redacción y el desbloqueo para saber por dónde continuar en los momentos en que los resultados obtenidos eran muy inferiores a lo esperado.
 
-Finalmente, quiero mostrar mis agradecimientos a la Escola Politécnica Superior d'Enginyeria de Vilanova i la Geltrú y al Centre de Recerca d'Arquitectures Avançades de Xarxes (CRAAX), por ofrecerme la oportunidad de realizar mis estudios, prácticas y trabajo final de grado con ellos. 
-
-\color{black}
+Finalmente, quiero mostrar mis agradecimientos a la Escola Politécnica Superior d'Enginyeria de Vilanova i la Geltrú y al Centre de Recerca d'Arquitectures Avançades de Xarxes (CRAAX), por ofrecerme la oportunidad de realizar mis estudios, prácticas y Trabajo Final de Grado con ellos. 
