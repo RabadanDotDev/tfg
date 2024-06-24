@@ -3,11 +3,17 @@
     "latex-workshop.latex.build.forceRecipeUsage": false,
     "latex-workshop.latex.recipes": [
         {
-            "name": "latexmk (lualatex)",
+            "name": "plantuml -> lualatexmk -> bibtex",
             "tools": [
                 "plantuml",
                 "lualatexmk",
                 "bibtex",
+            ]
+        },
+        {
+            "name": "lualatexmk",
+            "tools": [
+                "lualatexmk",
             ]
         },
         {

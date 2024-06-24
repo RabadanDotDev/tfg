@@ -1,0 +1,167 @@
+\documentclass[10pt,a4paper,twoside]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{multicol}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\usepackage{titlesec, blindtext}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{tocloft}
+\usepackage[
+    hyperindex=true,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    hidelinks,
+]{hyperref}
+\usepackage[all]{hypcap}
+\usepackage[labelfont=bf]{caption}
+\usepackage{float}
+\usepackage{bytefield}
+\usepackage{listings}
+\usepackage[
+    top=2cm,
+    inner=2cm,
+    outer=1.5cm,
+    bottom=2.5cm,
+]{geometry}
+\usepackage[skip=5pt]{parskip}
+
+\setmainfont[Ligature=TeX]{Times New Roman}
+\setlength\columnsep{0.5cm}
+\setlength{\parindent}{0in}
+\makeatletter
+\renewcommand{\fnum@figure}{Fig. \thefigure}
+\makeatother
+\captionsetup{labelsep=period}
+\titleformat{\section}[block]{\centering\large\bfseries}{\thesection. }{0.1em}{}
+\titlespacing{\section}{0em}{0.3em}{0.3em}
+\pagenumbering{gobble}
+
+\bibliographystyle{unsrt}
+
+\begin{document}
+
+\begin{center}
+    \bfseries\fontsize{22pt}{27pt}\selectfont\par
+    Desarrollo de una herramienta de análisis de tráfico de red y su uso en algoritmos de ML para la detección de ataques.
+    \par
+\end{center}
+
+\bigskip
+
+\begin{center}
+    \large\par
+    Raul Rabadan Arroyo
+    \par
+\end{center}
+
+\begin{center}
+    \par
+    Estudiante en Grado de Ingeniería Informática de la EPSEVG-UPC
+    \par
+\end{center}
+
+\smallskip
+
+\begin{multicols}{2}
+    \section*{Resumen}
+
+    Esta plantilla de muestra de Word provee las pautas básicas para ayudarle a preparar los documentos a presentar. Los documentos se publicarán exactamente como sean recibidos. Para asegurar un aspecto profesional y una máxima uniformidad entre todos los documentos, le pedimos cordialmente que ponga mucha atención en respetar estas pautas básicas, las cuales indican las áreas típicamente disponibles para cada parte del documento, desde el título hasta el texto principal así como el tipo y tamaño de las fuentes sugerido.
+
+    \section{Introducción}
+
+    Las pautas para la presentación de los documentos son un elemento importante para ayudar en la obtención de un aspecto profesional y una calidad aceptable. Son muy fáciles de seguir con los actuales procesadores de textos generalmente disponibles. Basta con tomar debida nota de las áreas que están típicamente disponibles para cada parte del documento así como el tipo y tamaño de las fuentes sugerido. Para verla mejor, esta plantilla de muestra está completamente escrita con las fuentes sugeridas para ser usadas en el documento. La puede conseguir en http://www-gsi.dec.usc.es/jsweb06.
+
+    \section{Márgenes, fuentes y espaciado entre líneas}
+
+    El documento tiene como máximo \textbf{8 páginas de longitud}, y debe ser escrito en \textbf{DIN-A4} (21 cm x 29.7 cm) con los siguientes márgenes:
+
+    \begin{itemize}
+        \item 2 cm, desde el margen superior hasta la primera línea en cada página.
+        \item 2 cm, hasta el margen interior del documento.
+        \item 1.5 cm, hasta el margen exterior del documento.
+        \item 2.5 cm, desde el margen inferior hasta la última línea del texto.
+    \end{itemize}
+
+    Los márgenes del documento deberán ser simétricos (“mirror margins”), es decir, en las páginas impares el margen izquierdo será el interior y en las páginas pares será el exterior. Recordar que el primer folio de la contribucion será numerado como impar.
+    
+    El Título, nombres de los Autores y sus datos deben ser escritos en formato de una columna en la parte superior de la primera página, mientras que el resto del texto debe hacerse en formato de 2 columnas. El espacio entre columnas es 0.5 cm, lo que deja 8.5 cm para el ancho de cada columna, exactamente como está formateada esta plantilla de muestra.
+
+    La fuente sugerida para usarse en el documento es Times New Roman, con tamaños de letra variables de acuerdo con la importancia de la parte del documento escrita:
+    \begin{itemize}
+        \item Para el título sugerimos Times New Roman 22 negrita.
+        \item Los nombres y datos de los autores se sugieren en Times New Roman 12.
+        \item El cuerpo principal del documento estará en Times New Roman 10.
+        \item Los encabezamientos de sección en Times New Roman 12 negrita.
+    \end{itemize}
+
+    En relación con el espaciado entre líneas, hay dos simples reglas a tener en cuenta. Primera el uso de espaciado simple en el documento. Segunda, la separación entre secciones debe ser una única línea en blanco.
+
+        En definitiva, creemos que estas sencillas pautas para el formato deben dar no sólo una densidad apropiada para presentar un buen trabajo científico en las 8 páginas asignadas a cada documento, sino también una adecuada claridad al texto para permitir una lectura relajada.
+
+    A continuación encontrará con más detalle cómo disponer la primera página del documento.
+
+    \section{Primera página}
+
+    Además del Título y los nombres y datos de los Autores la primera página contiene el Resumen del documento. Éste es un elemento bastante importante que da una primera visión rápida de lo que trata su documento y las nuevas contribuciones que propone. Por esa razón debe ser escrito con extremo cuidado para contener toda la información necesaria y relevante de la forma más clara y concisa posible. Debido a su importancia en la estructura global del documento, el Resumen aparece en la parte superior de la primera columna y no debe ocupar más de 15 líneas de texto. Esperamos que haga un esfuerzo para adherirse a esta regla.
+    
+    Después del Resumen, vemos el desarrollo de varias secciones en las que está organizado el documento. Primero, la Introducción, donde normalmente exponemos el motivo principal y el trabajo de fondo en relación con su propio trabajo así como las contribuciones que son propuestas y la forma de presentarlas. Es normalmente aquí donde encontramos el cuerpo principal de las referencias al trabajo presentado. Éstas son, por supuesto, extremadamente importantes y deben ser seleccionadas cuidadosamente entre las publicaciones del mundo científico relacionadas con su trabajo. El modo sugerido de llamar a una referencia en el cuerpo principal del texto es simplemente insertar entre corchetes un número de secuencia cada vez que se indica una nueva referencia. Por ejemplo, [1], [2], y así. La identidad completa de estas referencias, incluyendo autores, título, medios de publicación y datos específicos de la misma (números de páginas, fecha de publicación) pueden encontrarse al final del documento. Es muy fácil (y a menudo ocurre) confundir números de páginas e incluso fechas de publicación, lo que puede causar una frustración significativa cuando un lector interesado intente consultar la referencia. Por favor, sea tan cuidadoso como pueda para asegurar que la información concerniente a todas las referencias sea completa  y fiable. Ésta es obviamente una parte muy importante y relevante de su propio trabajo y no debe ser pasada por alto.
+
+    \section{Segunda página y posteriores}
+
+    Las subsiguientes segunda, tercera y cuarta páginas del documento se escribirán en un formato uniforme de 2 columnas de acuerdo con los márgenes indicados en la sección 2 de este documento. Por supuesto, no olvide mantener Times New Roman 10 para el texto con espaciado simple entre líneas.
+
+    Una recomendación final. \textbf{No necesita numerar las páginas} ya que esto se hará cuando se compongan las Actas definitivas.
+
+    \section{Acerca de las figuras}
+
+    Una de las partes más complejas a la hora de editar un artículo es sin lugar a dudas las figuras. Por esta razón no consideramos muy eficiente dar excesivas reglas acerca de su formato. Solamente citar varios consejos generales. Siempre que sea posible, se deberán colocar las figuras lo más cerca posible del lugar del texto donde se les haga referencia por primera vez. Por otra parte se procurará adecuar el tamaño de la figura para que ocupe la anchura de una columna, siempre y cuando la claridad de la misma no se vea comprometida, en cuyo caso se podrán utilizar las dos columnas, hasta un máximo de 17.5 cm.
+
+    Además de la libertad dada para el posicionamiento y edición de las figuras, nos gustaría proponerle una recomendación muy simple para la uniformidad, que concierne a los \textbf{pies de las figuras}. Deben ser escritos justo debajo de la figura, preferiblemente centrados con referencia al formato de la figura y escritos en fuente \textbf{Times New Roman 9} itálica para diferenciarlos del texto principal. Las figuras se numeran secuencialmente y su número debe aparecer en negrita, exactamente como está indicado en nuestra figura 1. El número de orden así como la abreviación fig. deberán ir en negrita.
+
+    \begin{figure}[H]
+        \begin{center}
+          \includegraphics[width=\linewidth, height=3cm]{../report/media/epsevg_logo.jpeg}
+        \end{center}
+        \caption{Ejemplo pie de figura}\label{fig:ex}
+    \end{figure}
+
+    \section{Acerca de las figuras tablas}
+
+    Las pautas para editar y situar las tablas son muy simples. Sólo hay que escribirlas como texto y situarlas como figuras. Se puede usar negrita y diferentes tamaños (desde Times New Roman 12 hasta Times New Roman 10) para diferenciar la información relevante que contienen, como está indicado debajo.
+    
+    Respecto a la anchura de las tablas, las pautas a seguir serán las mismas que en el caso de las figuras.
+
+    \begin{table}[H]
+        \begin{center}
+            \begin{tabular}{| l | l | l | l |} 
+                \hline
+                Distorsión armónica & 2 Arm. & 3 Arm. & 4 Arm. \\
+                \hline
+                Señal A & -51 dB & -53 dB & -54 dB \\
+                \hline
+                Señal B & -76 dB & -65 dB & -44 dB \\
+                \hline
+            \end{tabular}
+        \end{center}
+        \caption{Ilustración de la edición de una tabla}
+        \label{table:ex}
+    \end{table}
+
+    \section{Conclusiones}
+
+    Tiene ahora todas las pautas básicas que nos gustaría que usara al preparar el documento definitivo para presentar al JSWEB 2006. Por favor, tenga en cuenta de nuevo los márgenes a respetar en referencia a un DIN-A4, la longitud máxima de 8 páginas, las áreas dedicadas a cada una de las diferentes partes de su documento así como los tipos y tamaños de las fuentes que deben usarse para diferenciarlas. Como habrá adivinado hasta ahora, esta plantilla de muestra ha sido escrita en total conformidad con tales pautas.
+
+    \section{Agradecimientos}
+
+    Aquí se pondrían los agradecimientos relacionados con el proyecto u organización que ha financiado la investigación.
+
+    Test \cite{cicflowpost}
+
+    \bibliography{refs}
+
+\end{multicols}
+\end{document}
