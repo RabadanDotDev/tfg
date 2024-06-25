@@ -148,11 +148,11 @@ Para este dataset, también se han generado diferentes histogramas para asegurar
   \endminipage\hfill
 \end{figure}
 
-En la tabla \ref{table:toniotprotocolsip} podemos ver el resultado del análisis con tshark sobre la repartición de los diferentes protocolos de transporte sobre \acrshort{ipv4}. A diferencia de los otros casos, la mayoría de tramas en este dataset van sobre \acrshort{tcp} (90.154\%) y tiene cierto tráfico que se puede considerar residual en \acrshort{udp} (5.982\%) y no identificado (3.864\%).
+En la Tabla \ref{table:toniotprotocolsip} podemos ver el resultado del análisis con tshark sobre la repartición de los diferentes protocolos de transporte sobre \acrshort{ipv4}. A diferencia de los otros casos, la mayoría de tramas en este dataset van sobre \acrshort{tcp} (90.154\%) y tiene cierto tráfico que se puede considerar residual en \acrshort{udp} (5.982\%) y no identificado (3.864\%).
 
 \input{theoretical_framework/datasets_toniot_protosip.tex}
 
-La tabla \ref{table:botiotprotocols}, que contiene las tres primeras capas de protocolos identificados en BoT-IoT, es de mayor tamaño que en los casos anteriores. Esto es debido a que aparece el uso de "sll" (no confundir con \acrshort{ssl}) aparte del tráfico sobre Ethernet. Si abrimos los ficheros con WireShark, podemos observar que este consiste en el tipo "Linux cooked capture", el cual puede contener paquetes \acrshort{ip} como en la Figura \ref{fig:toniot_pcap_ssl_ip_packet} o paquetes Ethernet como en la Figura \ref{fig:toniot_pcap_ssl_eth_packet}. Se puede observar en esta última que WireShark no es capaz de reconocer los contenidos de la siguiente capa. Esta capa de enlace no es una capa de enlace real, sino que es una especial para guardar trazas de red de forma más flexible. 
+La Tabla \ref{table:botiotprotocols}, que contiene las tres primeras capas de protocolos identificados en BoT-IoT, es de mayor tamaño que en los casos anteriores. Esto es debido a que aparece el uso de "sll" (no confundir con \acrshort{ssl}) aparte del tráfico sobre Ethernet. Si abrimos los ficheros con WireShark, podemos observar que este consiste en el tipo "Linux cooked capture", el cual puede contener paquetes \acrshort{ip} como en la Figura \ref{fig:toniot_pcap_ssl_ip_packet} o paquetes Ethernet como en la Figura \ref{fig:toniot_pcap_ssl_eth_packet}. Se puede observar en esta última que WireShark no es capaz de reconocer los contenidos de la siguiente capa. Esta capa de enlace no es una capa de enlace real, sino que es una especial para guardar trazas de red de forma más flexible. 
 
 \begin{figure}[H]
   \minipage{0.49\textwidth}
@@ -167,6 +167,6 @@ La tabla \ref{table:botiotprotocols}, que contiene las tres primeras capas de pr
   \endminipage\hfill
 \end{figure}
 
-Podemos ver que la mayoría de los datos expresados en la tabla \ref{table:toniotprotocols} están encapsulados en \acrshort{sll} (34.4 GiB) y no se incluyen las cabeceras Ethernet originales, sino que aparece la capa \acrshort{ip} directamente (22.8 GiB) y a continuación \acrshort{tcp} (21.7 GiB). De todas maneras, hay una cantidad considerable de tramas (11.3 GiB), las cuales sí que incluyen la capa Ethernet. Adicionalmente, parte de los datos no utilizan \acrshort{sll} como encapsulación, sino que hacen uso de Ethernet como en los otros datasets (8.4 GiB). 
+Podemos ver que la mayoría de los datos expresados en la Tabla \ref{table:toniotprotocols} están encapsulados en \acrshort{sll} (34.4 GiB) y no se incluyen las cabeceras Ethernet originales, sino que aparece la capa \acrshort{ip} directamente (22.8 GiB) y a continuación \acrshort{tcp} (21.7 GiB). De todas maneras, hay una cantidad considerable de tramas (11.3 GiB), las cuales sí que incluyen la capa Ethernet. Adicionalmente, parte de los datos no utilizan \acrshort{sll} como encapsulación, sino que hacen uso de Ethernet como en los otros datasets (8.4 GiB). 
 
 \input{theoretical_framework/datasets_toniot_protos.tex}

@@ -1,32 +1,28 @@
 \newpage
 \pagestyle{plain}
 
-\phantomsection\addcontentsline{toc}{chapter}{INTRODUCCIÓN}
-\chapter*{INTRODUCCIÓN}
+\chapter{INTRODUCCIÓN}
 
 La ciberseguridad es una de las fronteras del conocimiento que ha tomado más relevancia estos últimos años. Para salvaguardar la disponibilidad, integridad y confidencialidad de la información tanto almacenada como en tránsito, se aplican numerosas y diversas técnicas en conjunto. Desde medidas criptográficas para proteger la información hasta el análisis del tráfico de red para detectar comportamientos maliciosos y poder bloquearlos. El presente trabajo se focalizará principalmente en el último punto.
 
-\phantomsection\addcontentsline{toc}{section}{MOTIVACIÓN}
-\section*{MOTIVACIÓN}
+\section{MOTIVACIÓN}
 
 La motivación del ámbito de este trabajo surge de una beca de colaboración con el grupo de investigación Centre de Recerca d'Arquitectures Avançades de Xarxes (CRAAX) y mi interés por la aplicabilidad de los sistemas de \gls{ml} en entornos limitados o con requerimientos de actuación en tiempo real, especialmente en el ámbito de ciberseguridad en las redes. En muchos casos, los tráficos de red maliciosos son identificados cuando estos ya han ocurrido o están generando problemas activamente para el resto de usuarios de la red. La gran utilidad que supondría la detección de ataques en su inicio o incluso antes de que ocurriesen es una meta en la que me gustaría colaborar. Llegar a este ideal es altamente difícil. Sin embargo, tenerlo como horizonte para dirigir el camino y acercarse lo máximo posible a este, ofrece la capacidad de mejorar la mitigación contra posibles adversarios.
 
 Durante la colaboración, he utilizado herramientas de extracción de características para la caracterización de flujos de red. Sin embargo, estas presentaban ciertas limitaciones e inconvenientes, los cuales me han impulsado a querer desarrollar una alternativa.
 
-\phantomsection\addcontentsline{toc}{section}{OBJETIVOS}
-\section*{OBJETIVOS}
+\section{OBJETIVOS}
 
 El objetivo principal del trabajo consiste en diseñar, programar y demostrar la utilidad de una herramienta de análisis de red basada en la extracción de características para detectar comportamientos maliciosos. La herramienta requerirá de ser robusta y eficiente, además de fácil de utilizar, extender y modificar. La robusteza y eficiencia son necesarias, ya que por su naturaleza tendrá que tratar datos en tiempo real en entornos limitados. La facilidad de uso, extensión y modificación es importante, ya que en el desarrollo de aplicaciones, y especialmente en el ámbito de la ciberseguridad, el entorno y los requerimientos están en constante variación.
 
-\phantomsection\addcontentsline{toc}{section}{METODOLOGÍA}
-\section*{METODOLOGÍA}
+\section{METODOLOGÍA}
 
 La metodología que se seguirá durante el transcurso del TFG se basa en parte en la metodología Agile y en Extreme Programming \cite{extremeprogramming}. Debido a que el trabajo está siendo realizado por una sola persona y coordinado con la directora del proyecto, no requiere de la mayoría de recomendaciones de gestión de equipos. 
 
 Para hacer un seguimiento del progreso, se realizará como mínimo una reunión semanal. En esta, se revisará el progreso obtenido y se decidirá si continuar de la misma manera y el objetivo a alcanzar en la siguiente semana. Adicionalmente, todo el código y la documentación será accesible en cualquier momento por la directora del proyecto. Las fuentes tanto de lo que se programe como de la documentación se encontrarán en un repositorio de GitHub. Para facilitar la revisión de la memoria, también se harán disponibles archivos PDF del último estado de la memoria en una carpeta compartida de Google Drive al menos una vez por semana. De esta manera, se podrá realizar un desarrollo iterativo en el cual nos acerquemos a la solución de forma progresiva.
 
 \phantomsection\addcontentsline{toc}{section}{PASOS PARA EL DESARROLLO}
-\section*{PASOS PARA EL DESARROLLO}
+\section{PASOS PARA EL DESARROLLO}
 
 La realización del trabajo consistirá en tres fases principales. Primero haremos un análisis de las herramientas y conjuntos de datos disponibles. Con esta información, haremos el desarrollo de la herramienta y lo documentaremos, incluyendo teoría y conceptos adicionales necesarios a la memoria. Finalmente, utilizaremos la herramienta en una tarea de \gls{ml} y trataremos de demostrar su funcionalidad. En la Figura \ref{fig:gantt} podemos ver un diagrama de Gantt de la temporización esperada.
 
