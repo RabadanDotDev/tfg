@@ -83,7 +83,15 @@
 
     \section{CICFlowMeter}
 
-    Por hacer. \cite{cicflowpost}
+    CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost} \cite{icissp17} \cite{cicflowrepo}. Permite obtener información sobre flujos bidireccionales sobre IP a partir de trazas de red en archivos con el formato PCAP. Adicionalmente, los protocolos de transporte que soporta son UDP y TCP. Por cada flujo, genera siete columnas identificativas y añade 76 características continuas. De estas características generadas, hay algunas como 'Fwd Packet Length Mean' y 'Fwd Segment Size Avg' que parecen estar representando el mismo valor.
+
+    La herramienta soporta exclusivamente trazas y la captura de paquetes que provengan de la capa de enlace Ethernet. No ofrece soporte para Linux Cooked Capture (SLL), la cual es utilizada en contextos en los cuales se capturan de diferentes interfaces de red al mismo tiempo o se quiere descartar información de la capa de Ethernet. Adicionalmente, no parece tener soporte para la desfragmentación de paquetes IP.
+
+    En el momento de utilizar la herramienta, se ha observado que se introducía cabeceras duplicadas en los archivos CSV. Esto era causado debido a que el módulo cic.cs.unb.ca.jnetpcap.FlowGenerator, en la función dumpLabeledFlowBasedFeatures, se escribe la cabecera dos veces, una después de generar el archivo y otra después de escribir todos los flujos completos. No ha sido posible encontrar una indicación de porque se está realizando de esta manera, por tanto, se puede asumir que ha sido un error.
+
+    Durante el análisis del código, se han identificado bloques de código comentados (puestos en forma de comentario para que sean ignorados en el momento de ejecución) además de tabulación inconsistente. Es posible que la causa de esto haya sido que el código ofrecido en el repositorio de GitHub este desactualizado o se haya decidido no continuar el trabajo en CICFlowMeter.
+
+    Por estas razones, se ha considerado que el desarrollo de otra herramienta que haga una tarea equivalente sin estos inconvenientes podría ser una aportación útil.
 
     \section{Desarollo herramienta}
 
