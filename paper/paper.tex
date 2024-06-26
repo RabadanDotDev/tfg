@@ -83,7 +83,7 @@
 
     Durante la colaboración, he utilizado herramientas de extracción de características para la caracterización de flujos de red. Sin embargo, estas presentaban ciertas limitaciones e inconvenientes, los cuales me han impulsado a querer desarrollar una alternativa.
 
-    El resto del artículo está estructurado de la siguiente manera. Primero, veremos en la Sección \ref{cicflowmeter} la herramienta que ha servido de principal inspiración para el desarrollo del trabajo y se comentarán sus potenciales mejoras. A continuación, en la Sección \ref{funcherramienta}, se indicará la estructura general de la herramienta, qué librerías se han utilizado y modificaciones necesarias a una de estas. Después de esto, se mostrará dentro de la Sección \ref{casoml} una aplicación en un caso de ML para mostrar su utilizad. Finalmente, terminaremos con las conclusiones y el trabajo futuro en Sección \ref{tabajofuturo} y Sección \ref{agradecimientos}, respectivamente.
+    El resto del artículo está estructurado de la siguiente manera. Primero, veremos en la Sección \ref{cicflowmeter} la herramienta que ha servido de principal inspiración para el desarrollo del trabajo y se comentarán sus potenciales mejoras. A continuación, en la Sección \ref{funcherramienta}, se indicará la estructura general de la herramienta, qué librerías se han utilizado y modificaciones necesarias a una de estas. Después de esto, se mostrará dentro de las secciones \ref{casoexec} y \ref{casoml} una aplicación en un caso de ML para mostrar su utilizad. Finalmente, terminaremos con las conclusiones y el trabajo futuro en Sección \ref{tabajofuturo} y Sección \ref{agradecimientos}, respectivamente.
 
     \section{CICFlowMeter} \label{cicflowmeter}
 
@@ -152,9 +152,9 @@
 
     Finalmente, una vez se considera un flujo cerrado, se etiqueta si es posible y se emite el resultado. El etiquetado se realiza a partir de un fichero 'ground truth' proporcionado por el usuario, el cual ha de incluir un par de direcciones IP, el protocolo de transporte utilizado, la marca de tiempo de inicio y final expresadas en tiempo UNIX y la etiqueta deseada. Se trata de encontrar la mejor coincidencia en este con el flujo cerrado y, en caso de no encontrar nada, se asigna la etiqueta 'unknown'. Una vez realizado esto, se emite el resultado según cómo lo haya indicado el usuario. La primera opción es emitirlo a la salida estándar, la cual puede estar conectada a la consola, a un archivo o a una 'pipe' que pasa los resultados a otro programa. La segunda, es escribirlo en archivos CSV con un prefijo indicado por el usuario. Para evitar generar archivos intratables, cada 10 millones de linias se empiezan a escribir en un archivo CSV nuevo.
 
-    \section{Aplicación caso práctico ML} \label{casoml}
+    \section{Aplicación de la herramienta} \label{casoexec}
 
-    Para mostrar un posible uso de la herramienta, hemos hecho uso de tres conjuntos de datos etiquetados, de los cuales se nos ofrecen las trazas de red originales. De estos, hemos extraído y simplificado las etiquetas disponibles, ejecutado la herramienta sobre las trazas, preprocesado los datos y entrenado diferentes modelos de ML con ellos. 
+    Para mostrar un posible uso de la herramienta, hemos hecho uso de tres conjuntos de datos etiquetados, de los cuales se nos ofrecen las trazas de red originales. De estos, hemos extraído y simplificado las etiquetas disponibles y a continuación ejecutado la herramienta sobre las trazas. En la Sección \ref{casoml} veremos cómo hacemos el preprocesado de los datos generados y generado un modelo de ML con ellos.
 
     El primer conjunto de datos utilizado ha sido CIC-DDos\-2019 \cite{8888419}. Este ha sido creado por el Canadian Institute for Cybersecurity que contiene trazas de dos días en los que aparece tráfico benigno y serie de ataques DDoS típicos. Para extraer las etiquetas, primero hemos leído los campos conteniendo las direcciones IP, protocolo, marca temporal de inicio, duración del flujo y etiqueta. A continuación, las marcas temporales se han ajustado para que estén expresadas en tiempo UNIX. Después de esto, se ha convertido la columna de duración en la marca temporal de finalización. Finalmente, se han eliminado los registros con protocolos inválidos, expresado y puesto el nombre de las columnas y etiquetas al formato que la herramienta esperaba.
     
@@ -162,7 +162,62 @@
     
     El tercero ha sido TON-IoT \cite{MOUSTAFA2021102994}. Este ha sido creado por la University of New South Wales Canberra, Australia y para generarlo se estructuró un entorno de red con tres capas llamadas Edge, Fog y Cloud para simular un entorno realista. Para la extracción de las etiquetas, hemos hecho un proceso similar al primer dataset. La diferencia ha sido que la marca temporal estaba representada como tiempo UNIX, pero en formato decimal. Es decir, con una parte entera con los segundos y una parte decimal con la fracción de segundo. También ha sido necesario representar los protocolos en formato numérico y descartar los registros con protocolos inválidos.
 
-    % Ejecución con etiquetado (mencionar stats ejecucion + paquetes + total contenidos + desbalance)
+    Una vez extraídas las etiquetas, se procedió a ejecutar la herramienta sobre los diferentes conjuntos de datos. Podemos ver en la Tabla \ref{table:statsevalpacketoffline} cómo la mayoría de paquetes de BoT-IoT fueron procesados correctamente, mientras que parte de los paquetes de los otros no se pudieron tener en cuenta para la generación de estadísticas. En la Tabla \ref{table:statstimeoffline} podemos observar cómo la herramienta ha podido tratar en un tiempo razonable los paquetes que estaban repartidos por horas o incluso días. Finalmente, en la Tabla \ref{table:generatedfilesoffline} podemos observar la magnitud de los datos resultantes de la ejecución.
+
+    \begin{table}[H]
+        \begin{center}
+            \resizebox{\columnwidth}{!}{%
+                \begin{tabular}{|c | c c c |} 
+                    \hline
+                    & \textbf{CIC-DDoS2019} & \textbf{BoT-IoT} & \textbf{TON-IoT} \\
+                    \hline
+                    Paquetes procesados & 312 191 170 & 549 787 584 & 213 236 852 \\
+                    Paquetes válidos    & 286 881 800 & 549 057 279 & 175 845 321 \\
+                    \hline
+                \end{tabular}
+            }
+        \end{center}
+        \caption{Paquetes procesados y válidos en el análisis}
+        \label{table:statsevalpacketoffline}
+    \end{table}
+
+    \begin{table}[H]
+        \begin{center}
+            \resizebox{\columnwidth}{!}{%
+                \begin{tabular}{|c | c c c |} 
+                    \hline
+                    & \textbf{CIC-DDoS2019} & \textbf{BoT-IoT} & \textbf{TON-IoT} \\
+                    \hline
+                    Tiempo total   & 7m 17,665s & 7m 31,202s & 3m 32,303s \\
+                    Tiempo usuario & 5m 50,915s & 7m  0,735s & 3m  4,560s \\
+                    Tiempo kernel  & 1m 50,915s & 0m 28,419s & 0m 26,181s \\
+                    \hline
+                \end{tabular}
+            }
+        \end{center}
+        \caption{Tiempos de análisis}
+        \label{table:statstimeoffline}
+    \end{table}
+
+    \begin{table}[H]
+        \begin{center}
+            \resizebox{\columnwidth}{!}{%
+                \begin{tabular}{|c | c c c |} 
+                    \hline
+                    & \textbf{CIC-DDoS2019} & \textbf{BoT-IoT} & \textbf{TON-IoT} \\
+                    \hline
+                    Número de archivos &          5 &          1 &          3  \\
+                    Flujos totales     & 48 385 896 &  6 077 653 & 27 005 789  \\
+                    Bytes totales      &    29 GiB  & 3,8 GiB    & 16 GiB      \\
+                    \hline
+                \end{tabular}
+            }
+        \end{center}
+        \caption{Archivos generados durante el análisis}
+        \label{table:generatedfilesoffline}
+    \end{table}
+
+    \section{Uso de los datos generados} \label{casoml}
 
     % Pasos preparación datos
 
