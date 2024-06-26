@@ -66,7 +66,7 @@
 
 \smallskip
 
-\begin{multicols}{2}
+\begin{multicols*}{2}
     \section*{Resumen}
 
     En este Trabajo de Final de Grado (TFG) se hace el desarrollo de una herramienta de análisis de red y se demuestra su funcionamiento a partir de analizar trazas de tráfico de red y el uso de los datos resultantes para entrenar modelos con Machine Learning. La herramienta desarrollada puede ser utilizada como componente en sistemas  de detección de intrusiones y tiene el potencial para ser extendida con más funcionalidades en el futuro. Se ha hecho uso de Rust para el desarrollo de la herramienta y es capaz de generar 72 características continuas, 2 discretas para el protocolo de transporte y una identificación de cada flujo compuesta por 7 valores. Adicionalmente, hay soporte para el etiquetado automático a partir de un fichero CSV. Con los registros generados por la herramienta, se ha podido realizar una detección de flujos de red malignos con una puntuación F1 media del 98.66\%.
@@ -288,40 +288,31 @@
     
     \section{Conclusiones} \label{conclusiones}
 
-    Por hacer.
+    Durante el transcurso del proyecto, se han analizado diferentes conjuntos de datos y herramientas disponibles. Con esto, hemos que no existía una herramienta que nos ofreciese el etiquetado automático de flujos con características similares a CICFlowMeter. Es decir, el poder generar estadísticas de flujos con etiquetas asociadas tanto en tiempo real como con trazas de red para entrenar modelos directamente de estas. Una vez desarrollada, el despliegue de esta herramienta no requiere de una gran complejidad, ya que es un programa compilado el cual requiere una cantidad limitada de librerías dinámicas.
 
+    Cuando se utilizó la herramienta para entrenar modelos, se pudo observar que la mayoría de modelos entrenados muestran un buen rendimiento, indicando que los datos generados por la herramienta permiten identificar el comportamiento de los flujos. Sin embargo, los resultados específicos obtenidos con los modelos generados tienen el potencial riesgo que solo funcionen correctamente sobre los entornos sintéticos originales donde se generaron los datos y que en una situación real los resultados varíen.
+    
     \section{Trabajo futuro} \label{tabajofuturo}
 
-    Por hacer.
+    Existen muchas posibles ramas de trabajo futuras como continuación de este proyecto. Por cada parte de la herramienta, es posible añadir nuevas características. Adicionalmente, se puede tratar de integrar en entornos más generales y hacer uso de esta bajo otros contextos.
+
+    La herramienta solo tiene soporte para dos capas de enlace y dos protocolos de transporte. Se podría añadir soporte para analizar flujos de comunicación en diferentes capas de la pila OSI y más cantidad de protocolos aceptados. Ejemplos pueden ser comunicaciones transmitidas sobre Bluetooth o 5G e incluso analizar si las peticiones de la capa de aplicación son válidas. Otra opción es añadir soporte para correlacionar diferentes flujos, sea para mejorar la detección de ataques DDoS o incluir información sobre comunicaciones que se transmitan en flujos paralelos como en RTP/RSTP.
+
+    Adicionalmente, hay partes de la herramienta donde se hacen copias de los datos o no se limita la capacidad máxima de las estructuras de datos. No se ha tenido en cuenta este punto en el desarrollo para poder tener un código más simple. Sin embargo, si se llegase a desplegar una herramienta y un atacante tratase de, por ejemplo, tomar ventaja de cómo reconstruimos paquetes IP fragmentados, sería posible provocar que se termine la memoria RAM disponible. Una posible solución simple para evitar esto es descartar cualquier paquete fragmentado y no tratar de reconstruirlo. 
+
+    Otro punto de posible mejora consiste en la creación de mayores tests del código para asegurar su buen funcionamiento incluso en casos inesperados. Con herramientas de cobertura de código se podrían detectar flujos de ejecución, los cuales no tienen tests asociados y podrían tener errores lógicos ocultos.
+
+    Otra categoría de posible trabajo futuro consiste en aplicar la herramienta sobre otros algoritmos de ML o conjuntos de datos. Observar si los modelos son capaces de generalizar a otros entornos puede indicar con mayor certeza si la herramienta puede ser utilizada en cualquier tipo de contexto o si es más efectiva en zonas específicas de la infraestructura.
 
     \section{Agradecimientos} \label{agradecimientos}
 
-    Por hacer.
+    Primero de todo, quiero agradecer a mis padres por el apoyo y palabras de aliento que he recibido durante el transcurso de mis estudios y de esta fase final del grado. Sin este, no hubiese sido posible haber llegado hasta este punto ni haber tenido la capacidad o la perseverancia para el desarrollo del trabajo.
+
+    A continuación, agradezco al profesorado, el cual me ha permitido descubrir y consolidar conceptos que de otra manera hubiese sido mucho más difícil obtener. Con especialidad a Ester Simo, la directora del proyecto, que ha ayudado a tener un control del progreso del proyecto, la detección de mejoras en la redacción y el desbloqueo para saber por dónde continuar en los momentos en que los resultados obtenidos eran muy inferiores a lo esperado.
+
+    Finalmente, quiero mostrar mis agradecimientos a la Escola Politécnica Superior d'Enginyeria de Vilanova i la Geltrú y al Centre de Recerca d'Arquitectures Avançades de Xarxes (CRAAX), por ofrecerme la oportunidad de realizar mis estudios, prácticas y Trabajo Final de Grado con ellos.
 
     \bibliography{refs}
 
-\end{multicols}
+\end{multicols*}
 \end{document}
-
-%\begin{table}[H]
-%    \begin{center}
-%        \begin{tabular}{| l | l | l | l |} 
-%            \hline
-%            Distorsión armónica & 2 Arm. & 3 Arm. & 4 Arm. \\
-%            \hline
-%            Señal A & -51 dB & -53 dB & -54 dB \\
-%            \hline
-%            Señal B & -76 dB & -65 dB & -44 dB \\
-%            \hline
-%        \end{tabular}
-%    \end{center}
-%    \caption{Ilustración de la edición de una tabla}
-%    \label{table:ex}
-%\end{table}
-
-%\begin{figure}[H]
-%    \begin{center}
-%      \includegraphics[width=\linewidth, height=3cm]{../report/media/epsevg_logo.jpeg}
-%    \end{center}
-%    \caption{Ejemplo pie de figura}\label{fig:ex}
-%\end{figure}
