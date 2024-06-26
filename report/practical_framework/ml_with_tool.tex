@@ -1301,9 +1301,13 @@ Una vez tomada la muestra, se ha aplicado el logaritmo sobre las característica
 
 Finalmente, se ha hecho un split 70/20/10 para entrenar los modelos, seleccionar el que tenga mejor rendimiento y comprobar la capacidad de generalización del modelo seleccionado con datos que aún no ha visto. 
 
+Se ha utilizado el script \texttt{packet\_\-pincer\_\-preprocess\_\-results.py} para el preprocesamiento y se encuentra disponible en el anexo 1.
+
 \subsection{Entrenamiento de modelos}
 
 En este subpunto se muestran los resultados de utilizar algoritmos de aprendizaje supervisado con los datos que hemos preparado. En los casos que se puedan configurar hiperparámetros, se ha hecho una búsqueda en cuadrícula de diferentes valores y se han escogido los que presentan la mejor métrica de 'f-score macro' ofrecido por \texttt{scikit-learn}. Esta es una media aritmética entre los f-score de cada etiqueta que el modelo puede seleccionar, en nuestro caso 'benign' y 'malign'.
+
+El script utilizado para la realización del entrenamiento de los modelos es \texttt{packet\_\-pincer\_\-train\_\-models\_\-pass.py} disponible en el anexo 1.
 
 \subsubsection{Naive bayes}
 
@@ -1372,14 +1376,14 @@ En la Tabla \ref{table:decisiontreeresults} podemos ver que los resultados son s
     \label{table:decisiontreeresults}
 \end{table}
 
-Podemos ver en la matriz de confusión de la Figura \ref{fig:decisiontreematrix} cómo solo 11 de 689 flujos benignos se han clasificado como malignos y 24 de los, 76467 malignos como benignos.
-
 \begin{figure}[H]
     \begin{center}
         \includegraphics[width=0.55\linewidth]{media/packet_pincer_train_models_decision_trees.png}
     \end{center}
     \caption{Matriz de confusión de las clasificaciones del árbol de decisión sobre los datos de validación}\label{fig:decisiontreematrix}
 \end{figure}
+
+Podemos ver en la matriz de confusión de la Figura \ref{fig:decisiontreematrix} cómo solo 11 de 689 flujos benignos se han clasificado como malignos y 24 de los, 76467 malignos como benignos.
 
 \subsubsection{KNN}
 
