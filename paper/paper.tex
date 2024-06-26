@@ -217,14 +217,75 @@
         \label{table:generatedfilesoffline}
     \end{table}
 
+    Debido a la estructura de los datos originales, los flujos etiquetados como benignos son solo un 0,846 \%. Adicionalmente, tenemos que las etiquetas de ataques tienen niveles de especificidad distinta y están concentradas en diversas variaciones de ataques de denegación de servicio.
+
     \section{Uso de los datos generados} \label{casoml}
 
-    % Pasos preparación datos
+    Para mostrar un ejemplo sencillo del uso de los datos generados, se ha decidido hacer un modelo de detección de flujos de tráfico regular y tráfico de ataque. Ha sido necesario el realizar un muestreo para poder tratar los datos con la capacidad de cómputo disponible. 
 
-    % Decir que modelos hemos entrenado, cual ha tenido mejores resultados
+    Para realizar el preprocesamiento inicial, se ha tomado cada archivo CSV generado y se han remplazado las etiquetas específicas de ataques por 'malign', manteniendo las etiquetas de tráfico normal como 'benign'. A continuación, se ha realizado un muestreo estratificado del 0.5\% de los datos, reduciendo los aproximadamente 80 millones de registros a 358 778. Una vez realizado el muestreo, se ha aplicado el logaritmo a las características continúas, habiéndoles sumado 1 para evitar generar valores infinitos. Después de esto, se ha realizado un escalado de todos los datos para que estén localizados en el rango $[0, 1]$. 
+    
+    Debido a que tenemos una cantidad de características no reducida, hemos ejecutado una implementación del algoritmo Boruta \cite{borutapy} para realizar una selección de características más representativas. Al ejecutarlo, nos ha descartado las características del recuento de paquetes con los flags CWR, ECC y URG en las cabeceras TCP. Esto es esperable, ya que la extensa mayoría de estas eran 0.
 
-    % Mostrar resultados validación
+    Con los datos preparados, se ha hecho un split 70/20/10 para entrenar los modelos, seleccionar el que tenga mejor rendimiento y comprobar la capacidad de generalización del modelo seleccionado con datos que aún no ha visto. 
 
+    El rendimiento de los modelos al entrenarlos con el 70\% y aplicarlos al 20\% se puede observar en la Tabla \ref{table:rendimientomodelos}. Podemos ver como, en general, el rendimiento es muy bueno. El modelo que parece tener mejor rendimiento es el que se basa en bosques aleatorios, el cual entrena una serie de árboles de decisión con técnicas adicionales para mejorar la precisión mientras se evita el sobreajuste \cite{sklearnrandomforest}.
+
+    \begin{table}[H]
+        \begin{center}
+            \resizebox{\columnwidth}{!}{%
+                \begin{tabular}{|c | c c c |} 
+                    \hline
+                    \textbf{Modelo} & \textbf{Exactitud} & \textbf{F1 macro}  & \textbf{F1 avg} \\
+                    \hline
+                    Naive bayes        & 0.710405          &         0.440790  &          0.822148 \\
+                    Arbol de decisión  & 0.999546          &         0.987305  &          0.999548 \\
+                    KNN                & 0.998704          &         0.963123  &          0.998699 \\
+                    Red neuronal       & 0.997771          &         0.941093  &          0.997843 \\
+                    Votación           & 0.999183          &         0.977438  &          0.999192 \\
+                    Bagging            & 0.999663          &         0.990481  &          0.999663 \\
+                    AdaBoost           & 0.999093          &         0.974074  &          0.999087 \\
+                    Bosques aleatorios & \textbf{0.999689} & \textbf{0.991213} & \textbf{0.999689} \\
+                    \hline
+                \end{tabular}
+            }
+        \end{center}
+        \caption{Rendimiento de modelos sobre los datos de entrenamiento y selección}
+        \label{table:rendimientomodelos}
+    \end{table}
+
+    Para comprobar si el mejor modelo es capaz de generalizar a más datos, se ha tomado el 90\% de datos utilizados para entrenar y seleccionar y entrenaremos un nuevo modelo. Con este, generaremos nuevas estadísticas con el 10\% restante de comprobación y verificaremos si se mantiene su rendimiento.
+
+    \begin{table}[H]
+        \begin{center}
+            \begin{tabular}{|c | c c c |} 
+                \hline
+                & \textbf{Precisión} & \textbf{Recuperación} & \textbf{F1}\\
+                \hline
+                benign               & 0.988024 & 0.959302 & 0.973451 \\
+                malign               & 0.999634 & 0.999895 & 0.999765  \\
+                \hline
+                exactitud            &          &          & 0.999533 \\
+                F1 macro             & 0.993829 & 0.979599 & 0.986608 \\
+                F1 avg               & 0.999530 & 0.999533 & 0.999530 \\
+                \hline
+            \end{tabular}
+        \end{center}
+        \caption{Resultados de clasificación del modelo final sobre los datos de test}
+        \label{table:selectedresults}
+    \end{table}
+    
+    \begin{figure}[H]
+        \begin{center}
+            \includegraphics[width=\linewidth]{../report/media/packet_pincer_train_model_random_forest_selected.png}
+        \end{center}
+        \caption{Matriz de confusión del modelo final sobre los datos de test}\label{fig:selectedmatrix}
+    \end{figure}
+    
+    El entrenamiento final ha tardado 5.8 segundos y la predicción 2.2 centésimas de segundo. Se podría considerar que el modelo es relativamente rápido y si las condiciones fuesen iguales podría procesar unos 1.7 millones de paquetes por segundo. Las puntuaciones F1 y la exactitud han mejorado ligeramente comparado con la selección de modelos como podemos ver en la Tabla \ref{table:selectedresults}. Si miramos la matriz de confusión de la Figura \ref{fig:selectedmatrix}, podemos ver como solo se han clasificado incorrectamente 3 flujos malignos como benignos y 10 flujos benignos como malignos.
+
+    Con esto, podemos afirmar que el modelo seleccionado puede generalizar a datos nuevos, siempre que sigan la distribución y el formato de los datos con los que hemos trabajado. Es posible que en un entorno distinto el rendimiento del modelo no se mantenga.
+    
     \section{Conclusiones} \label{conclusiones}
 
     Por hacer.

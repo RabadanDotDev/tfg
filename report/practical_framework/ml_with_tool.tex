@@ -1615,12 +1615,12 @@ Como hemos visto, el modelo que presenta mejor rendimiento es el de bosques alea
             \hline
             & \textbf{Precisión} & \textbf{Recuperación} & \textbf{F1}  & \textbf{Soporte} \\
             \hline
-            benign               & 0.988024 & 0.959302 & 0.973451  &   344 \\
-            malign               & 0.999634 & 0.999895 & 0.999765  & 38234 \\
+            benign               & 0.991098 & 0.970930 & 0.980910  &   344 \\
+            malign               & 0.999739 & 0.999922 & 0.999830  & 38234 \\
             \hline
-            exactitud            &          &          & 0.999533  & 38578 \\
-            media aritmética f1  & 0.993829 & 0.979599 & 0.986608  & 38578 \\
-            media ponderada f1   & 0.999530 & 0.999533 & 0.999530  & 38578 \\
+            exactitud            &          &          & 0.999663  & 38578 \\
+            media aritmética f1  & 0.995418 & 0.985426 & 0.990370  & 38578 \\
+            media ponderada f1   & 0.999661 & 0.999663 & 0.999661  & 38578 \\
             \hline
         \end{tabular}
     \end{center}
@@ -1635,6 +1635,6 @@ Como hemos visto, el modelo que presenta mejor rendimiento es el de bosques alea
     \caption{Matriz de confusión del modelo final sobre los datos de test}\label{fig:selectedmatrix}
 \end{figure}
 
-El entrenamiento ha tardado 5.8 segundos y la predicción 2.2 centésimas de segundo. El modelo sigue siendo relativamente rápido. La puntuación F1 han disminuido ligeramente comparado con lo que teníamos antes si miramos la Tabla \ref{table:selectedresults}. De todas maneras, si miramos la matriz de confusión de la Figura \ref{fig:selectedmatrix}, podemos ver como tiene 8 flujos malignos mal clasificados menos y 2 flujos benignos mal clasificados más. 
+El entrenamiento ha tardado 5.8 segundos y la predicción 2.2 centésimas de segundo. El modelo sigue siendo relativamente rápido. La puntuación F1 ha mejorado ligeramente comparado con lo que teníamos antes si miramos la Tabla \ref{table:selectedresults}. Si miramos la matriz de confusión de la Figura \ref{fig:selectedmatrix}, podemos ver como tiene 9 flujos malignos y 2 flujos benignos mal clasificados menos. 
 
 Con esto, podemos afirmar que el modelo seleccionado puede generalizar a datos nuevos, siempre que sigan la distribución y el formato de los datos con los que hemos trabajado. 

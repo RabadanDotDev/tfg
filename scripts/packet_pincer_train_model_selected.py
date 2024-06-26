@@ -41,7 +41,7 @@ def train_run(df_train: pd.DataFrame, df_test: pd.DataFrame, name: str, model):
 
     print(f"{name} - Training full model. Start time at {datetime.now()}")
     start_time = datetime.now()
-    model.fit(x_train, y_train.values.ravel())
+    model.fit(x_train, y_train.values.ravel(), )
     elapsed_time = datetime.now() - start_time
     print(f"{name} - Training complete. Took {elapsed_time}")
 
@@ -59,20 +59,20 @@ def train_run(df_train: pd.DataFrame, df_test: pd.DataFrame, name: str, model):
 
     print(f"{name} - Plotting results")
     plt.clf()
-    plt.figure(figsize=(8, 8))
+    plt.figure(figsize=(4, 4))
     classes = unique_labels(y_test, y_test_predictions)
     cm = metrics.confusion_matrix(y_test, y_test_predictions)
     sns.heatmap(cm, annot=True, cmap='Blues', fmt='_d', cbar=False, xticklabels=classes, yticklabels=classes, norm=LogNorm())
-    plt.xlabel('Predicted Labels')
-    plt.ylabel('True Labels')
-    plt.title('Confusion Matrix')
+    plt.xlabel('Etiquetas predichas')
+    plt.ylabel('Etiquetas reales')
+    plt.title('Matriz de confusión')
     plt.savefig(REPORT_MEDIA_FOLDER / f"packet_pincer_train_model_{name}_selected.png", bbox_inches="tight")
     print(clasification_report)
 
 def main() -> None:
     df_train_validation = pd.concat([pd.read_csv(TRAIN_CSV), pd.read_csv(VALIDATION_CSV)])
     df_test = pd.read_csv(TEST_CSV)
-    train_run(df_train_validation, df_test, "random_forest", RandomForestClassifier(n_estimators=20))
+    train_run(df_train_validation, df_test, "random_forest", RandomForestClassifier(n_estimators=20, random_state=6))
 
 if __name__=="__main__":
     main()
