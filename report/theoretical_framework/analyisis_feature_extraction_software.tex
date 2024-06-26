@@ -4,9 +4,9 @@ En esta sección analizaremos diversas herramientas que pueden ser utilizadas pa
 
 \subsection{CICFlowmeter}
 
-CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost} \cite{icissp17} \cite{cicflowrepo}. Permite obtener información sobre flujos bidireccionales sobre \acrshort{ip} a partir de trazas de red en archivos con el formato pcap. Adicionalmente, los protocolos de transporte que soporta son \acrshort{udp} y \acrshort{tcp}. Por cada flujo, genera siete columnas identificativas y añade cierta información del flujo. 
+CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost} \cite{icissp17} \cite{cicflowrepo}. Permite obtener información sobre flujos bidireccionales sobre \acrshort{ip} a partir de trazas de red en archivos PCAP. Adicionalmente, los protocolos de transporte que soporta son \acrshort{udp} y \acrshort{tcp}. Por cada flujo, genera siete columnas identificativas y añade cierta información del flujo. 
 
-\subsubsection{Features generadas} \label{cicflowfeatures}
+\subsubsection{Características generadas} \label{cicflowfeatures}
 
 En el Readme del código fuente ofrecido, podemos encontrar las siguientes características generadas. Hay algunas que representan lo mismo, pero se obtienen de manera distinta como 'Fwd Packet Length Mean' con respecto a 'Fwd Segment Size Avg'.
 
@@ -156,7 +156,7 @@ El último se basa en el lenguaje utilizado. Como podemos ver en la Tabla \ref{t
             \hline
         \end{tabular}
     }
-    \caption{Tiempo de ejecución del computo del conjunto de Mandelbrot \cite{languagebench}}
+    \caption{Tiempo de ejecución del cómputo del conjunto de Mandelbrot \cite{languagebench}}
     \label{table:languagebench}
 \end{table}
 
@@ -166,18 +166,18 @@ TShark es un analizador de protocolos de red \cite{tsharkmanual}. Permite captur
 
 \begin{enumerate} 
     \item \textbf{-z conv,type[,filter]}: Genera una tabla que lista todas las conversaciones que se han detectado en la captura. 'type' indica el tipo de conversación, la cual puede ser tanto por direcciones de acceso a la red (Bluetooth, Ethernet, ...) como de red o transporte (IP, \acrshort{tcp}, \acrshort{udp}, ...). Cada conversación es mostrada en una fila de la tabla, la cual muestra, en número de tramas/bytes transmitidos en cada dirección, en número total, el tiempo relativo de inicio y la duración.
-    \item \textbf{-z dests,tree[,filter]}: Genera estadísticas por direcciones \acrshort{ipv4}, transporte \acrshort{tcp}/\acrshort{udp} y/o puerto asociado. Da información del número de transmisiones por cada uno y la cadencia
+    \item \textbf{-z dests,tree[,filter]}: Genera estadísticas por direcciones \acrshort{ipv4}, transporte \acrshort{tcp}/\acrshort{udp} y/o puerto asociado. Da información del número de transmisiones por cada uno y la cadencia.
     \item \textbf{-z endpoints,type[,filter]}: Genera una tabla por cada dirección del tipo seleccionado con información sobre el número de paquetes y bytes totales, recibidos y enviados.
-    \item \textbf{-z flow,name,mode[,filter]}: Muestra un diagrama de los flujos de datos en formato textual
-    \item \textbf{-z icmp,srt[,filter]}: Muestra información sobre peticiones, respuestas, perdidas y latencias de peticiones echo en \acrshort{icmp}
+    \item \textbf{-z flow,name,mode[,filter]}: Muestra un diagrama de los flujos de datos en formato textual.
+    \item \textbf{-z icmp,srt[,filter]}: Muestra información sobre peticiones, respuestas, perdidas y latencias de peticiones echo en \acrshort{icmp}.
     \item \textbf{-z io,phs[,filter]}: Muestra un árbol con los protocolos utilizados y la cantidad respectiva de tramas/bytes que los lleva.
     \item \textbf{-z io,stat,interval[,filter][,filter][,filter]…​}: Muestra, por cada incremento del intervalo especificado, el número de tramas y bytes. 
-    \item \textbf{-z io,stat,interval,'COUNT|SUM|MIN|MAX|AVG|LOAD(field)filter'}: Permite generar el número, suma, mínimo, máximo, media o proporción de cada campo en el intervalo especificado. Adicionalmente, se puede pedir el número de tramas y bytes como en la opción anterior con 'FRAMES()' o 'BYTES()'
+    \item \textbf{-z io,stat,interval,'COUNT|SUM|MIN|MAX|AVG|LOAD(field)filter'}: Permite generar el número, suma, mínimo, máximo, media o proporción de cada campo en el intervalo especificado. Adicionalmente, se puede pedir el número de tramas y bytes como en la opción anterior con 'FRAMES()' o 'BYTES()'.
     \item \textbf{-z ip\_hosts,tree[,filter]}: Genera información como con dests, pero solo de direcciones \acrshort{ipv4}.
     \item \textbf{-z ip\_srcdst,tree[,filter]}: Genera información como con ip\_hosts, pero diferenciando direcciones \acrshort{ip} de origen y de destino.
-    \item \textbf{-z plen,tree[,filter]}: Genera estadísticas sobre los tamaños de los paquetes. Por cada grupo, se indica el número, el tamaño medio, el valor mínimo, el valor máximo y la cadencia
-    \item \textbf{-z proto,colinfo,filter,field}: Utilizado para mostrar por el canal estándard información adicional sobre los campos de cada paquete
-    \item \textbf{-z ptype,tree[,filter]}: Genera estadísticas sobre los protocolos utilizados en paquetes \acrshort{ipv4}
+    \item \textbf{-z plen,tree[,filter]}: Genera estadísticas sobre los tamaños de los paquetes. Por cada grupo, se indica el número, el tamaño medio, el valor mínimo, el valor máximo y la cadencia.
+    \item \textbf{-z proto,colinfo,filter,field}: Utilizado para mostrar por el canal estándard información adicional sobre los campos de cada paquete.
+    \item \textbf{-z ptype,tree[,filter]}: Genera estadísticas sobre los protocolos utilizados en paquetes \acrshort{ipv4}.
 \end{enumerate}
 
 Pese a esto, el programa no está diseñado para la generación de estadísticas en tiempo real. Su principal objetivo es el de permitir a un operador de una red o desarrolladores de aplicaciones ver lo que está ocurriendo en la red con facilidad. La documentación del programa es útil para poder tener mayor información de lo que está ocurriendo en un momento dado de la red, pero el programa no está pensado para el propósito de generar estadísticas de los flujos en tiempo real \cite{wiresharkrealtimestats}. Lo podemos ver en el hecho de que las estadísticas se proporcionen al final, como resumen, y no se generen en cuanto los datos se encuentran disponibles.
@@ -238,10 +238,10 @@ La cantidad de características que nProbe es capaz generar sin necesidad de plu
     \item \textbf{TCP\_WIN\_MAX\_OUT}: Ventana máxima \acrshort{tcp} observada del receptor al emisor.
     \item \textbf{ICMP\_TYPE}: Representación numérica del tipo \acrshort{icmp} multiplicado por 256 mas representación numerica del codigo  \acrshort{icmp}, si aplica.
     \item \textbf{ICMP\_IPV4\_TYPE}: Representación numérica del tipo \acrshort{icmp}, si aplica.
-    \item \textbf{DNS\_QUERY\_ID}: Identificador numérico de la transacción de la petición \acrshort{dns}, si aplica
-    \item \textbf{DNS\_QUERY\_TYPE}: Representación numérica del tipo de la petición \acrshort{dns}, si aplica
-    \item \textbf{DNS\_TTL\_ANSWER}: TTL del primer registro A de la respuesta del \acrshort{dns}, si aplica
-    \item \textbf{FTP\_COMMAND\_RET\_CODE}: Código de respuesta del comando \acrshort{ftp}, si aplica
+    \item \textbf{DNS\_QUERY\_ID}: Identificador numérico de la transacción de la petición \acrshort{dns}, si aplica.
+    \item \textbf{DNS\_QUERY\_TYPE}: Representación numérica del tipo de la petición \acrshort{dns}, si aplica.
+    \item \textbf{DNS\_TTL\_ANSWER}: TTL del primer registro A de la respuesta del \acrshort{dns}, si aplica.
+    \item \textbf{FTP\_COMMAND\_RET\_CODE}: Código de respuesta del comando \acrshort{ftp}, si aplica.
 \end{enumerate}
 
 Como podemos ver, algunas características propuestas no son independientes, algunas están expresadas en diferentes unidades, pero son en esencia el mismo valor e incluso algunas son potencialmente iguales. El motivo específico por el cual se han escogido estas y no otras no está explicado en la fuente.

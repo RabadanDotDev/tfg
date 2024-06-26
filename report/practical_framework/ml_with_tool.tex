@@ -256,7 +256,7 @@ La distribución de las diferentes cadencias de paquetes se puede observar en la
         TON-IoT                    & 53,10\%                & 54,44\%          & 55,27\% \\
         \hline
     \end{tabular}
-    \caption{Protocolo de transporte utilizado por conjunto de datos}
+    \caption{Cantidad de ceros por conjunto de datos}
     \label{table:packet_pincer_packet_second_zeroes}
 \end{table}
 
@@ -989,7 +989,7 @@ La media de bytes enviados sobre la capa de transporte está en parte relacionad
         \includegraphics[width=\linewidth]{media/packet_pincer_toniot/forward_transport_payload_bytes_min_log_x_log_y.png}
         \caption{TI (forward)}
     \end{subfigure}
-       \caption{Distribución de los bytes mímimos enviados en un paquete sobre la capa de transporte hacia el recpetor inicial}
+       \caption{Distribución de los bytes mímimos enviados en un paquete sobre la capa de transporte hacia el receptor inicial}
        \label{fig:packet_pincer_forward_transport_payload_bytes_min}
 \end{figure}
 
@@ -1528,7 +1528,7 @@ Podemos ver una ligera mejora de 0.001 en las puntuaciones F1 con este modelo si
     \begin{center}
         \includegraphics[width=0.55\linewidth]{media/packet_pincer_train_models_bagging.png}
     \end{center}
-    \caption{Matriz de confusión de lasclasificador 'Bagging' sobre los datos de validación}\label{fig:baggingmatrix}
+    \caption{Matriz de confusión del clasificador 'Bagging' sobre los datos de validación}\label{fig:baggingmatrix}
 \end{figure}
 
 La causa de la mejora de los valores F1, pero la reducción en otras medidas comparado con el árbol de decisión individual, la podemos observar con claridad en la matriz de confusión de la Figura \ref{fig:baggingmatrix}. Hay 11 flujos malignos menos clasificados como benignos, mientras que hay dos flujos benignos clasificados como benignos. Si se quiere mejorar la efectividad de la detección de malignos, con una pequeña penalización para los benignos y un poco más de tiempo de proceso, se podría tomar este modelo antes que el árbol individual.
