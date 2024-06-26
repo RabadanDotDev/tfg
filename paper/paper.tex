@@ -95,7 +95,58 @@
 
     \section{Funcionamiento herramienta} \label{funcherramienta}
 
-    Por hacer.
+    La herramienta, como se mencionó anteriormente, se ha desarrollado haciendo uso de Rust. Se ha escogido este lenguaje para el desarrollo de la herramienta debido a la capacidad de escribir código de bajo nivel, su alto rendimiento, su énfasis en el código correcto, la calidad de las herramientas asociadas y el gran número de librerías disponibles.
+
+    El ciclo principal del programa tiene diversas fases. Primero se va accediendo a cada paquete de forma secuencial. Por cada uno, se trata de reensamblarlo en caso de que sea un paquete IP fragmentado y decodificarlo. Si se consigue hacer esto, se trata de extraer su identificador y determinar si es de un flujo conocido o de uno nuevo y se actualiza el estado interno de forma correspondiente. Finalmente, se comprueba si hay flujos de red que han pasado más de cierto tiempo sin actividad. En caso afirmativo, se emiten las estadísticas acumuladas y se descarta su información.
+
+    El programa está principalmente ideado para ser ejecutado por terminal. Esto significa que necesariamente se ha tenido que dar soporte para indicar qué argumentos se han de pasar al programa y cómo este ha de reaccionar a las señales. Para facilitar esta tarea, hemos hecho uso de dos librerías. La primera librería utilizada es \texttt{clap} \cite{Knapp_clap_2024} para definir los parámetros por consola. Estos permiten al usuario seleccionar si emitir resultados a archivos o a la salida estándar, proporcionar un archivo 'ground truth' para etiquetar los datos y si hacer un análisis de trazas de red o capturar tráfico activamente. La segunda librería es \texttt{ctrlc} \cite{controlc}, la cual nos permite de una forma sencilla el detectar que se ha enviado una interrupción al programa. En caso de recibirla, se emiten todos los resultados y se finaliza la ejecución.
+
+    Como ya vimos, el ciclo principal inicia con la lectura de paquetes. Para realizar esto, hemos hecho uso de la librería \texttt{pcap} \cite{rustpcap}, la cual nos permite obtener datos desde una traza de paquetes o una interficie de red. Sin embargo, no tiene soporte para trabajar a partir de una colección de trazas. Debido a que necesitábamos realizar esto, se ha hecho una capa alrededor de las funcionalidades que nos ofrecía la librería para poder tener soporte a leer de un conjunto de archivos, los cuales pueden tener solapaciones temporales entre ellos. Este proceso no ha sido trivial, ya que debido a que \texttt{pcap} nos proporcionaba referencias 'prestadas' a memoria, que podíamos tener más de una traza de red y las restricciones de uso de memoria del lenguaje, no podíamos dar al usuario acceso directo a los paquetes obtenidos. Para permitir el especificar cómo tratar los paquetes desde un módulo externo, se ha hecho uso de clausuras.
+
+    Una vez obtenido los paquetes, se ha de realizar el paso de descodificación. Para esta tarea, se ha empleado la librería \texttt{etherparse} \cite{etherparse}. Esta librería originalmente tenía soporte para interpretar, entre otros, tramas Ethernet, paquetes IP, datagramas UDP y segmentos TCP. Sin embargo, no ofrecía soporte para interpretar SLL, el cual era uno de los formatos con los que queríamos trabajar. Debido a que la librería tenía soporte para la mayoría de puntos necesarios, además de  ofrecer una interfaz sencilla, se decidió hacer una extensión de esta para añadirle soporte de SLL. Después de trabajar durante una semana, se añadieron 4145 líneas de código y se eliminaron 141. Estas incluyen toda la lógica para interpretar el formato, tests y documentación asociada. El 29 de abril se ofreció al desarrollador original la combinación de las mejoras a través de un 'pull request' \cite{slladdsllpr} en el repositorio original. Después de unas revisiones, los cambios fueron integrados a la rama principal del proyecto.
+
+    La extracción del identificador de la comunicación es sencillo. Se acceden a las cabeceras de red y de transporte para obtener la direcciones de IP de origen y la de destino, el protocolo de transporte utilizado y los puertos de origen y de destino. Una vez obtenido, este se compara con los flujos activos conocidos y se determina si es un flujo nuevo o forma parte de los ya existentes. A continuación, se acumula información estadística para poder emitir un resultado en el momento que el flujo deje de considerarse activo.
+
+    % Indicar defragmentación?
+
+    La información que se acumula durante el transcurso de la ejecución es diversa. Las estadísticas escogidas para generar han sido basadas en las utilizadas en CICFlowMeter. La información acumulada durante la ejecución consiste en:
+
+    \begin{itemize}
+        \item Marca de tiempo del primer y último paquete.
+        \item Si se ha detectado el protocolo de transporte UDP o el TCP.
+        \item Recuento de paquetes diferenciado por dirección.
+        \item \texttt{RunningStat} para el número de bytes enviado, diferenciado y sin diferenciar por dirección.
+        \item \texttt{RunningStat} para el periodo de llegada entre paquetes diferenciados por dirección.
+        \item Información sobre los flags TCP observados por dirección.
+        \item \texttt{RunningStat} para la información específica sobre las longitudes de cabeceras y datos en la capa de transporte.
+        \item El número de paquetes vacíos hacia el receptor inicial.
+        \item \texttt{RunningStat} para mantener información sobre los tiempos de actividad.
+    \end{itemize}
+
+    Los \texttt{RunningStat} mencionados son una estructura que se ha programado para calcular incrementalmente valores estadísticos. Nos permite obtener en cualquier momento el número de valores acumulados, la suma, el mínimo, el máximo, la media y la desviación estándar. Para calcular las dos últimas, mantenemos valores parciales de la manera que se indica en la página 232 de 'The art of computer programming' \cite{10.5555/270146}. Específicamente, primero se define la recurrencia \ref{eq:meanrec} para calcular la media de forma iterativa. A continuación, se utiliza esta para obtener la recurrencia de la 'diferencia al cuadrado' mostrada en \ref{eq:sqrrec}, de la cual podemos obtener la varianza como se indica en \ref{eq:variancereq}. A partir de esta, podemos obtener la desviación estándar (\sigma).
+
+    \begin{equation} \label{eq:meanrec}
+        \biggl\{
+            \begin{array}{l}
+              M_{0} = 0\\
+              M_{k} = M_{k-1} + {{ x_{k} - M_{k-1} } \over {k}}  \\
+            \end{array} 
+    \end{equation}
+    
+    \begin{equation} \label{eq:sqrrec}
+    \biggl\{
+        \begin{array}{l}
+            S_{0} = 0 \\
+            S_{k} = S_{k-1} + ( x_{k} - M_{k-1} ) * ( x_{k} - M_{k} )
+        \end{array}      
+    \end{equation}
+    
+    \begin{equation} \label{eq:variancereq}
+    \biggl\{
+        \sigma^2_{k} = {S_{k} \over {(k - 1)}}
+    \end{equation}
+
+    Finalmente, una vez se considera un flujo cerrado, se etiqueta si es posible y se emite el resultado. El etiquetado se realiza a partir de un fichero 'ground truth' proporcionado por el usuario, el cual ha de incluir un par de direcciones IP, el protocolo de transporte utilizado, la marca de tiempo de inicio y final expresadas en tiempo UNIX y la etiqueta deseada. Se trata de encontrar la mejor coincidencia en este con el flujo cerrado y, en caso de no encontrar nada, se asigna la etiqueta 'unknown'. Una vez realizado esto, se emite el resultado según cómo lo haya indicado el usuario. La primera opción es emitirlo a la salida estándar, la cual puede estar conectada a la consola, a un archivo o a una 'pipe' que pasa los resultados a otro programa. La segunda, es escribirlo en archivos CSV con un prefijo indicado por el usuario. Para evitar generar archivos intratables, cada 10 millones de linias se empiezan a escribir en un archivo CSV nuevo.
 
     \section{Aplicación caso práctico ML} \label{casoml}
 
