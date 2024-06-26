@@ -133,7 +133,7 @@
         \biggl\{
             \begin{array}{l}
               M_{0} = 0\\
-              M_{k} = M_{k-1} + {{ x_{k} - M_{k-1} } \over {k}}  \\
+              M_{k} = M_{k-1} + {\frac{ x_{k} - M_{k-1} }{k}}  \\
             \end{array} 
     \end{equation}
     
@@ -147,14 +147,28 @@
     
     \begin{equation} \label{eq:variancereq}
     \biggl\{
-        \sigma^2_{k} = {S_{k} \over {(k - 1)}}
+        \sigma^2_{k} = {\frac{S_{k}}{(k - 1)}}
     \end{equation}
 
     Finalmente, una vez se considera un flujo cerrado, se etiqueta si es posible y se emite el resultado. El etiquetado se realiza a partir de un fichero 'ground truth' proporcionado por el usuario, el cual ha de incluir un par de direcciones IP, el protocolo de transporte utilizado, la marca de tiempo de inicio y final expresadas en tiempo UNIX y la etiqueta deseada. Se trata de encontrar la mejor coincidencia en este con el flujo cerrado y, en caso de no encontrar nada, se asigna la etiqueta 'unknown'. Una vez realizado esto, se emite el resultado según cómo lo haya indicado el usuario. La primera opción es emitirlo a la salida estándar, la cual puede estar conectada a la consola, a un archivo o a una 'pipe' que pasa los resultados a otro programa. La segunda, es escribirlo en archivos CSV con un prefijo indicado por el usuario. Para evitar generar archivos intratables, cada 10 millones de linias se empiezan a escribir en un archivo CSV nuevo.
 
     \section{Aplicación caso práctico ML} \label{casoml}
 
-    Por hacer.
+    Para mostrar un posible uso de la herramienta, hemos hecho uso de tres conjuntos de datos etiquetados, de los cuales se nos ofrecen las trazas de red originales. De estos, hemos extraído y simplificado las etiquetas disponibles, ejecutado la herramienta sobre las trazas, preprocesado los datos y entrenado diferentes modelos de ML con ellos. 
+
+    El primer conjunto de datos utilizado ha sido CIC-DDos\-2019 \cite{8888419}. Este ha sido creado por el Canadian Institute for Cybersecurity que contiene trazas de dos días en los que aparece tráfico benigno y serie de ataques DDoS típicos. Para extraer las etiquetas, primero hemos leído los campos conteniendo las direcciones IP, protocolo, marca temporal de inicio, duración del flujo y etiqueta. A continuación, las marcas temporales se han ajustado para que estén expresadas en tiempo UNIX. Después de esto, se ha convertido la columna de duración en la marca temporal de finalización. Finalmente, se han eliminado los registros con protocolos inválidos, expresado y puesto el nombre de las columnas y etiquetas al formato que la herramienta esperaba.
+    
+    El segundo conjunto consiste en BoT-IoT \cite{DBLP:journals/corr/abs-1811-00701}. Este ha sido creado por la University of New South Wales Canberra, Australia y para generarlo, se desarrolló un entorno de red realista, consistiendo en plataformas de red, dispositivos IoT simulados y extracción de características y análisis forense. Para la extracción de las etiquetas, hemos hecho un proceso similar a lo anterior. Sin embargo, en vez de duración, tenemos directamente el tiempo del último paquete y la etiqueta está separada en una categoría y una subcategoría. Para mantener consistencia, hemos juntado las dos últimas para representar una única etiqueta. Adicionalmente, ha sido necesario convertir todos los protocolos de transporte a su representación numérica y eliminar los registros con protocolos inválidos.
+    
+    El tercero ha sido TON-IoT \cite{MOUSTAFA2021102994}. Este ha sido creado por la University of New South Wales Canberra, Australia y para generarlo se estructuró un entorno de red con tres capas llamadas Edge, Fog y Cloud para simular un entorno realista. Para la extracción de las etiquetas, hemos hecho un proceso similar al primer dataset. La diferencia ha sido que la marca temporal estaba representada como tiempo UNIX, pero en formato decimal. Es decir, con una parte entera con los segundos y una parte decimal con la fracción de segundo. También ha sido necesario representar los protocolos en formato numérico y descartar los registros con protocolos inválidos.
+
+    % Ejecución con etiquetado (mencionar stats ejecucion + paquetes + total contenidos + desbalance)
+
+    % Pasos preparación datos
+
+    % Decir que modelos hemos entrenado, cual ha tenido mejores resultados
+
+    % Mostrar resultados validación
 
     \section{Conclusiones} \label{conclusiones}
 
