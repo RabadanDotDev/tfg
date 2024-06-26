@@ -73,43 +73,43 @@
 
     \section{Introducción}
 
-    La ciberseguridad es una de las fronteras del conocimiento que ha tomado más relevancia estos últimos años. Para salvaguardar la disponibilidad, integridad y confidencialidad de la información tanto almacenada como en tránsito, se aplican numerosas y diversas técnicas en conjunto. Desde medidas criptográficas para proteger la información hasta el análisis del tráfico de red para detectar comportamientos maliciosos y poder bloquearlos. El presente trabajo se focaliza principalmente en el último punto.
+    La ciberseguridad es una de las fronteras del conocimiento que ha tomado más relevancia estos últimos años. Para salvaguardar la disponibilidad, integridad y confidencialidad de la información, tanto almacenada como en tránsito, se aplican numerosas y diversas técnicas en conjunto. Desde medidas criptográficas para proteger la información, hasta el análisis del tráfico de red para detectar comportamientos maliciosos y poder bloquearlos. El presente trabajo se focaliza principalmente en el último punto.
 
     La motivación del ámbito de este trabajo surge de una beca de colaboración con el grupo de investigación Centre de Recerca d'Arquitectures Avançades de Xarxes (CRAAX) y mi interés por la aplicabilidad de los sistemas de ML en entornos limitados o con requerimientos de actuación en tiempo real, especialmente en el ámbito de ciberseguridad en las redes. En muchos casos, los tráficos de red maliciosos son identificados cuando estos ya han ocurrido o están generando problemas activamente para el resto de usuarios de la red. La gran utilidad que supondría la detección de ataques en su inicio o incluso antes de que ocurriesen es una meta en la que me gustaría colaborar. Llegar a este ideal es altamente difícil. Sin embargo, tenerlo como horizonte para dirigir el camino y acercarse lo máximo posible a este, ofrece la capacidad de mejorar la mitigación contra posibles adversarios.
 
     Durante la colaboración, he utilizado herramientas de extracción de características para la caracterización de flujos de red. Sin embargo, estas presentaban ciertas limitaciones e inconvenientes, los cuales me han impulsado a querer desarrollar una alternativa.
 
-    El resto del artículo está estructurado de la siguiente manera. Primero, se mostrará la herramienta que ha servido de principal inspiración para el desarrollo del trabajo y se comentarán sus potenciales mejoras. A continuación, se indicará la estructura general de la herramienta, qué librerías se han utilizado y modificaciones necesarias a una de estas. Después de esto, se mostrará una aplicación en un caso de ML para mostrar su utilizad y finalizaremos con las conclusiones.
+    El resto del artículo está estructurado de la siguiente manera. Primero, veremos en la Sección \ref{cicflowmeter} la herramienta que ha servido de principal inspiración para el desarrollo del trabajo y se comentarán sus potenciales mejoras. A continuación, en la Sección \ref{funcherramienta}, se indicará la estructura general de la herramienta, qué librerías se han utilizado y modificaciones necesarias a una de estas. Después de esto, se mostrará dentro de la Sección \ref{casoml} una aplicación en un caso de ML para mostrar su utilizad. Finalmente, terminaremos con las conclusiones y el trabajo futuro en Sección \ref{tabajofuturo} y Sección \ref{agradecimientos}, respectivamente.
 
-    \section{CICFlowMeter}
+    \section{CICFlowMeter} \label{cicflowmeter}
 
-    CICFlowMeter es una herramienta para generar y analizar flujos de red \cite{cicflowpost} \cite{icissp17} \cite{cicflowrepo}. Permite obtener información sobre flujos bidireccionales sobre IP a partir de trazas de red en archivos con el formato PCAP. Adicionalmente, los protocolos de transporte que soporta son UDP y TCP. Por cada flujo, genera siete columnas identificativas y añade 76 características continuas. De estas características generadas, hay algunas como 'Fwd Packet Length Mean' y 'Fwd Segment Size Avg' que parecen estar representando el mismo valor.
+    CICFlowMeter es una herramienta para generar y analizar flujos de red creado por el Canadian Institute for Cybersecurity \cite{cicflowpost} \cite{icissp17} \cite{cicflowrepo}. Permite obtener información acerca de flujos bidireccionales sobre IP a partir de trazas de red en archivos con el formato PCAP. Adicionalmente, los protocolos de transporte que soporta son UDP y TCP. Por cada flujo, genera siete columnas identificativas y añade 76 características continuas. De estas características generadas, hay algunas como 'Fwd Packet Length Mean' y 'Fwd Segment Size Avg' que parecen estar representando el mismo valor.
 
     La herramienta soporta exclusivamente trazas y la captura de paquetes que provengan de la capa de enlace Ethernet. No ofrece soporte para Linux Cooked Capture (SLL), la cual es utilizada en contextos en los cuales se capturan de diferentes interfaces de red al mismo tiempo o se quiere descartar información de la capa de Ethernet. Adicionalmente, no parece tener soporte para la desfragmentación de paquetes IP.
 
-    En el momento de utilizar la herramienta, se ha observado que se introducía cabeceras duplicadas en los archivos CSV. Esto era causado debido a que el módulo cic.cs.unb.ca.jnetpcap.FlowGenerator, en la función dumpLabeledFlowBasedFeatures, se escribe la cabecera dos veces, una después de generar el archivo y otra después de escribir todos los flujos completos. No ha sido posible encontrar una indicación de porque se está realizando de esta manera, por tanto, se puede asumir que ha sido un error.
+    En el momento de utilizar la herramienta, se ha observado que se introducían cabeceras duplicadas en los archivos CSV. Esto era causado debido a que el módulo cic.cs.unb.ca.jnetpcap.FlowGenerator, en la función dumpLabeledFlowBasedFeatures, se escribe la cabecera dos veces, una después de generar el archivo y otra después de escribir todos los flujos completos. No ha sido posible encontrar una indicación de por qué se está realizando de esta manera, por tanto, se puede asumir que ha sido un error.
 
-    Durante el análisis del código, se han identificado bloques de código comentados (puestos en forma de comentario para que sean ignorados en el momento de ejecución) además de tabulación inconsistente. Es posible que la causa de esto haya sido que el código ofrecido en el repositorio de GitHub este desactualizado o se haya decidido no continuar el trabajo en CICFlowMeter.
+    Durante el análisis del código, se han identificado bloques de código comentados (puestos en forma de comentario para que sean ignorados en el momento de ejecución) además de tabulación inconsistente. Es posible que la causa de esto haya sido que el código ofrecido en el repositorio de GitHub esté desactualizado o se haya decidido no continuar el trabajo en CICFlowMeter.
 
     Por estas razones, se ha considerado que el desarrollo de otra herramienta que haga una tarea equivalente sin estos inconvenientes podría ser una aportación útil.
 
-    \section{Desarollo herramienta}
+    \section{Funcionamiento herramienta} \label{funcherramienta}
 
     Por hacer.
 
-    \section{Aplicación caso práctico ML}
+    \section{Aplicación caso práctico ML} \label{casoml}
 
     Por hacer.
 
-    \section{Conclusiones}
+    \section{Conclusiones} \label{conclusiones}
 
     Por hacer.
 
-    \section{Trabajo futuro}
+    \section{Trabajo futuro} \label{tabajofuturo}
 
     Por hacer.
 
-    \section{Agradecimientos}
+    \section{Agradecimientos} \label{agradecimientos}
 
     Por hacer.
 
