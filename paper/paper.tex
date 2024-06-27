@@ -69,7 +69,7 @@
 \begin{multicols*}{2}
     \section*{Resumen}
 
-    En este Trabajo de Final de Grado (TFG) se hace el desarrollo de una herramienta de análisis de red y se demuestra su funcionamiento a partir de analizar trazas de tráfico de red y el uso de los datos resultantes para entrenar modelos con Machine Learning. La herramienta desarrollada puede ser utilizada como componente en sistemas  de detección de intrusiones y tiene el potencial para ser extendida con más funcionalidades en el futuro. Se ha hecho uso de Rust para el desarrollo de la herramienta y es capaz de generar 72 características continuas, 2 discretas para el protocolo de transporte y una identificación de cada flujo compuesta por 7 valores. Adicionalmente, hay soporte para el etiquetado automático a partir de un fichero CSV. Con los registros generados por la herramienta, se ha entrenado un modelo supervisado de Machine Learning (ML) para detectar flujos de red malignos, logrando una puntuación F1 media del 98.66\%.
+    En este Trabajo de Final de Grado (TFG) se hace el desarrollo de PacketPincer, una herramienta de análisis de red, y se demuestra su funcionamiento a partir de analizar trazas de tráfico de red y el uso de los datos resultantes para entrenar modelos con Machine Learning. La herramienta desarrollada puede ser utilizada como componente en sistemas  de detección de intrusiones y tiene el potencial para ser extendida con más funcionalidades en el futuro. Se ha hecho uso de Rust para el desarrollo de la herramienta y es capaz de generar 72 características continuas, 2 discretas para el protocolo de transporte y una identificación de cada flujo compuesta por 7 valores. Adicionalmente, hay soporte para el etiquetado automático a partir de un fichero CSV. Con los registros generados por la herramienta, se ha entrenado un modelo supervisado de Machine Learning (ML) para detectar flujos de red malignos, logrando una puntuación F1 media del 98.66\%.
 
     \section{Introducción}
     
@@ -95,7 +95,7 @@
 
     \section{Estructura de la herramienta} \label{funcherramienta}
 
-    La herramienta se ha desarrollado haciendo uso de Rust. Se ha escogido este lenguaje para el desarrollo de la herramienta debido a su capacidad para escribir código de bajo nivel, su alto rendimiento, su énfasis en el código correcto, la calidad de las herramientas asociadas y el gran número de librerías disponibles.
+    PacketPincer se ha desarrollado haciendo uso de Rust. Se ha escogido este lenguaje para el desarrollo de la herramienta debido a su capacidad para escribir código de bajo nivel, su alto rendimiento, su énfasis en el código correcto, la calidad de las herramientas asociadas y el gran número de librerías disponibles. El nombre ha sido escogido por el análisis que realiza de los paquetes y por intentar seguir el estilo de nombres de los programas hechos en Rust.
 
     El ciclo principal del programa tiene diversas fases. Primero, se accede cada paquete de forma secuencial. Para cada uno de estos se trata de reensamblarlo, si es un paquete IP fragmentado, y luego decodificarlo. Si esto se realiza con éxito, se extrae su identificador y se determina si pertenece a un flujo conocido o a uno nuevo, actualizando el estado interno en consecuencia. Finalmente, se comprueba si hay flujos de red que han pasado más de cierto tiempo sin actividad. En caso afirmativo, se emiten las estadísticas acumuladas y se descarta la información de esos flujos.
 
