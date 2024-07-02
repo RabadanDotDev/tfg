@@ -43,6 +43,7 @@ def train_run(df_train: pd.DataFrame, df_test: pd.DataFrame, name: str, model):
     start_time = datetime.now()
     model.fit(x_train, y_train.values.ravel(), )
     elapsed_time = datetime.now() - start_time
+    joblib.dump(model, TMP_FOLDER / 'model.joblib')
     print(f"{name} - Training complete. Took {elapsed_time}")
 
     print(f"{name} - Predicting categories. Start time at {datetime.now()}")
