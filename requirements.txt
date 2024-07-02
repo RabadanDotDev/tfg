@@ -4,5 +4,5 @@ matplotlib
 distinctipy
 natsort
 scikit-learn
-BorutaPy
+Boruta
 seaborn
